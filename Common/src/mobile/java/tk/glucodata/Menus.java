@@ -44,9 +44,6 @@ import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.MainActivity.REQUEST_BARCODE;
 import static tk.glucodata.Natives.getInvertColors;
-import static tk.glucodata.Natives.getshowscans;
-import static tk.glucodata.Natives.getsystemui;
-import static tk.glucodata.Natives.setsystemui;
 import static tk.glucodata.NumberView.smallScreen;
 import static tk.glucodata.settings.Settings.removeContentView;
 
@@ -294,12 +291,6 @@ static private void showNow(MainActivity act) {
 			});
 
     var menusviewview=view.findViewById(R.id.menusview);menusviewview.setOnClickListener(v ->{}); 
-        CheckBox systemuiview=view.findViewById(R.id.systemui);
-	systemuiview.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
-				setsystemui(isChecked);
-			    	act.selectionSystemUI(); 
-				});
-	systemuiview.setChecked(getsystemui( ));
         var menusview=view.findViewById(R.id.menus);menusview.setOnClickListener(v ->{
 				act.poponback();
 			   on=false;
@@ -329,12 +320,6 @@ static private void showNow(MainActivity act) {
 					removeContentView(view);
 					Settings.set(act);
 	}); 
-        Button aboutview=view.findViewById(R.id.about);
-        {
-         aboutview.setText(R.string.photo);
-        aboutview.setOnClickListener(v ->
-              PhotoScan.scan(act,REQUEST_BARCODE));
-            }
         var closeview=view.findViewById(R.id.close);closeview.setOnClickListener(v ->{
 		act.moveTaskToBack(true);
 	}); 
@@ -401,11 +386,6 @@ static private void showNow(MainActivity act) {
 	glucosefloatview.setChecked(Natives.getfloatglucose());
 
 
-        CheckBox scansview=view.findViewById(R.id.scans);scansview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowscans(isChecked);
-				act.requestRender();
-		}); 
- 	scansview.setChecked(getshowscans()) ;
 
     CheckBox streamview=view.findViewById(R.id.stream);streamview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
 		Natives.setshowstream(isChecked);
@@ -413,11 +393,6 @@ static private void showNow(MainActivity act) {
 		}); 
 	streamview.setChecked(Natives.getshowstream() );
 
-    CheckBox calibratedscansview=view.findViewById(R.id.calibratedscans);calibratedscansview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowcalibratedscans(isChecked);
-				act.requestRender();
-		}); 
-	calibratedscansview.setChecked(Natives.getshowcalibratedscans() );
 
 
     CheckBox calibratedstreamview=view.findViewById(R.id.calibratedstream);calibratedstreamview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
@@ -426,19 +401,7 @@ static private void showNow(MainActivity act) {
 		}); 
 	calibratedstreamview.setChecked(Natives.getshowcalibratedstream() );
 
-     CheckBox calibratedhistoryview=view.findViewById(R.id.calibratedhistory);
-     calibratedhistoryview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-             Natives.setshowcalibratedhistories(isChecked); 
-			act.requestRender();
-	        }); 
-	calibratedhistoryview.setChecked(Natives.getshowcalibratedhistories()) ;
 
-     CheckBox historyview=view.findViewById(R.id.history);
-     historyview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		 Natives.setshowhistories(isChecked); 
-				act.requestRender();
-	}); 
-	historyview.setChecked(Natives.getshowhistories()) ;
 
         CheckBox amountsview=view.findViewById(R.id.amounts);amountsview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
 	 Natives.setshownumbers(isChecked); 
@@ -449,11 +412,6 @@ static private void showNow(MainActivity act) {
 
 
 
-        CheckBox darkmodeview=view.findViewById(R.id.darkmode);darkmodeview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-
-	Natives.setInvertColors(isChecked);
-	});
-	darkmodeview.setChecked( getInvertColors());
         var nowview=view.findViewById(R.id.now);nowview.setOnClickListener(v ->{
 
                act.lightBars(!getInvertColors( ));

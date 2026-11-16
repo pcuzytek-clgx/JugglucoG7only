@@ -585,8 +585,9 @@ public void setMenuForcesLandscape(boolean force) {
         }
     if(!menuForcesLandscape)
         return; */
-    menuForcesLandscape=force;
-    applyScreenOrientation(getResources().getConfiguration());
+    final Configuration config=getResources().getConfiguration();
+    menuForcesLandscape=force&&canForceMenuLandscape(config);
+    applyScreenOrientation(config);
     }
 
 /*
@@ -662,7 +663,9 @@ if(!isWearable) {
     final boolean lockNow=lockFirstLandscape &&
             config.orientation==Configuration.ORIENTATION_LANDSCAPE;
     final boolean nearlySquare=largeScreen && !isElongated;
-    final boolean currentAsLandscape=nearlySquare;
+    /* G7 fork: on phones the graph is drawn directly on the current (portrait)
+     * surface: time horizontal, glucose vertical. */
+    final boolean currentAsLandscape=nearlySquare||!largeScreen;
 
     setGraphOrientationModes(lockNow,currentAsLandscape);
 
@@ -682,7 +685,7 @@ if(!isWearable) {
     else {
         canRotate=!largeScreen;
         if(!largeScreen) {
-            wanted=getMenuLandscapeOrientation(config);
+            wanted=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
             }
         else if(android16LargeScreen) {
             /* Normally covered by lockFirstLandscape above. */
@@ -762,6 +765,8 @@ if(!isWearable) {
          return;
       startall();
       Natives.onCreate();
+      if(BuildConfig.DEBUG&&getIntent()!=null&&getIntent().getBooleanExtra("demo",false))
+          Natives.debugDemoSensor();
      if(!isWearable&&Menus.on)
            Menus.show(this);
 
@@ -1261,21 +1266,13 @@ protected void onStop() {
 
 @UiThread
 @SuppressWarnings("deprecation")
-void setSystemUI(boolean val) {
+// G7-only: the system bars are always visible.
+void setSystemUI() {
     try {
-    View decorView = getWindow().getDecorView();
-final    int hideuiflags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_FULLSCREEN;
-    decorView.setSystemUiVisibility(val? 0 : hideuiflags);
-    
+        getWindow().getDecorView().setSystemUiVisibility(0);
     } catch(Throwable e) {
         Log.stack(LOG_ID,"setSystemUI",e);
         }
-
 }
 /*
 void switchSystemUI() {
@@ -1285,21 +1282,20 @@ void switchSystemUI() {
 
 public boolean showui=false;
 void selectionSystemUI() {
-    setSystemUI(showui||Natives.getsystemUI());
+    setSystemUI();
     }
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
         // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 public   void  hideSystemUI() {
     {if(doLog) {Log.d(LOG_ID,"hideSystemUI");};};
-    if(!(Natives.getsystemUI()||showui))
-        setSystemUI(false) ;
+    setSystemUI();
     }
 //    int: Bitwise-or of flags SYSTEM_UI_FLAG_LOW_PROFILE, SYSTEM_UI_FLAG_HIDE_NAVIGATION, SYSTEM_UI_FLAG_FULLSCREEN, SYSTEM_UI_FLAG_LAYOUT_STABLE, SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION, SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN, SYSTEM_UI_FLAG_IMMERSIVE, and SYSTEM_UI_FLAG_IMMERSIVE_STICKY.
     // Shows the system bars by removing all the flags
 // except for the ones that make the content appear under the system bars.
 public     void showSystemUI() {
-    setSystemUI(true);
+    setSystemUI();
     }
 
 /*private void openBluetoothSettings() {
@@ -2148,10 +2144,10 @@ public void addMyContentView(View view, ViewGroup.LayoutParams params) {
     addMyContentView(this, view,  params);
     }
 
+/* G7 fork: menus have a portrait layout (layout-port/menus.xml) and are never
+ * forced to landscape. */
 public boolean canForceMenuLandscape(Configuration config) {
-    final boolean largeScreen=testPortrait || config.smallestScreenWidthDp >= 600;
-    final boolean android16LargeScreen=testPortrait || hasAndroid16LargeScreenRestriction();
-    return !(largeScreen && android16LargeScreen);
+    return false;
     }
 
 

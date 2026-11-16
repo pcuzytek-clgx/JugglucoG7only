@@ -398,7 +398,7 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(setScreenOrientation)(JNIEnv *env,
     settings->data()->orientation=val;
     }
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getInvertColors)(JNIEnv *env, jclass cl) {
-    return settings->data()->invertcolorsget();
+    return true;
     }
 
 

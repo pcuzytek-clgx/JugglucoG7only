@@ -319,6 +319,7 @@ private static class ReselectSpinner extends Spinner {
         lightSpinner.setAdapter(createThemePickerAdapter(context, lightThemes, context.getString(R.string.light)));
         darkSpinner.setAdapter(createThemePickerAdapter(context, darkThemes, context.getString(R.string.dark)));
         getMargins(darkSpinner).rightMargin=p8;
+        lightSpinner.setVisibility(View.GONE);
 
         TextView radiusLabel = new TextView(context);
         radiusLabel.setText(context.getString(R.string.radius) + currentRadius + "dp");

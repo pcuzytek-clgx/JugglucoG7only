@@ -1,5 +1,6 @@
 
 #include <GLES2/gl2.h>
+#include <optional>
 #include "config.h"
 #include "SensorGlucoseData.hpp"
 #include "sensoren.hpp"
@@ -312,6 +313,209 @@ struct PhysicalPortraitLayout {
         }
 };
 
+#ifndef WEAROS
+int getglucosestr(double nonconvert,char *glucosestr,int maxglucosestr,int glucoselowest,int glucosehighest);
+/* G7 fork: Dexcom-app-like layout on tall portrait phones.  While the graph
+ * is drawn (or a long press is resolved) the curve sees only the graph area
+ * inside the card, translated to its own origin. */
+bool JCurve::dexPhoneLayout() const {
+    return portrait&&currentOrientationAsLandscape()&&surfaceheight>surfacewidth*1.4f;
+    }
+
+void JCurve::dexGeometry() {
+    const float W=surfacewidth,H=surfaceheight;
+    const float margin=density*12.0f;
+    const float left=physicalbarleft+margin,right=W-physicalbarright-margin;
+    const float R=std::min(W*.2f,H*.095f);
+    const float cx=W*.5f,cy=physicalbartop+margin+R*1.3f;
+    dexbubble={cx-R,cy-R,cx+R,cy+R};
+    dexcard={left,cy+R*1.3f+margin,right,H-physicalbarbottom-margin};
+    const float chiptop=dexcard.top+margin;
+    const float chipheight=density*36.0f;
+    const float gap=density*8.0f;
+    constexpr int nrchips=std::size(dexrangehours);
+    const float chipwidth=std::min(density*72.0f,(dexcard.right-dexcard.left-2*margin-(nrchips-1)*gap)/nrchips);
+    float x=dexcard.left+margin;
+    for(auto &chip:dexchips) {
+        chip={x,chiptop,x+chipwidth,chiptop+chipheight};
+        x+=chipwidth+gap;
+        }
+    dexgraph={dexcard.left+margin*.5f,chiptop+chipheight+margin*.5f,dexcard.right-margin*.5f,dexcard.bottom-margin*.5f};
+    }
+
+int JCurve::dexChipAt(float x,float y) const {
+    for(int i=0;i<std::size(dexrangehours);i++) {
+        const auto &chip=dexchips[i];
+        const float extra=density*6.0f;
+        if(x>=chip.left-extra&&x<chip.right+extra&&y>=chip.top-extra&&y<chip.bottom+extra)
+            return dexrangehours[i];
+        }
+    return 0;
+    }
+
+static int dexFollowNow(int duration) {
+    return duration*97/100;
+    }
+
+void JCurve::setDexRange(int hours) {
+    duration=hours*60*60;
+    settings->data()->duration=duration;
+    diffcurrent=dexFollowNow(duration);
+    doclamp=true;
+    starttime=time(nullptr)-diffcurrent;
+    }
+
+struct DexGraphLayout {
+    JCurve &curve;
+    NVGcontext *avg;
+    int oldwidth,oldheight;
+    int oldstatusbarheight,oldstatusbarleft,oldstatusbarright;
+    float olddleft,olddtop,olddright,olddbottom,olddheight,olddwidth;
+    DexGraphLayout(JCurve &c,NVGcontext *avgin):curve(c),avg(avgin),
+        oldwidth(c.width), oldheight(c.height),
+        oldstatusbarheight(c.statusbarheight),
+        oldstatusbarleft(c.statusbarleft), oldstatusbarright(c.statusbarright),
+        olddleft(c.dleft),olddtop(c.dtop),olddright(c.dright),olddbottom(c.dbottom),
+        olddheight(c.dheight), olddwidth(c.dwidth) {
+        const auto &g=c.dexgraph;
+        const float w=g.right-g.left,h=g.bottom-g.top;
+        c.width=w;
+        c.height=h;
+        c.statusbarheight=c.statusbarleft=c.statusbarright=0;
+        c.dleft=c.dtop=c.dright=c.dbottom=0;
+        c.dwidth=w-c.dexLabelWidth();
+        c.dheight=h;
+        c.dexdrawing=true;
+        if(avg) {
+            nvgSave(avg);
+            nvgTranslate(avg,g.left,g.top);
+            nvgScissor(avg,0,0,w,h);
+            }
+        }
+    ~DexGraphLayout() {
+        if(avg)
+            nvgRestore(avg);
+        curve.dexdrawing=false;
+        curve.width=oldwidth;
+        curve.height=oldheight;
+        curve.statusbarheight=oldstatusbarheight;
+        curve.statusbarleft=oldstatusbarleft;
+        curve.statusbarright=oldstatusbarright;
+        curve.dleft=olddleft;
+        curve.dtop=olddtop;
+        curve.dright=olddright;
+        curve.dbottom=olddbottom;
+        curve.dheight=olddheight;
+        curve.dwidth=olddwidth;
+        }
+    };
+
+void JCurve::showDexHeader(NVGcontext* avg,uint32_t nu) {
+    extern std::vector<int> usedsensors;
+    const NVGcolor background=invertcolors?*getwhite():nvgLerpRGBA(*getwhite(),*getblack(),.06f);
+    const NVGcolor cardcolor=invertcolors?nvgLerpRGBA(*getwhite(),*getblack(),.10f):*getwhite();
+    nvgBeginPath(avg);
+    nvgRect(avg,0,0,surfacewidth,surfaceheight);
+    nvgFillColor(avg,background);
+    nvgFill(avg);
+
+    nvgBeginPath(avg);
+    nvgRoundedRect(avg,dexcard.left,dexcard.top,dexcard.right-dexcard.left,dexcard.bottom-dexcard.top,density*16.0f);
+    nvgFillColor(avg,cardcolor);
+    nvgFill(avg);
+
+    const SensorGlucoseData *hist=nullptr;
+    const ScanData *poll=nullptr;
+    for(int index:usedsensors) {
+        const SensorGlucoseData *sens=sensors->getSensorData(index);
+        if(const ScanData *last=sens->lastValidStream();last&&(!poll||last->t>poll->t)) {
+            poll=last;
+            hist=sens;
+            }
+        }
+    if(poll&&(nu-poll->t)>=maxbluetoothage)
+        poll=nullptr;
+
+    const float cx=(dexbubble.left+dexbubble.right)*.5f,cy=(dexbubble.top+dexbubble.bottom)*.5f;
+    const float R=(dexbubble.right-dexbubble.left)*.5f;
+    NVGcolor ring=nvgRGB(0x8A,0x8A,0x8A);
+    constexpr const int maxbuf=20;
+    char value[maxbuf];
+    int valuelen;
+    if(poll) {
+        auto cali=make_calibrator<ScanData>(hist);
+        double mgdL=cali.calibrateNow(*poll);
+        if(isnan(mgdL))
+            mgdL=poll->getmgdL();
+        valuelen=getglucosestr(mgdL,value,maxbuf,hist->getminmgdL(),hist->getmaxmgdL());
+        const double internal=mgdL*10.0;
+        if(internal<settings->targetlow())
+            ring=nvgRGB(0xD3,0x2F,0x2F);
+        else if(internal>settings->targethigh())
+            ring=nvgRGB(0xF2,0xA9,0x00);
+        }
+    else {
+        valuelen=snprintf(value,maxbuf,"---");
+        ring=invertcolors?nvgRGB(0x55,0x55,0x55):nvgRGB(0xC4,0xC4,0xC4);
+        }
+
+    const float ringwidth=R*.11f;
+    if(poll&&!isnan(poll->ch)) {
+        constexpr const float maxrate=2.0f;
+        const float rate=std::clamp(poll->ch,-maxrate,maxrate);
+        const float angle=-rate/maxrate*NVG_PI*.5f;
+        nvgSave(avg);
+        nvgTranslate(avg,cx,cy);
+        nvgRotate(avg,angle);
+        nvgBeginPath(avg);
+        nvgMoveTo(avg,R*1.25f,0);
+        nvgLineTo(avg,R*.96f,-R*.24f);
+        nvgLineTo(avg,R*.96f,R*.24f);
+        nvgClosePath(avg);
+        nvgFillColor(avg,ring);
+        nvgFill(avg);
+        nvgRestore(avg);
+        }
+    nvgBeginPath(avg);
+    nvgCircle(avg,cx,cy,R-ringwidth*.5f);
+    nvgFillColor(avg,cardcolor);
+    nvgFill(avg);
+    nvgStrokeWidth(avg,ringwidth);
+    nvgStrokeColor(avg,ring);
+    nvgStroke(avg);
+
+    nvgFillColor(avg,*getblack());
+    nvgTextAlign(avg,NVG_ALIGN_CENTER|NVG_ALIGN_MIDDLE);
+    nvgFontSize(avg,R*(valuelen>3?.62f:.78f));
+    nvgText(avg,cx,cy-R*.06f,value,value+valuelen);
+    const auto unit=settings->getunitlabel();
+    nvgFontSize(avg,R*.2f);
+    nvgFillColor(avg,*getdarkgray());
+    nvgText(avg,cx,cy+R*.45f,unit.data(),unit.data()+unit.size());
+
+    nvgFontSize(avg,density*15.0f);
+    for(int i=0;i<std::size(dexrangehours);i++) {
+        const auto &chip=dexchips[i];
+        const bool selected=duration==dexrangehours[i]*60*60;
+        nvgBeginPath(avg);
+        nvgRoundedRect(avg,chip.left,chip.top,chip.right-chip.left,chip.bottom-chip.top,(chip.bottom-chip.top)*.5f);
+        if(selected) {
+            nvgFillColor(avg,invertcolors?nvgRGB(0xE0,0xE0,0xE0):nvgRGB(0x4A,0x4A,0x4A));
+            nvgFill(avg);
+            }
+        else {
+            nvgStrokeWidth(avg,density);
+            nvgStrokeColor(avg,invertcolors?nvgRGB(0x5A,0x5A,0x5A):nvgRGB(0xB0,0xB0,0xB0));
+            nvgStroke(avg);
+            }
+        char label[8];
+        const int len=snprintf(label,sizeof(label),"%d h",dexrangehours[i]);
+        nvgFillColor(avg,selected?*getwhite():*getblack());
+        nvgText(avg,(chip.left+chip.right)*.5f,(chip.top+chip.bottom)*.5f,label,label+len);
+        }
+    }
+#endif
+
 static inline float numberListTextHeight(const JCurve &curve) {
     if(!curve.portrait)
         return curve.textheight;
@@ -438,13 +642,10 @@ int64_t JCurve::doehier(int menu,int item,bool right) {
                     break;
                 };break;
         case 2: {
+                constexpr const int displayitems[]={2,4};
+                if(item>=0&&item<(int)std::size(displayitems))
+                    item=displayitems[item];
                 switch(item)     {
-                        case 0: 
-                        showui=!showui;
-                        settings->setui(showui);
-                       return menu+3*0x10;
-
-                          break;
                         /*
                             nrmenu=0;
                             int lastsensor=sensors->lastscanned();
@@ -459,15 +660,6 @@ int64_t JCurve::doehier(int menu,int item,bool right) {
                                 }
                             }; return -1ll; 
                             */
-                        case 1:
-                                if(right) {
-                                    showscans=!showscans; setshowscans(showscans);
-                                    }
-                                else {
-                                  showcalibratedscans=!showcalibratedscans; 
-                                  setshowcalibratedscans(showcalibratedscans);
-                                  }
-                            return -1ll;
                         case 2:
                                 if(right) {
                                         showstream=!showstream; setshowstream(showstream);
@@ -475,21 +667,7 @@ int64_t JCurve::doehier(int menu,int item,bool right) {
                                         }
                                  showcalibratedstream=!showcalibratedstream; setshowcalibratedstream(showcalibratedstream);
                                  return -1ll;
-                        case 3: 
-                                if(right) {
-                                        showhistories=!showhistories; setshowhistories(showhistories);
-                                        return -1ll;
-                                        }
-                                showcalibratedhistories=!showcalibratedhistories; 
-                                setshowcalibratedhistories(showcalibratedhistories);
-                                return -1ll;
                         case 4: shownumbers=!shownumbers; setshownumbers(shownumbers);return -1ll;
-                        case 5: showmeals=!showmeals; setshowmeals(showmeals);return -1ll;
-
-                        case 6: invertcolors=!invertcolors; 
-                                setinvertcolors(invertcolors) ; 
-                               return menu+invertcolors*0x10;
-                              break;//return -1ll;
                         };
                     break;
                    }
@@ -642,6 +820,14 @@ int64_t JCurve::screentap(float x,float y) {
         if(nrmenu)  {
             return menutap(x,y);
             }
+#ifndef WEAROS
+        if(dexPhoneLayout()) {
+            if(int hours=dexChipAt(x,y)) {
+                setDexRange(hours);
+                return -1LL;
+                }
+            }
+#endif
         if(showmeals) {
             const float crit= (density*10);
             for(mealposition &p:mealpos) {
@@ -1043,6 +1229,14 @@ int64_t JCurve::longpress(float x,float y) {
             return 0LL;
             }
           }
+#ifndef WEAROS
+    std::optional<DexGraphLayout> dexlayout;
+    if(dexPhoneLayout()) {
+        x-=dexgraph.left;
+        y-=dexgraph.top;
+        dexlayout.emplace(*this,nullptr);
+        }
+#endif
     const uint32_t endtime=starttime+duration;
     const auto [transx,transy]= gettrans(starttime, endtime);
     if(shownumbers)
@@ -2057,7 +2251,9 @@ void initopengl(float small,float menu,float density,float headin) {
     if(!openglstarted||appcurve.headsize!=headin||appcurve.smallsize!=small||appcurve.menusize!=menu||appcurve.density!=density) {
             appcurve.setfontsize(small, menu, density, headin);
             }
-    appcurve.invertcolorsset(settings->data()->invertcolorsget());
+    // G7-only fork: dark mode is the only display mode.
+    settings->data()->invertcolors=true;
+    appcurve.invertcolorsset(true);
     appcurve.showcalibratedscans=settings->data()->showcalibratedscans;
     appcurve.showcalibratedstream=settings->data()->showcalibratedstream;
     appcurve.showcalibratedhistories=settings->data()->showcalibratedhistories;
@@ -2096,16 +2292,22 @@ const int *menuopt0[]={&menus,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
 
 
 const int *menuopt0b[]={nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
-const int *menuopt1[]={&showui,&appcurve.showscans,&appcurve.showstream,&appcurve.showhistories,&appcurve.shownumbers,&appcurve.showmeals,&appcurve.invertcolors};
+const int *menuopt1[]={&appcurve.showstream,&appcurve.shownumbers,nullptr,nullptr,nullptr,nullptr,nullptr};
 const int **optionsmenu[]={menuopt0,menuopt0b,menuopt1,nullptr};
-const int *premenuopt1[]={nullptr,&appcurve.showcalibratedscans,&appcurve.showcalibratedstream,&appcurve.showcalibratedhistories,nullptr,nullptr,nullptr};
+const int *premenuopt1[]={&appcurve.showcalibratedstream,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
 const int **preoptionsmenu[]={nullptr,nullptr,premenuopt1,nullptr};
 #define arsizer(x) sizeof(x)/sizeof(x[0])
 constexpr const int menulen[]={arsizer(jugglucotext::menustr0),arsizer(jugglucotext::menustr1),arsizer(jugglucotext::menustr2),arsizer(jugglucotext::menustr3)};
+// G7-only: the display menu has only Stream and Amounts.
+constexpr const int displaymenulen=2;
 int getmenulen(const int menu) {
     int len=menulen[menu];
-    if(!menu&&!alarmongoing)
-        return len-1;
+    if(!menu) {
+        constexpr const int mainmenulen=6;
+        return alarmongoing?mainmenulen:mainmenulen-1;
+        }
+    if(menu==2)
+        return displaymenulen;
     return len;    
     }
 void setfloatptr() {
@@ -2161,8 +2363,25 @@ int getmenu(int tapx,float dwidth) {
 int oldtapx=tapx;
 tapx=-8000;
 #endif
-
+#ifndef WEAROS
+        int shown;
+        if(dexPhoneLayout()) {
+            dexGeometry();
+            // Like the Dexcom app: while "now" is visible it stays at the right edge.
+            if(doclamp||(nu>=starttime&&nu<=(starttime+duration))) {
+                doclamp=true;
+                diffcurrent=dexFollowNow(duration);
+                }
+            showDexHeader(avg,nu);
+            DexGraphLayout graph(*this,avg);
+            shown=displaycurve(avg,nu);
+            }
+        else
+            shown=displaycurve(avg,nu);
+        if( !shown&&( ((tapx
+#else
         if( !displaycurve(avg,nu)&&( ((tapx
+#endif
 #ifdef WEAROSx
 
         =oldtapx

@@ -105,13 +105,6 @@ const jugglucotext engtext {
 		"Watch",
 		"Sensor",
 		"Settings",
-
-#if defined(SIBIONICS)
-		"Photo",
-#else
-		"About",
-#endif
-
 		"Close",
 		"Stop Alarm"
 		},
@@ -128,13 +121,8 @@ const jugglucotext engtext {
 		"Talk",
 		"Float"
 		},
-	.menustr2= {"System UI",
-	"Scans",
-	"Stream",
-	"History",
-	"Amounts",
-	"Meals",
-	"Dark mode"},
+	.menustr2= {"Stream",
+	"Amounts"},
 	.menustr3= {hourminstr,
 	"Search",
 	"Date",

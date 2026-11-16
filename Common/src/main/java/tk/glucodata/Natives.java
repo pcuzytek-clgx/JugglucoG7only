@@ -262,7 +262,6 @@ public static native void setusebluetooth(boolean val);
 public static native boolean getusebluetooth( );
 public static native boolean streamingAllowed();
 //public static native void systemUI(boolean val);
-public static native boolean getsystemUI();
 //public static native void startbackup();
 
 public static native boolean backuphasrestore( );
@@ -380,7 +379,6 @@ public static native short readalarmsuspension(int type);
 
 public static native void writealarmsuspension(int type,short sus);
 public static native boolean getInvertColors( );
-public static native void setInvertColors(boolean val);
 public static native boolean getfixatex( );
 public static native void setfixatex(boolean val);
 public static native boolean getfixatey( );
@@ -688,7 +686,6 @@ public static native boolean getSeparate( );
 
 public static native void setLibreCurrent(boolean val);
 public static native boolean getLibreCurrent( );
-public static native String getCPUarch();
 
 public static native void setUSEALARM(boolean val);
 public static native boolean getUSEALARM( );
@@ -720,8 +717,6 @@ public static native boolean makepercentages( );
 public static native void makenumbers();
 public static native void settouchtalk(boolean val);
 public static native boolean gettouchtalk( );
-public static native boolean getsystemui( );
-public static native void setsystemui(boolean val);
 public static native void settonow();
 public static native boolean showlastscan( );
 public static native long saylastglucose();
@@ -771,6 +766,7 @@ public static native String getUsedSensorName( );
 public static native float getthreshold( );
 public static native void setthreshold(float val);
 public static native void systembar(int left,int top,int right,int bottom);
+public static native boolean debugDemoSensor();
 public static native void sethour24(boolean val);
 public static native boolean gethour24( );
 

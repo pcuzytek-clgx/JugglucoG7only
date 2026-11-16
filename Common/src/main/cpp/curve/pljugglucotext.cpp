@@ -103,13 +103,6 @@ jugglucotext pltext {
 		"Zegarek",
 		"Sensor",
 		"Ustawienia",
-
-#if defined(SIBIONICS)
-		"Zdjęcie",
-#else
-		"Informacje",
-#endif
-
 		"Zamknij",
 		"Zatrzymaj alarm"
 		},
@@ -126,13 +119,8 @@ jugglucotext pltext {
 		"Na głos",
 		"Pływ. wart."
 		},
-	.menustr2= {"Integr. z sys.",
-	"Skany",
-	"Strumień",
-	"Historia",
-	"Wartości",
-	"Posiłki",
-   "Tryb ciemny"},
+	.menustr2= {"Strumień",
+	"Wartości"},
 	.menustr3= {hourminstr,
 	"Wyszukaj",
 	"Data",

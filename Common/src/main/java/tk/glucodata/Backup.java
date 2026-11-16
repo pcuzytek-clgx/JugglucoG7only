@@ -1128,13 +1128,7 @@ ViewGroup.LayoutParams params;
    public  void mkbackupview(MainActivity act) {
       act.themeLightBars();
       act.showui=true;
-      if(!isWearable&&!Natives.getsystemUI()) {
-         act.showSystemUI();
-         Applic.app.getHandler().postDelayed( ()->{
-         realmkbackupview(act,true); },1);
-         }
-       else
-         realmkbackupview(act,true);
+      realmkbackupview(act,true);
    //    Applic.app.getHandler().postDelayed( ()-> realmkbackupview(act),1); //for what was it needed?
       }
    public  void realmkbackupview(MainActivity act,boolean lightback) {

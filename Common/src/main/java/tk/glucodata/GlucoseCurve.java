@@ -695,17 +695,8 @@ static private boolean startv1=true;
                                 Settings.set(activity);
                                 };break;
 
-                            case 4: {
-                                if(!isWearable) {
-                                    MainActivity activity = (MainActivity) getContext();
-                                    PhotoScan.scan(activity,REQUEST_BARCODE);
-                                    }
-
-
-                                break;
-                                }
-                            case 5: ((Activity) getContext()).moveTaskToBack(true);break; //keeps current state 
-                            case 6:  Notify.stopalarm();break;
+                            case 4: ((Activity) getContext()).moveTaskToBack(true);break; //keeps current state 
+                            case 5:  Notify.stopalarm();break;
                             default:
                             }
 
@@ -740,13 +731,7 @@ static private boolean startv1=true;
                 };break;
             case 2: {
                 int val=item&0xF;
-                switch(val) {
-                        case 3: 
-                            ((MainActivity) getContext()).selectionSystemUI();
-                            break;
-                        default: ((MainActivity) getContext()).lightBars(val==0);
-                                break;
-                        };
+                ((MainActivity) getContext()).lightBars(val==0);
 //                var light=item==0;
  //               var main=(MainActivity) getContext();
   //              main.lightBars(light);
@@ -1470,14 +1455,6 @@ public void surfaceCreated(SurfaceHolder holder) {
 public void surfaceDestroyed(SurfaceHolder holder) {
    {if(doLog) {Log.i(LOG_ID,"surfaceDestroyed(SurfaceHolder holder)");};};
    super.surfaceDestroyed(holder);
-    }
-static public void    doabout(MainActivity activity) {
-if(!isWearable) {
-    String about=activity.getString(R.string.about)+"<p>Version Code: "+ BuildConfig.VERSION_CODE+"<br>Version Name: "+ 
-        BuildConfig.VERSION_NAME +"<br>"+Natives.getCPUarch()+"<br>Build time: "+ BuildTime.TIME +"</p>";
-    
-    help.help(about, activity,l->{});
-    }
     }
 void removeviews() {
         numberview.deleteviews();    

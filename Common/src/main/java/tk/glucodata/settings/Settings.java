@@ -180,13 +180,7 @@ public static void set(MainActivity act) {
     act.themeLightBars();
     thisone=new Settings();
 
-    if(!isWearable&&!Natives.getsystemUI()) {
-        act.showui=true;
-        act.showSystemUI();
-        thisone.makesettings(act);
-        }
-    else
-        thisone.makesettingsin(act);
+    thisone.makesettingsin(act);
 
     }
 private class Closerun implements Runnable {
@@ -230,10 +224,6 @@ private void makesettingsin(MainActivity act) {
         */
     act.setonback(closerun);
 }
-private void makesettings(MainActivity act) {
-    Applic.app.getHandler().postDelayed( ()->{ makesettingsin(act);},1);
-        
-}
 
 
 void recreate() {
@@ -262,14 +252,7 @@ void finish() {
 
 
     if(!isWearable) {
-    activity.showui=false;
-//   activity.hideSystemUI();
-
-    if(!Natives.getsystemUI()) {
-        Applic.app.getHandler().postDelayed( ()->{
-                    activity.hideSystemUI();
-                    },1);
-        }
+        activity.showui=false;
         }
     activity.requestRender();
     }
@@ -1198,8 +1181,10 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
                 orientationHasEffect=!Natives.getRotateText();
 
             final boolean rotateTextHasEffect=effectiveAutoRotate&&!nearlySquare;
-            reverseorientation.setVisibility(orientationHasEffect?VISIBLE:INVISIBLE);
-            rotateText.setVisibility(rotateTextHasEffect?VISIBLE:INVISIBLE);
+            /* G7 fork: phones draw the graph directly in portrait, so these
+             * options have no effect there (MainActivity.applyScreenOrientation). */
+            reverseorientation.setVisibility(orientationHasEffect&&largeScreen?VISIBLE:INVISIBLE);
+            rotateText.setVisibility(rotateTextHasEffect&&largeScreen?VISIBLE:INVISIBLE);
             };
 
         reverseorientation.setOnCheckedChangeListener( (buttonView,  isChecked) ->  {
@@ -1485,17 +1470,15 @@ private    void mksettings(MainActivity context) {
         var hormarg=(int)(tk.glucodata.GlucoseCurve.metrics.density*30);
         alarmmarg.setMarginEnd(hormarg);
         View[] row9;
-        var about=getbutton(context,R.string.aboutname);
-           about.setOnClickListener(v-> tk.glucodata.GlucoseCurve.doabout(context));
         var intro=getbutton(context,"Intro");
          intro.setOnClickListener(v-> help(R.string.introhelp,context));
         if(advhelp!=null) {
             advanced=new Button(context);
             advanced.setText(R.string.advanced);
-            row9= new View[]{help,advanced,intro,about,close} ;
+            row9= new View[]{help,advanced,intro,close} ;
             }
         else {
-            row9= new View[]{help,intro,about,close} ;
+            row9= new View[]{help,intro,close} ;
             }
 
 //      var oldxdrip=getbutton(context,"send old"); oldxdrip.setOnClickListener(v-> tk.glucodata.Natives.sendxdripold());
@@ -1531,7 +1514,7 @@ private    void mksettings(MainActivity context) {
                 new View[]{floatconfig,calibration},new View[]{glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
                 new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2],numdis[3]}:new View[]{numdis[2]},
-                new View[]{help,advanced},new View[]{intro,about},new View[]{close}};
+                new View[]{help,advanced},new View[]{intro,close}};
             }
         else {
             portraitViews=new View[][]{
@@ -1541,7 +1524,7 @@ private    void mksettings(MainActivity context) {
                 new View[]{floatconfig,calibration},new View[]{glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
                 new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2],numdis[3]}:new View[]{numdis[2]},
-                new View[]{about,intro},new View[]{help,close}};
+                new View[]{help,intro},new View[]{close}};
             }
         }
 

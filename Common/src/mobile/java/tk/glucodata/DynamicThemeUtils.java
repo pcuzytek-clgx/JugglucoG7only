@@ -189,7 +189,7 @@ private static final String LOG_ID="DynamicThemeUtils";
 static void setTheme(Activity act) {
        int theme=Natives.getTheme();
        Log.i(LOG_ID,"getTheme()="+theme);
-       if(theme!=0) {
+       if(theme!=0&&theme<AppTheme.values().length&&AppTheme.values()[theme].isDark()) {
                 act.setTheme( AppTheme.values()[theme].getStyleResId());
                 if(Natives.getisOval()) {
                     act.getTheme().applyStyle(R.style.ShapeOverride_Oval, true);

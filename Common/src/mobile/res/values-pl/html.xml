@@ -556,32 +556,6 @@ i zawartość węglowodanów do definicji składnika.</p>
 <p style="margin-bottom: 0in"><br/></p>
 ]]>
 </string>
-<string name="about" >
-<![CDATA[
-<p><a href="https://www.juggluco.nl/Jugglucohelp/pl/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/about.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/about.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/about.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/about.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/fr/about.html">fr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/about.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/about.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/about.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/about.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/about.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/about.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pt/about.html">pt</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/about.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/sv/about.html">sv</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/about.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/about.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/about.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/about.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/about.html?lang=en">en</a>&emsp;&emsp;</p><h1>Informacje</h1>
-<p style="margin-bottom: 0in">Aplikację Juggluco stworzył <a href="https://www.juggluco.nl/Juggluco">Jaap Korthals Altes</a></p>
-<p style="margin-bottom: 0in">Poza standardowymi bibliotekami Androida wykorzystywane są m.in:</p>
-<ul>
-	<li><p align="left" style="margin-bottom: 0in">Komendy NFC i Bluetooth specyficzne dla sensor&oacute;w Abbott FreeStyle Libre oraz algorytmy interpretacji specyficzne dla sensor&oacute;w FreeStyle Libre. Wszystkie są niedokumentowane;</p></li>
-	<li><p align="left" style="margin-bottom: 0in">Do komunikacji z zegarkami Garmin wykorzystywany jest<a href="https://developer.garmin.com/connect-iq/sdk"> Connect IQ Mobile SDK</a>;</p></li>
-	<li><p align="left" style="margin-bottom: 0in">Wykresy są tworzone za pomocą <a href="https://github.com/memononen/nanovg">NanoVG</a>;</p></li>
-	<li><p align="left" style="margin-bottom: 0in">Funkcja klonowania wykorzystuje <a href="https://ascon.iaik.tugraz.at/">uwierzytelnione szyfrowanie Ascon</a>;</p></li>
-	<li><p align="left" style="margin-bottom: 0in">Komunikacja z sensorami Libre3 wykorzystuje <a href="https://github.com/intel/tinycrypt">TinyCrypt</a>;</p></li>
-	<li><p align="left" style="margin-bottom: 0in">Pr&oacute;bnik kolor&oacute;w jest adaptacją <a href="https://github.com/yukuku/ambilwarna">AmbilWarna</a>;</p></li>
-	<li><p align="left" style="margin-bottom: 0in">Wsparcie dla NovoPen&oacute;w NFC jest modyfikacją kodu pobranego z xDrip.</p></li>
-</ul>
-<p><br/></p>
-<p>Aplikację Juggluco na język włoski przetłumaczył <a href="mailto:matteo.gabriele81@gmail.com">Matteo Gabriele</a>.</p>
-<p>Aplikację Juggluco na język włoski przetłumaczył Rui Pinheiro.</p>
-<p>Aplikację Juggluco na język polski przetłumaczył <a href="mailto:adelis@translaris.pl">Arkadiusz Deliś</a>.</p>
-<p>Aplikację Juggluco na język białoruski przetłumaczył  <a href="mailto:3477734n@gmail.com">Находкін Яўген.</a></p>
-<p>Aplikację Juggluco na język francuski przetłumaczył Fabrice Delfosse.</p>
-<p>Aplikację Juggluco na język ukraiński przetłumaczyli <a href="mailto:3477734n@gmail.com">Находкін Яўген</a> i <a href="mailto:moydiabet@gmail.com">Дзіма Дыябетык</a>.</p>
-<p>Aplikację Juggluco na język chiński przetłumaczył <a href="mailto:q.pw@qq.com"><span lang="zh-CN">兜子a</a></span>.</p>
-<p>Aplikację Juggluco na język rosyjski przetłumaczył <a href="mailto:zzzmei_92@mail.ru?subject=Juggluco%20%D0%BD%D0%B0%20%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%BE%D0%BC">Васильев Артем</a>.</p>
-<p>Aplikację Juggluco na język turecki przetłumaczył <a href="mailto:beyazbulut14@gmail.com?subject=Turkish%20translation%20of%20Juggluco">beyazbulut14@gmail.com</a></a>
-]]>
-</string>
 <string name="disturbhelp" >
 <![CDATA[
 <p><a href="https://www.juggluco.nl/Jugglucohelp/pl/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/disturbhelp.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/disturbhelp.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/disturbhelp.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/disturbhelp.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/fr/disturbhelp.html">fr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/disturbhelp.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/disturbhelp.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/disturbhelp.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/disturbhelp.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/disturbhelp.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/disturbhelp.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pt/disturbhelp.html">pt</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/disturbhelp.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/disturbhelp.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/disturbhelp.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/disturbhelp.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/disturbhelp.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/disturbhelp.html?lang=en">en</a>&emsp;&emsp;</p><h1>Dostęp w trybie &quot;<i>Nie przeszkadzać</i>&quot;</h1>

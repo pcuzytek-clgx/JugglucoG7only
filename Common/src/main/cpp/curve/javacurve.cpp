@@ -697,10 +697,6 @@ extern "C" JNIEXPORT void JNICALL fromjava(endnumlist)(JNIEnv *env, jclass thiz)
  appcurve.endnumlist();
  }
 #endif
-extern int showui;
-extern "C" JNIEXPORT jboolean JNICALL fromjava(getsystemUI)(JNIEnv *env, jclass thiz) {
- return showui;
- }
 int64_t openNums(std::string_view numpath,int64_t ident);
 
 extern pathconcat numbasedir;
@@ -877,13 +873,6 @@ extern "C" JNIEXPORT jlong JNICALL fromjava(saylastglucose)(JNIEnv *env, jclass 
 #endif
 #ifndef WEAROS
 //MENUS functions:
-extern "C" JNIEXPORT jboolean JNICALL fromjava(getsystemui)(JNIEnv *env, jclass thiz) {
- return showui;
- }
-extern "C" JNIEXPORT void JNICALL fromjava(setsystemui)(JNIEnv *env, jclass thiz,jboolean val) {
- showui=val;
- settings->setui(showui);
- }
 
 extern "C" JNIEXPORT void JNICALL fromjava(settonow)(JNIEnv *env, jclass thiz) {
  auto max=time(nullptr);
@@ -968,10 +957,6 @@ extern "C" JNIEXPORT jlong JNICALL fromjava(percentileEndtime) (JNIEnv *env, jcl
  }
 
 #endif
-extern "C" JNIEXPORT void  JNICALL   fromjava(setInvertColors)(JNIEnv *env, jclass cl,jboolean val) {
-	appcurve.setinvertcolors(val);
-	}
-
 #if defined(JUGGLUCO_APP)&&!defined(WEAROS)
 extern bool  exportdata(uint32_t starttime, uint32_t duration,int type,int fd,float days) ;
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(exportdata)(JNIEnv *env, jclass cl,jint type,jint fd,jfloat days) {

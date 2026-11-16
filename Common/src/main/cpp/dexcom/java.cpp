@@ -712,6 +712,34 @@ Doesn't seem to be usefull. When there are muliple sensor it is not the case tha
 extern "C" JNIEXPORT void JNICALL   fromjava(dexEndBackfill)(JNIEnv *env, jclass cl,jlong dataptr) {
       backup->wakebackup(wakestream);
       }
+
+/* G7 fork, debug builds only (called from MainActivity when BuildConfig.DEBUG
+ * and the launch intent has --ez demo true): creates a fake G7 sensor with a
+ * day of synthetic 5-minute readings so the UI can be checked on an emulator. */
+#include <cmath>
+extern "C" JNIEXPORT jboolean JNICALL   fromjava(debugDemoSensor)(JNIEnv *env, jclass cl) {
+   using namespace std::literals;
+   const uint32_t now=time(nullptr);
+   const uint32_t start=now-26*60*60;
+   auto [index,sens]=sensors->newmakeDexComSensorindex("DEMO00000000"sv,"1234"sv,"00386270004581"sv,"DEMO"sv,start);
+   if(!sens)
+      return false;
+   sens->getinfo()->starttime=start;
+   sensors->getsensor(index)->starttime=start;
+   sensors->setindices();
+   const auto glucose=[](double t) {
+      const double h=t/3600.0;
+      return 130.0+60.0*sin(h*2*M_PI/7.0)+25.0*sin(h*2*M_PI/2.3);
+      };
+   const int last=(now-start)/DEXSECONDS;
+   for(int id=0;id<=last;id++) {
+      const uint32_t t=start+id*DEXSECONDS;
+      const int mgdL=(int)round(glucose(t));
+      const float rate=(float)((glucose(t)-glucose(t-DEXSECONDS))/5.0);
+      sens->savepollallIDs<DEXSECONDS>(t,id,mgdL,rate2changeindex(rate),rate);
+      }
+   return true;
+   }
 #endif
 
 

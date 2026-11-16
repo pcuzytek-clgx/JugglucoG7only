@@ -1382,7 +1382,7 @@ template <class LT> void    JCurve::glucoselines(NVGcontext* avg,const float las
     nvgStrokeWidth(avg, glucoseLinesStrokeWidth);
     nvgStrokeColor(avg, *getgray());
     const double yscale=transy(1)-transy(0);
-    const float mindisunit=smallsize*1.5;
+    const float mindisunit=smallsize*(dexdrawing?3.0f:1.5f);
     const float minst=abs(mindisunit/yscale);
     const bool ismmolL=glunit==1;//settings->usemmolL();
     const double unit=ismmolL?0.5*convfactor:100;
@@ -1392,7 +1392,10 @@ template <class LT> void    JCurve::glucoselines(NVGcontext* avg,const float las
     float startld;
     nvgTextAlign(avg,NVG_ALIGN_CENTER|NVG_ALIGN_MIDDLE);
 
-    if(getLevelLeft()) {
+    if(dexdrawing) {
+        startld = dwidth+dexLabelWidth()*.5f;
+        }
+    else if(getLevelLeft()) {
         startld = timelen*.4;
         }
     else  {
@@ -1455,6 +1458,13 @@ template <class LT> const displaytime JCurve::getdisplaytime(const uint32_t nu,c
     uint32_t last=uint32_t(floorf(endhier/double(tstep)))*tstep;    
     if((last>nu)&&(2*(last-nu))>tstep)
         last=nu;
+#ifndef WEAROS
+    // Dexcom-like phone layout: keep time lines out of the glucose label column.
+    if(dexdrawing) {
+        while(last>first&&transx(last)>dleft+dwidth)
+            last-=tstep;
+        }
+#endif
 
     CURVELOGGER("getdisplaytime xscale=%f %u %u %u\n",xscale,tstep,first,last);
     return {tstep,first,last};
@@ -2164,7 +2174,7 @@ int    JCurve::displaycurve(NVGcontext* avg,time_t nu) {
     int  gmax = gmin+grange;
     const auto [transx,transy]= gettrans(starttime2, endtime);
 displaytime disp=getdisplaytime(nu,starttime2,endtime, transx);
-    const float dlast=nu<endtime?transx(disp.last):dleft+dwidth;
+    const float dlast=(nu<endtime&&!dexdrawing)?transx(disp.last):dleft+dwidth;
     CURVELOGAR("before showsaverange");
     showsaverange(avg,dlast,transy(settings->targetlow()),transy(settings->targethigh()));
 
@@ -2265,7 +2275,7 @@ displaytime disp=getdisplaytime(nu,starttime2,endtime, transx);
             el->showNums(*this, transx,  transy,was) ;
         }
 
-    if(nu<endtime&&(dwidth-smallfontlineheight)>nupos) {
+    if(!dexdrawing&&nu<endtime&&(dwidth-smallfontlineheight)>nupos) {
         showbluevalue(avg,nu, nupos,usedsensors);
         CURVELOGAR("end display curve value");
         }

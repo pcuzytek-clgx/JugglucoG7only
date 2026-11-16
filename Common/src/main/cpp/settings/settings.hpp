@@ -945,8 +945,8 @@ Settings(const char *settingsname,const char *base,const char *country): Mmap(se
                           #ifdef CARRY_LIBS
                                 data()->havelibrary=true;
                           #endif
-                          #ifdef WEAROS
                                 data()->invertcolors=true;
+                          #ifdef WEAROS
                                 data()->usegarmin=false;
                           #else
                                 data()->usegarmin=true;
@@ -1031,7 +1031,7 @@ Settings(const char *settingsname,const char *base,const char *country): Mmap(se
 #endif
     setconvert(country);
 
-     showui=getui();
+     showui=true;
     if(!data()->httpport)
         data()->httpport=defaulthttpport;
 }
