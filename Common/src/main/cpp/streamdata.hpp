@@ -20,30 +20,6 @@ struct libre3stream:streamdata {
     libre3stream(int sensindex,SensorGlucoseData *sens): streamdata(3, sensindex,sens){};
     };
 #ifdef DEXCOM
-struct accustream:streamdata {
-    accustream(int sensindex,SensorGlucoseData *sens): streamdata(0x20, sensindex,sens){};
-    };
-
-   #include "air/air.hpp" 
-struct airstream:streamdata {
-        Mmap<DeviceInfo3Obj> sensorInfo;
-        Mmap<air1_opcal4_arguments_t> generated;
-        int tmpiter=0;
-        int tmptot=0;
-        int ininfo=0;
-        int errors=0;
-#ifndef AIR_STACK
-       air_input input;
-       air1_opcal4_output_t output;
-       air1_opcal4_debug_t debug;
-#endif
-        airstream(int sensindex,SensorGlucoseData *sens): streamdata(0x30, sensindex,sens),
-                                sensorInfo(hist->sensordir,sensorInfoStr,1,[](DeviceInfo3Obj *gegs){ *gegs={}; }),
-                                generated(hist->sensordir,generatedStr,1)
-           {
-           }
-        bool setNumberNew(int nr);
-    };
 #endif
 #ifdef SIBIONICS
 #include "sibionics/SiContext.hpp"

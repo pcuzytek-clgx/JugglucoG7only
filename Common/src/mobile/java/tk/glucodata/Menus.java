@@ -337,18 +337,11 @@ static private void showNow(MainActivity act) {
 					Settings.set(act);
 	}); 
         Button aboutview=view.findViewById(R.id.about);
-        if(tk.glucodata.BuildConfig.SiBionics==1) {
+        {
          aboutview.setText(R.string.photo);
         aboutview.setOnClickListener(v ->
               PhotoScan.scan(act,REQUEST_BARCODE));
             }
-        else  {
-           aboutview.setOnClickListener(v ->{
-                       var c=Applic.app.curve;
-                       if(c!=null)
-                        c.doabout(act);
-                  }); 
-                 }
         var closeview=view.findViewById(R.id.close);closeview.setOnClickListener(v ->{
 		act.moveTaskToBack(true);
 	}); 

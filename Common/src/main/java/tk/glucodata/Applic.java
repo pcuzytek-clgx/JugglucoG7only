@@ -539,9 +539,6 @@ void initbluetooth(boolean usebluetooth,Context context,boolean frommain) {
         }
     SensorBluetooth.start(usebluetooth);
 
-    if(!isWearable) {
-        BluetoothGlucoseMeter.startDevices();
-        }
     }
 static boolean possiblybluetooth(Context context) {
     {if(doLog) {Log.i(LOG_ID,"possiblybluetooth");};};

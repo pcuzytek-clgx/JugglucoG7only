@@ -1196,14 +1196,6 @@ ViewGroup.LayoutParams params;
       staticnum.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
         Natives.setstaticnum(isChecked);
         ActivityHealth.settingsChanged(act);
-        if(!isWearable) {
-            if(isChecked) {
-                BluetoothGlucoseMeter.stopDevices();
-                }
-            else {
-                BluetoothGlucoseMeter.startDevices();
-                }
-            }
         });
 
       staticnum.setText(R.string.dontchangeamounts);

@@ -7,3 +7,6 @@ build/
 # IDE
 .idea/
 *.iml
+
+# Local agent notes
+AGENTS.md

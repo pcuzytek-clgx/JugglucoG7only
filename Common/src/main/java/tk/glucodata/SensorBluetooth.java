@@ -841,7 +841,7 @@ private boolean checkandconnect(SuperGattCallback  cb,long delay) {
     return true;
     }
 SuperGattCallback getGattCallback(String name, long dataptr) {
-    if(libreVersion==3||tk.glucodata.BuildConfig.SiBionics==1||tk.glucodata.BuildConfig.DexCom==1) {
+    if(libreVersion==3||tk.glucodata.BuildConfig.DexCom==1) {
         int vers = Natives.getLibreVersion(dataptr);
         if(libreVersion==3) {
             if (vers == 3) {
@@ -851,23 +851,6 @@ SuperGattCallback getGattCallback(String name, long dataptr) {
         if(tk.glucodata.BuildConfig.DexCom==1) {
             if(vers==0x40) {
                 return new DexGattCallback(name, dataptr);
-                }
-            if(vers==0x20) {
-                return new AccuGattCallback(name, dataptr);
-                }
-            if(vers==0x30) {
-                return new AirGattCallback(name, dataptr);
-                }
-            if(vers==0x50) {
-                return new AidexXGattCallback(name, dataptr);
-                }
-            }
-        if(tk.glucodata.BuildConfig.SiBionics==1) {
-            if(vers==0x15) {
-                return new Si3GattCallback(name, dataptr);
-                }
-            if(vers==0x10) {
-                return new SiGattCallback(name, dataptr);
                 }
             }
         }

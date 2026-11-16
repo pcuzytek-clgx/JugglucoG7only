@@ -652,7 +652,7 @@ extern "C" JNIEXPORT jlong JNICALL   fromjava(getdataptr)(JNIEnv *env, jclass cl
 #endif
 
             {
-#ifdef DEXCOM
+#if 0 // Accu-Chek/Air/AidexX removed
                 if (sens->isAccuChek()) {
                     LOGGER("getdataptr(%s) AccuChek\n", sensor);
                     data = new accustream(sensorindex, sens);
@@ -1217,7 +1217,6 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(hasSibionics)(JNIEnv *env, jcl
           }
    return false;
     }  */
-extern bool hasGlucoseMeters();
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(hasNeedScan)(JNIEnv *env, jclass cl) {
     setusedsensors();
     const int len= usedsensors.size();
@@ -1226,7 +1225,7 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(hasNeedScan)(JNIEnv *env, jcla
          if(sensors->needsScan(index))
                 return true;
           }
-   return hasGlucoseMeters();
+   return false;
     } 
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(hasAidexX)(JNIEnv *env, jclass cl) {
     setusedsensors();

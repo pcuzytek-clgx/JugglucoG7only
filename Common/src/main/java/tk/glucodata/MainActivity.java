@@ -36,7 +36,6 @@ import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.talkbackoff;
 import static tk.glucodata.Applic.talkbackon;
 import static tk.glucodata.Applic.useZXing;
-import static tk.glucodata.BuildConfig.SiBionics;
 import static tk.glucodata.Floating.setfloatglucose;
 import static tk.glucodata.Floating.shoulduseadb;
 import static tk.glucodata.GlucoseCurve.STEPBACK;
@@ -1024,7 +1023,7 @@ if(!isWearable) {
         }
     if(!isWearable) {
        waslightBars();
-       if(SiBionics==1)  {
+       {
             if(tocalendarapp) {
                 final String name=Natives.getUsedSensorName();
                 if(name!=null) {
@@ -1171,14 +1170,6 @@ RunOnUiThread(() ->
             Log.i(LOG_ID,"onTagDiscovered: ");
         }
 
-   if(!isWearable) {
-        // Generic NDEF fallback (TagInfo-style readout)
-        if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
-            new Thread(() -> Sib3Scan.readNdef(this,tag)).start();
-        } else {
-            Sib3Scan.readNdef(this,tag);
-        }
-      }
     }
 
 static boolean hasTech(String[] techs, String want) {
@@ -1719,7 +1710,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
          return;
       case REQUEST_BARCODE_SIB2: 
       case REQUEST_BARCODE: 
-         if(SiBionics==1 &&!isWearable&&useZXing) {
+         if(!isWearable&&useZXing) {
            ZXing.zXingResult(resultCode, data,this,requestCode);
            return;
            };break;

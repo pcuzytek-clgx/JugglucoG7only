@@ -7,16 +7,8 @@ plugins {
 def requestedTasks = gradle.startParameter.taskNames
 def requestedTask = requestedTasks ? requestedTasks[0] : ""
 
-// -Pabi=armeabi-v7a or -Pabi=arm64-v8a selects one ABI; the default builds both.
-def selectedAbi = providers.gradleProperty('abi').getOrElse('all')
-def selectedAbis = [
-        'all': ['armeabi-v7a', 'arm64-v8a'],
-        'armeabi-v7a': ['armeabi-v7a'],
-        'arm64-v8a': ['arm64-v8a']
-][selectedAbi]
-if (selectedAbis == null) {
-    throw new GradleException("Unknown ABI '${selectedAbi}'. Use -Pabi=all, -Pabi=armeabi-v7a or -Pabi=arm64-v8a.")
-}
+// G7-only fork: Pixel 10 Pro is 64-bit only.
+def selectedAbis = ['arm64-v8a']
 
 //def MINSDK = 19
 int MINSDK = 19
@@ -42,7 +34,7 @@ if(false) {
     APPCOMPAT = '1.7.1'
     GMSWEAR = '19.0.0'
     GMSBASE = '18.10.0'
-    MINSDK = 21
+    MINSDK = 36
     TARGETSDK = 36
     CPPSTD = "-std=gnu++26"
 }
@@ -159,159 +151,30 @@ android {
     //buildToolsVersion '33.0.0'
     }
 
-flavorDimensions = ['wearos','libreVersion','SiBionics', 'DexCom','Google']
-//    flavorDimensions 'wearos','libreVersion','SiBionics', 'DexCom'
+flavorDimensions = ['wearos']
 
+    // G7-only fork: single phone flavor (Dexcom + Clarity + mirror), no Google Play/Wear variants.
     productFlavors {
-        google {
-            minSdk = 26
-            buildConfigField 'int', 'minSDK', '26'
-            manifestPlaceholders["minSDK"] = '26'
-            dimension 'Google'
-            versionNameSuffix '-g'
-            buildConfigField 'int', 'Google', '1'
-            buildConfigField 'int', 'noZXing', '0'
-             manifestPlaceholders["debuggable"] = "false"
-             manifestPlaceholders["requireWatch"] = "true"
-        }
-        nogoogle {
-            dimension 'Google'
-            versionNameSuffix '-nog'
+       mobile {
+            dimension 'wearos'
+            versionNameSuffix '-phone'
+            versionCode 939
             minSdk = MINSDK
-            //targetSdk 28 
             targetSdk = TARGETSDK
-            buildConfigField 'int', 'targetSDK', TARGETSDK.toString()
-            manifestPlaceholders["targetSDK"] = TARGETSDK.toString()
             buildConfigField 'int', 'minSDK', MINSDK.toString()
+            buildConfigField 'int', 'isWear', '0'
             buildConfigField 'int', 'Google', '0'
             buildConfigField 'int', 'noZXing', '0'
-             manifestPlaceholders["debuggable"] = "true"
-             manifestPlaceholders["requireWatch"] = "false"
-        }
-
-        dex {
-            dimension 'DexCom'
-            versionNameSuffix '-x'
             buildConfigField 'int', 'DexCom', '1'
+            buildConfigField 'int', 'libreVersion', '2'
+            manifestPlaceholders["debuggable"] = "true"
+            manifestPlaceholders["requireWatch"] = "false"
             externalNativeBuild.cmake {
                 arguments "-DDEXCOM=TRUE"
+                arguments "-DCLARITY=ON"
+                arguments "-DCLARITY_ARM64_MERGED=ON"
                 cppFlags "   -DDEXCOM=1 "
                 cFlags "   -DDEXCOM=1 "
-            }
-        }
-        nodex {
-            dimension 'DexCom'
-            versionNameSuffix '-nox'
-            buildConfigField 'int', 'DexCom', '0'
-            externalNativeBuild.cmake {
-            }
-        }
-
-        libreOld {
-    //******  Zet op rollout op 100% ******
-            dimension 'libreVersion'
-            versionCode 939 //LIBRE2ONLY
-         //    versionName '11.5.7-no3'
-            versionNameSuffix '-no3'
-            buildConfigField 'int', 'libreVersion', '2'
-            externalNativeBuild.cmake {
-
-                }
-           }
-        libre3 {
-            // targetSdk 26
-       //ndkver = '27.0.11718014 rc1'
-//       minSdk 23
-            dimension 'libreVersion'
-        versionNameSuffix '-li3'
-        versionCode 939 //LIBRE3
-    //******  Zet op rollout op 100% ******
-
-               buildConfigField 'int', 'libreVersion', '3'
-            externalNativeBuild.cmake {
-            arguments "-Dlibre3=TRUE"
-            cppFlags "   -DLIBRE3=1 "
-            cFlags "   -DLIBRE3=1 "
-
-            }
-
-        }
-        si {
-      dimension 'SiBionics'
-        versionNameSuffix '-si'
-        versionCode 939 
-       buildConfigField 'int', 'SiBionics', '1'
-       externalNativeBuild.cmake {
-         cppFlags "   -DSIBIONICS=1 "
-         cFlags "   -DSIBIONICS=1 "
-            }
-        }
-        nosi {
-            dimension 'SiBionics'
-         versionCode 939 
-         versionNameSuffix '-nosi'
-          buildConfigField 'int', 'SiBionics', '0'
-          externalNativeBuild.cmake {
-                 }
-        }
-
-        wear {
-          // targetSdk 26
-//           targetSdk 31
-
-            // targetSdk 30
-
-           targetSdk 35
-            dimension 'wearos'
-        minSdk = 26
-        buildConfigField 'int', 'minSDK', '26'
-        manifestPlaceholders["minSDK"] = '26'
-        versionCode 940 //WATCH
-    //******  Zet op rollout op 100% ******
-        //versionName '11.5.7-wear'
-        versionNameSuffix '-wear'
-        signingConfig signingConfigs.alg
-
-//            buildConfigField 'int', 'targetSDK', "$targetSdk"
-           buildConfigField 'int', 'isWear', '1'
-            externalNativeBuild.cmake {
-            arguments "-DWEAROS=TRUE"
-                arguments "-DCLARITY=OFF"
-                cppFlags " -DWEAROS=1  -DUSEDIN=1   "
-                cFlags " -DWEAROS=1  -DUSEDIN=1   "
-
-                }
-        }
-
-        small {
-
-//        minSdk 19
-            dimension 'wearos'
-        versionCode 940 //WATCH
-        //versionName '11.5.7-small'
-        versionNameSuffix '-small'
-        signingConfig signingConfigs.alg
-
-           buildConfigField 'int', 'isWear', '1'
-            externalNativeBuild.cmake {
-                arguments "-DWEAROS=TRUE"
-                arguments "-DCLARITY=OFF"
-                cppFlags " -DWEAROS=1  -DUSEDIN=1   "
-                cFlags " -DWEAROS=1  -DUSEDIN=1   "
-
-                }
-        }
-       mobile {
-//        minSdk 19
-            dimension 'wearos'
-           versionNameSuffix '-phone'
-           buildConfigField 'int', 'isWear', '0'
-
-
-            externalNativeBuild.cmake {
-                arguments "-DCLARITY=ON"
-                arguments "-DCLARITY_ARM32_MERGED=ON"
-                arguments "-DCLARITY_ARM64_MERGED=ON"
                 }
         }
     }
@@ -562,47 +425,11 @@ buildTypes {
     compileSdk 36
 //    buildToolsVersion '37.0.0'
        sourceSets {
-       mobileLibre3SiDexGoogle {
-            java.srcDirs = ['src/mobileSi/java', 'src/mobileSiGoogle/java']
-            jniLibs.srcDirs = [ 'src/mobileSi/jniLibs']
-            manifest { srcFile 'src/mobileSi/AndroidManifest.xml' }
-            res.srcDirs= ['src/mobileSi/res']
-            }
-       mobileLibre3SiDexNogoogle {
-            java.srcDirs = ['src/mobileSi/java', 'src/mobileSiNogoogle/java']
-            jniLibs.srcDirs = [ 'src/mobileSi/jniLibs']
-            manifest { srcFile 'src/mobileSi/AndroidManifest.xml' }
-            res.srcDirs= ['src/mobileSi/res', 'src/mobileSiNogoogle/res']
-            }
-           mobileLibreOldNosiNodexNogoogle {
-               java.srcDirs = ['src/mobileNosi/java']
-               res.srcDirs= ['src/mobileNosi/res']
+           mobile {
+               java.srcDirs += ['src/dex/java', 'src/libreOld/java']
            }
-
-           wearLibre3SiDexNogoogle{
-               manifest.srcFile 'src/wearNogoogle/AndroidManifest.xml'
-               java.srcDirs = ['src/wearSi/java']
-               jniLibs.srcDirs = [ 'src/wearSi/jniLibs']
-           }
-           wearLibre3SiDexGoogle{
-               java.srcDirs = ['src/wearSi/java']
-               jniLibs.srcDirs = [ 'src/wearSi/jniLibs']
-           }
-
-
-
-         }
+       }
    androidComponents {
-        // Callback before variants are built.
-        beforeVariants(selector().all(), { variant ->
-            if( variant.name.contains("LibreOldNosiNodexGoogle")|| !(variant.name.contains("Libre3SiDex")||variant.name.contains("LibreOldNosiNodex"))|| (variant.name.contains("small")&&!variant.name.contains("LibreOldNosiNodexNogoogle")) ||
-(variant.name.contains("wear")&&variant.name.contains("LibreOldNosiNodex"))
-
-            ) {
-                variant.enable = false
-            }
-        })
-
         // Register BuildTime.java as generated Java source for every enabled variant.
         // addGeneratedSourceDirectory() assigns outputDirectory and carries the task
         // dependency automatically; no java.srcDir Provider or JavaCompile hook is needed.
@@ -641,13 +468,6 @@ allprojects {
     }
 }
 
-configurations {
-    mobileLibre3SiDexGoogleImplementation {}
-    mobileLibre3SiDexNogoogleImplementation {}
-    mobileLibreOldSiDexImplementation {}
-    mobileLibre3SiNodexImplementation {}
-    mobileLibreOldSiNodexImplementation {}
-}
 /*
 configurations.all {
     resolutionStrategy {
@@ -682,6 +502,9 @@ implementation "androidx.appcompat:appcompat:1.6.1"
   mobileImplementation 'androidx.health.connect:connect-client:1.1.0-rc03'
 //  mobileImplementation files('/n/ojka/Downloads/ciq-companion-app-sdk-2.0.3.aar');
   mobileImplementation 'com.garmin.connectiq:ciq-companion-app-sdk:2.4.0@aar'
+  mobileImplementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
+  mobileImplementation 'com.google.zxing:core:3.5.4'
+  mobileImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     compileOnly 'com.google.android.wearable:wearable:2.9.0'
     implementation "com.google.android.gms:play-services-wearable:$GMSWEAR"
@@ -689,55 +512,21 @@ implementation "androidx.appcompat:appcompat:1.6.1"
 
 
 
-    wearImplementation 'androidx.activity:activity-ktx:1.11.0'
-    wearImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    wearImplementation 'com.google.android.material:material:1.13.0'
-    wearImplementation 'androidx.databinding:viewbinding:9.2.0'
-    wearImplementation 'androidx.core:core-ktx:1.18.0'
 
 
-    wearImplementation 'androidx.wear:wear:1.4.0'
 
-    wearImplementation 'androidx.percentlayout:percentlayout:1.0.0'
-    wearImplementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    //wearImplementation "androidx.wear.watchface:watchface-client-guava:1.2.1"
-    //wearImplementation "com.google.guava:guava:31.1-android"
-    wearImplementation "androidx.wear.watchfacepush:watchfacepush:1.0.0"
-//    wearImplementation "androidx.wear.watchfacepush:watchfacepush-guava:1.0.0-rc01"
     
     // This is the bridge you need to use Kotlin suspend from Java
-    wearImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2"
 
 //    implementation("com.ibm.icu:icu4j:78.3")
 
 //    mobileImplementation "androidx.gridlayout:gridlayout:1.0.0"
-    wearImplementation("androidx.wear.protolayout:protolayout-expression:1.4.0")
-    wearImplementation 'androidx.wear.watchface:watchface-style:1.2.1'
-    wearImplementation 'androidx.wear.watchface:watchface-complications:1.3.0'
-    wearImplementation 'androidx.wear.watchface:watchface-editor:1.2.1'
-    wearImplementation 'androidx.wear.watchface:watchface-client:1.2.1'
-    wearImplementation 'androidx.wear.watchface:watchface:1.2.1'
-    wearImplementation 'androidx.wear.watchface:watchface-complications-rendering:1.2.1'
-    wearImplementation 'androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0'
-     wearImplementation 'androidx.core:core-splashscreen:1.2.0'
-     wearImplementation 'androidx.wear.protolayout:protolayout-external-protobuf:1.4.0'
-    mobileLibre3SiNodexImplementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
-    mobileLibre3SiNodexImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
-    mobileLibreOldSiNodexImplementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
-    mobileLibreOldSiNodexImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
-
-    mobileLibre3SiDexGoogleImplementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
-    mobileLibre3SiDexNogoogleImplementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
-
-    mobileLibre3SiDexGoogleImplementation 'com.google.zxing:core:3.5.4'
-    mobileLibre3SiDexNogoogleImplementation 'com.google.zxing:core:3.5.4'
 
 
-    mobileLibre3SiDexGoogleImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
-    mobileLibre3SiDexNogoogleImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
-    mobileLibreOldSiDexImplementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
+
+
 
 }
 

@@ -70,7 +70,6 @@ import static java.lang.Math.abs;
 import static java.lang.System.currentTimeMillis;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.usedlocale;
-import static tk.glucodata.BuildConfig.SiBionics;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.MainActivity.REQUEST_BARCODE;
 import static tk.glucodata.MainActivity.systembarBottom;
@@ -709,10 +708,7 @@ static private boolean startv1=true;
                             case 5: {
                                 if(!isWearable) {
                                     MainActivity activity = (MainActivity) getContext();
-                                    if(SiBionics==1)
-                                        PhotoScan.scan(activity,REQUEST_BARCODE);
-                                    else
-                                        doabout(activity);
+                                    PhotoScan.scan(activity,REQUEST_BARCODE);
                                     }
 
 
@@ -1563,7 +1559,7 @@ public void onResume() {
     app.setmintime();
 
     if(!isWearable) {
-       if(SiBionics==1)  {
+       {
             if(MainActivity.tocalendarapp) {
                 final String name=Natives.getUsedSensorName();
                 if(name!=null) {

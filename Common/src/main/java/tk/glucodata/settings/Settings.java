@@ -124,7 +124,6 @@ import tk.glucodata.Libreview;
 import tk.glucodata.Log;
 import tk.glucodata.MainActivity;
 import tk.glucodata.Menus;
-import tk.glucodata.MeterList;
 import tk.glucodata.Natives;
 import tk.glucodata.Notify;
 import tk.glucodata.NumAlarm;
@@ -1781,17 +1780,16 @@ static private void exchanges(MainActivity context, View parent) {
       getMargins(ok).setMarginEnd(hormarg);
 
 
-        var meters = getbutton(context, R.string.meterlist);
         lay = new Layout(context, (l, w, h) -> {
             int[] ret = {w, h};
             return ret;
-        }, new View[]{everSensebroadcast,librelinkbroadcast},new View[]{xdripbroadcast, jugglucobroadcast},Build.VERSION.SDK_INT >= 28 ?new View[]{healthconnect,activities,clarity,libreview}:new View[]{clarity,libreview}, new View[]{webserver, uploader,exportview,mirrorview} ,                /*new View[]{emulator},*/new View[]{help,meters, ok})
+        }, new View[]{everSensebroadcast,librelinkbroadcast},new View[]{xdripbroadcast, jugglucobroadcast},Build.VERSION.SDK_INT >= 28 ?new View[]{healthconnect,activities,clarity,libreview}:new View[]{clarity,libreview}, new View[]{webserver, uploader,exportview,mirrorview} ,                /*new View[]{emulator},*/new View[]{help, ok})
             .portraitLayout(
                 new View[]{everSensebroadcast},new View[]{librelinkbroadcast},
                 new View[]{xdripbroadcast},new View[]{jugglucobroadcast},
                 new View[]{webserver,uploader},new View[]{clarity,libreview},
                 (Build.VERSION.SDK_INT >= 28)?new View[]{healthconnect,activities}:null,
-                new View[]{exportview,mirrorview},/*new View[]{emulator},*/new View[]{help,meters},new View[]{ok});
+                new View[]{exportview,mirrorview},/*new View[]{emulator},*/new View[]{help},new View[]{ok});
 
     final   int pad=(int)(tk.glucodata.GlucoseCurve.metrics.density*10.0);
     final   int bottompad=(int)(tk.glucodata.GlucoseCurve.metrics.density*5.0);
@@ -1803,8 +1801,6 @@ static private void exchanges(MainActivity context, View parent) {
                 c.dialogs.showexport(context,c.getWidth(),c.getHeight(),lay);
             }
         });
-        meters.setOnClickListener(v->{
-            MeterList.show(context,lay); });
       }
 
     thelayout[0] = lay;

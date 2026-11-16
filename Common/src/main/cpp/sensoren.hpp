@@ -595,7 +595,7 @@ void useAgain(int sensindex) {
        resensordata(sensindex);
        }
 
-#ifdef SIBIONICS
+#if 1 // photo-scan sensor creation, shared by barcode-registered sensors
 private:
 std::pair<int,SensorGlucoseData *> getOldSensorPair(sensor *sensgegs,uint32_t now,int serialsize=0) {
        const int   sensindex= sensgegs - sensorlist();
@@ -613,6 +613,7 @@ std::pair<int,SensorGlucoseData *> getOldSensorPair(sensor *sensgegs,uint32_t no
        resensordata(sensindex);
        return {sensindex,sens};
        }
+#ifdef SIBIONICS
 /*
 std::pair<int,SensorGlucoseData *> makeSI3sensorIndex(const BarCode &barcode,std::string_view scanned,uint32_t now) {
     const char *longname; 
@@ -663,147 +664,9 @@ std::pair<int,SensorGlucoseData *> genMakeSI3sensorIndex(const char *blueToothNu
    SensorGlucoseData::mkdatabaseSI3(sensordir,scanned,now,siType);
    return addSensorInitgetPair(longname,maxdaysSI3*2);
    }
-private:
-std::pair<int,SensorGlucoseData *> makeAirSensorindex(const BarCode &barcode,std::string_view scanned,uint32_t now) {
-        if(!barcode.Expiry.data()||barcode.Expiry.size()!=6) {
-            LOGAR("makeAirSensorindex: wrong Expiry");
-            return {-1,nullptr};
-            }
-        if(!barcode.PIN.data()||barcode.PIN.size()!=6) {
-            LOGAR("makeAirSensorindex: wrong PIN");
-            return {-1,nullptr};
-            }
-        if(!barcode.SensorCode.data()||barcode.SensorCode.size()!=16) {
-            LOGAR("makeAirSensorindex: wrong SensorCode");
-            return {-1,nullptr};
-            }
-        if(!barcode.Serial.data()||barcode.Serial.size()!=12) {
-            LOGAR("makeAirSensorindex: wrong Serial");
-            return {-1,nullptr};
-            }
-
-        char longname[17];
-        memcpy(longname,barcode.Expiry.data(),4);
-        memcpy(longname+4,barcode.Serial.data(),12);
-        longname[16]='\0';
-        LOGGER("makeAirSensorindex: longname: %s\n",longname);
-    std::string_view name{longname,16};
-    removeunused();
-   if(sensor *sensgegs = findsensorm(longname) ) {
-       LOGGER("makeAirSensorindex: known sensor %s\n",sensgegs->showsensorname());
-      return getOldSensorPair(sensgegs,now);
-       }
-   const pathconcat sensordir(inbasedir,name);
-   SensorGlucoseData::mkdatabaseAir(sensordir,scanned,now );
-   return addSensorInitgetPair(name,maxdaysAir*2);
-}
-/*
-std::pair<int,SensorGlucoseData *> makeAirSensorindex(std::string_view scanned,uint32_t now) {
-
-    if(sizeof(careSenseAirScan_t)!=scanned.size()) { 
-            LOGGER("makeAirSensorindex: wrong size %zd != %zd\n",sizeof(careSenseAirScan_t),scanned.size());
-            return {};
-        }
-    const struct careSenseAirScan_t *scan=reinterpret_cast<const struct careSenseAirScan_t*>( scanned.data());
-    const char start[]="01";
-    if(memcmp(start,scan->start,3)) {
-                LOGGER("makeAirSensorindex: %s missing\n",start);
-                return {};
-                }
-        if(memcmp(scan->tus17,"17",2)) {
-            LOGAR("makeAirSensorindex: 17 missing");
-            return {};
-            }
-        if(memcmp(scan->tus21,"21",2)) {
-            LOGAR("makeAirSensorindex: 21 missing");
-            return {};
-            }
-        const char start2[]="240";
-        if(memcmp(start2,scan->start2,4)) {
-            LOGGER("makeAirSensorindex: %s missing\n",start2);
-            return {};
-            }
-        const char start3[]="250";
-        if(memcmp(start3,scan->start3,4)) {
-            LOGGER("makeAirSensorindex: %s missing",start3);
-            return {};
-            }
-        #ifndef NOLOG
-        const std::string_view gtin={scan->gtin,sizeof(scan->gtin)};
-        LOGGER("gtin: %.*s\n",(int)gtin.size(),gtin.data());
-        const std::string_view pinCode={scan->pinCode,sizeof(scan->pinCode)};
-        LOGGER("pinCode: %.*s\n",(int)pinCode.size(),pinCode.data());
-        const std::string_view sensorCode={scan->sensorCode,sizeof(scan->sensorCode)};
-        LOGGER("sensorCode: %.*s\n",(int)sensorCode.size(),sensorCode.data());
-        #endif
-        const std::string_view expiry={scan->expiry,sizeof(scan->expiry)};
-        LOGGER("expiry: %.*s\n",(int)expiry.size(),expiry.data());
-        const std::string_view serial={scan->serial,sizeof(scan->serial)};
-        LOGGER("serial: %.*s\n",(int)serial.size(),serial.data());
-        char longname[17];
-        memcpy(longname,expiry.data(),4);
-        memcpy(longname+4,serial.data(),12);
-        longname[16]='\0';
-        LOGGER("makeAirSensorindex: longname: %s\n",longname);
-    std::string_view name{longname,16};
-    removeunused();
-   if(sensor *sensgegs = findsensorm(longname) ) {
-       LOGGER("makeAirSensorindex: known sensor %s\n",sensgegs->showsensorname());
-      return getOldSensorPair(sensgegs,now);
-       }
-   const pathconcat sensordir(inbasedir,name);
-   SensorGlucoseData::mkdatabaseAir(sensordir,scanned,now );
-   return addSensorInitgetPair(name,maxdaysAir*2);
-}
-*/
-struct accuScan {
-    char controlHaak;
-    char s01[2];
-    char num[14];
-    char tus1[2];
-    char proYear[2];
-    char proMonth[2];
-    char proDay[2];
-    char tus2[2];
-    char exYear[2];
-    char exMonth[2];
-    char exDay[2];
-    char s21[2];
-    char name[11];
-    };
-std::pair<int,SensorGlucoseData *> makeAccuCheckSensorindex(std::string_view scanned,uint32_t now) {
-    if(scanned.size()!=46) {
-        return {-1,nullptr};
-        }
-   std::string_view name=scanned.substr(scanned.size()-16,16);
-#ifndef NOLOG
-   const accuScan *accu=reinterpret_cast<  const accuScan *>(scanned.data());
-   LOGGER("AccuChek %.11s %.16s expiration year %.2s month %.2s day %.2s\n",accu->name,name.data(),accu->exYear,accu->exMonth,accu->exDay);
 #endif
-   removeunused();
-   if(sensor *sensgegs = findsensorm(name.data()) ) {
-       LOGGER("known sensor %s\n",sensgegs->showsensorname());
-       const int   sensindex= sensgegs - sensorlist();
-       SensorGlucoseData *sens=getSensorData(sensindex) ;
-       sensgegs->finished=0;
-       auto *info= sens->getinfo();
-       info->accuChek=true;
-
-       info->lastscantime=now;
-       if(!info->pollcount) info->starttime=now; //Not needed
-       sendsiScan(sens);
-       void resensordata(int sensorindex) ;
-       resensordata(sensindex);
-       return {sensindex,sens};
-       }
-   const pathconcat sensordir(inbasedir,name);
-   SensorGlucoseData::mkdatabaseAccu(sensordir,scanned,now );
-   const int ind=addsensor(name);
-   sensor *sen=getsensor(ind);
-   sen->initialized=true;
-   sen->halfdays=maxdaysAccu*2;
-   return {ind,getSensorData(ind)} ;
-    }
+private:
+#ifdef SIBIONICS
 std::pair<int,SensorGlucoseData *> makeSIsensorIndex(std::string_view gegsSI,uint32_t now,bool hasnum,uint8_t maxdays) {
    const auto name=namefromSIgegs(gegsSI.data(),gegsSI.size(),hasnum);
    removeunused();
@@ -831,50 +694,8 @@ std::pair<int,SensorGlucoseData *> makeSIsensorIndex(std::string_view gegsSI,uin
    sen->halfdays=maxdays*2;
    return {ind,getSensorData(ind)} ;
    }
+#endif
 public:
-
-    inline static constexpr const char  nameLinX[]{"LinX_L"};
-inline static constexpr const char  nameLumiFlex[]{"FlLumi"};
-enum MicroTech {
-    AidexX,
-    LinX,
-    LumiFlex,
-    GlucoRx,
-    Wellion
-    } ;
-std::pair<int,SensorGlucoseData *> makeAidexXSensorindex(const std::string_view serial,MicroTech type,std::string_view gegsSI,uint32_t now) {
-    if(serial.size()<3) {
-        LOGGER("makeAidexXSensorindex serial %s\n",serial.size()?serial.data():"null");
-        return {-1,nullptr};
-        }
-    std::array<char,17> longname;
-    char *startname=&longname[0];
-    char *zero=&longname[16];
-    static constexpr const char aidex[]{"AiDEXx"};
-    static constexpr const int aidexlen=sizeof(aidex)-1;
-    const int left=16-serial.size();
-    memcpy(startname,type==LinX?nameLinX:(type==LumiFlex?nameLumiFlex:aidex),aidexlen);
-    if(left>aidexlen) {
-        memset(startname+aidexlen,'x',left-aidexlen);
-        }
-    char *ptr=zero-serial.size();
-    memcpy(ptr,serial.data(),serial.size());
-   *zero='\0';
-   LOGGER("makeAidexXSensorindex %.*s\n",longname.size(),startname);
-   removeunused();
-   std::string_view name{startname,16};
-   if(sensor *sensgegs = findsensorm(longname.data()) ) {
-       LOGGER("makeAidexXSensorindex: known sensor %s\n",sensgegs->showsensorname());
-       return getOldSensorPair(sensgegs,now,serial.size());
-       }
-   const pathconcat sensordir(inbasedir,longname);
-   SensorGlucoseData::mkdatabaseAidexX(sensordir,gegsSI,serial,type==LumiFlex?16:15,now);
-   return addSensorInitgetPair(name,maxdaysAidexX*2);
-   }
-
-
-
-
 
 std::pair<int,SensorGlucoseData *> makePhotoScanSensorIndex(std::string_view gegsSI,uint32_t now) {
    LOGGER("makePhotoScanSensorIndex(%.*s) len=%zd\n",gegsSI.size(),gegsSI.data(),gegsSI.size());
@@ -887,15 +708,10 @@ std::pair<int,SensorGlucoseData *> makePhotoScanSensorIndex(std::string_view geg
       {
 
         if(barcode.GTIN.data()==nullptr) {
-            if(gegsSI.size()==53) {
-                return makeAirSensorindex(barcode,gegsSI,now);
-                }
-             else {
-                LOGGER("makePhotoScanSensorIndex not Air size=%d\n",gegsSI.size());
-                }
             return {-1,nullptr};
             }
 
+#ifdef SIBIONICS
         const union {
             const char _[8]{"6972831"};
             std::array<char,7> sibionics;
@@ -954,6 +770,7 @@ std::pair<int,SensorGlucoseData *> makePhotoScanSensorIndex(std::string_view geg
 
                }
 
+#endif
      const  union {
           const char _[8]{"0386270"};
           std::array<char,7> dexcom;
@@ -962,53 +779,6 @@ std::pair<int,SensorGlucoseData *> makePhotoScanSensorIndex(std::string_view geg
             return newmakeDexComSensorindex(barcode.Serial,barcode.PIN,barcode.GTIN,gegsSI,now);
             }
 
-     const  union {
-          const char _[8]{"4640107"};
-          std::array<char,7> lumiflex;
-          };
-    
-      if(lumiflex==barcode.getManifacturer()) {
-        return makeAidexXSensorindex(barcode.Serial,LumiFlex,gegsSI,now);
-        }
-
-     const  union {
-          const char _[8]{"6958590"};
-          std::array<char,7> aidexx;
-          };
-    
-      if(aidexx==barcode.getManifacturer()) {
-        static constexpr std::string_view LinxGTIN{"06958590309550"sv};
-        return makeAidexXSensorindex(barcode.Serial,LinxGTIN==barcode.GTIN?LinX:AidexX,gegsSI,now);
-        }
-     const union {
-          const char _[8]{"5060342"};
-          std::array<char,7> glucoRx;
-          };
-     if(glucoRx==barcode.getManifacturer()) {
-        return makeAidexXSensorindex(barcode.Serial,GlucoRx,gegsSI,now);
-        }
-     const union {
-          const char _[8]{"9120015"};
-          std::array<char,7> wellion;
-          };
-     if(wellion==barcode.getManifacturer()) {
-        return makeAidexXSensorindex(barcode.Serial,Wellion,gegsSI,now);
-        }
-
-     const union {
-        const char _[8]{"8806712"};
-        std::array<char,7> air;
-        };
-      if(air==barcode.getManifacturer()) {
-            return makeAirSensorindex(barcode,gegsSI,now);
-            }
-     const union {
-        const char _[8]{"4015630"};
-        std::array<char,7> accu;
-        };
-      if(accu==barcode.getManifacturer()) {
-            return makeAccuCheckSensorindex(gegsSI,now);
-            }
        }
       }
   catch (const std::exception& e) {
