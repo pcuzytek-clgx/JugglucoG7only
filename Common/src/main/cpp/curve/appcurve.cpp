@@ -110,7 +110,7 @@ strsepconcat text;
 #endif
     histgegs(const SensorGlucoseData *hist): hist(hist)/*,glu(glu),tim(tim)*/,nu(time(nullptr))
 #ifndef DONTTALK
-    ,text(getsensorhelp(usedtext->menustr0[3],": ","\n","\n"," "))
+    ,text(getsensorhelp(usedtext->menustr0[2],": ","\n","\n"," "))
 #endif
     {
 
@@ -2098,7 +2098,7 @@ void setfloatptr() {
     }
 #else
 int menus=0;
-const int *menuopt0[]={nullptr,&menus,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
+const int *menuopt0[]={&menus,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
 
 
 const int *menuopt0b[]={nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
@@ -2121,8 +2121,8 @@ void setfloatptr() {
 //void setnewamount() { }
 
 void      removemenus(const jugglucotext* text) {
-       menuopt0[1]=nullptr;
-      const_cast<jugglucotext* >(text)->menustr0[1]=""sv;
+       menuopt0[0]=nullptr;
+      const_cast<jugglucotext* >(text)->menustr0[0]=""sv;
         }
 #endif
 

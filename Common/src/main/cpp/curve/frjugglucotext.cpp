@@ -104,7 +104,6 @@ jugglucotext frtext {
 	.SD="SD: %.2f",
 	.glucose_variability="Variabilité glycémique: %.1f%%",
      	.menustr0={
-		"ChatGPT",
 		"Menus",
 		"Montre",
 		"Capteur",

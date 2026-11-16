@@ -81,7 +81,6 @@ jugglucotext uktext {
 	.SD="SD: %.2f",
 	.glucose_variability="Варіабельність глюкози: %.1f%%",
      .menustr0={
-		"ChatGPT",
 		"Меню",
 		"Дивитися",
 		"Датчик",

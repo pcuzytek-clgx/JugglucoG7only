@@ -106,7 +106,6 @@ const jugglucotext artext {
 	.SD=RTLFMT(u8"الانحراف المعياري: %.2f"),
 	.glucose_variability=RTLFMT(u8"تذبذب الغلوكوز: %.1f%%"),
      .menustr0={
-		"ChatGPT",
 		RTL(u8"القوائم"),
 		RTL(u8"الساعة"),
 		RTL(u8"المستشعر"),

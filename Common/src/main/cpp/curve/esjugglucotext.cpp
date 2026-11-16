@@ -103,7 +103,6 @@ const jugglucotext estext {
 	.SD="DE: %.2f",
 	.glucose_variability="Variabilidad de la glucosa: %.1f%%",
      .menustr0={
-		"ChatGPT",
 		"Menús",
 		"Reloj",
 		"Sensor",

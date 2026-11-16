@@ -99,7 +99,6 @@ static jugglucotext nltext {
 
 
      .menustr0={
-		"ChatGPT",
 		"Menus",
 		"Horloges",
 		"Sensor",

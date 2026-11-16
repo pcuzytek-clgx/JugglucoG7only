@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
-#include "jgchat/vendor/nlohmann/json.hpp"
+#include "vendor/nlohmann/json.hpp"
 #include "logging.hpp"
 #include <cstdint>
 #include <span>

@@ -104,7 +104,6 @@ const jugglucotext hitext {
 	.SD="SD: %.2f",
 	.glucose_variability="ग्लूकोज परिवर्तनशीलता: %.1f%%",
      .menustr0={
-		"ChatGPT",
 		"मेन्यू",
 		"घड़ी",
 		"सेंसर",

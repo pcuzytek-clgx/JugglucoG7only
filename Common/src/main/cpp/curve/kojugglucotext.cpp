@@ -86,7 +86,6 @@ jugglucotext kotext {
     .SD="SD: %.2f",
     .glucose_variability="혈당 변동성: %.1f%%",
     .menustr0={
-        "ChatGPT",
         "메뉴",
         "워치",
         "센서",

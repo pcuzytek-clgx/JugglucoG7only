@@ -43,9 +43,6 @@ public class Natives  {
     public static native String clarityLoginFinish(String callback);
     public static native void clarityWake();
 
-    public static native String askChatGPT(android.app.Activity activity, String archiveURL, String existingChatURL);
-    public static native void stopAskChatGPT();
-    public static native String askChatGPTStatus();
 
     static final private String LOG_ID="Natives";
 //   static long numptr=0;

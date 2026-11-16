@@ -683,9 +683,8 @@ static private boolean startv1=true;
                 switch(menu) {
                      case 0:
                         switch (item) {
-                           case 0: JugglucoChat.show((MainActivity) getContext());break;
-                            case 1: Menus.show((MainActivity) getContext());break;
-                            case 2: {
+                            case 0: Menus.show((MainActivity) getContext());break;
+                            case 1: {
                             MainActivity activity = (MainActivity) getContext();
                             if(!isWearable) {
                                 tk.glucodata.Watch.show(activity);
@@ -696,16 +695,16 @@ static private boolean startv1=true;
                                 }
 
                                 break;
-                              case 3: 
+                              case 2: 
 
                                 bluediag.start((MainActivity)getContext()); 
                                   break;
-                              case 4: {
+                              case 3: {
                                 MainActivity activity = (MainActivity) getContext(); 
                                 Settings.set(activity);
                                 };break;
 
-                            case 5: {
+                            case 4: {
                                 if(!isWearable) {
                                     MainActivity activity = (MainActivity) getContext();
                                     PhotoScan.scan(activity,REQUEST_BARCODE);
@@ -714,8 +713,8 @@ static private boolean startv1=true;
 
                                 break;
                                 }
-                            case 6: ((Activity) getContext()).moveTaskToBack(true);break; //keeps current state 
-                            case 7:  Notify.stopalarm();break;
+                            case 5: ((Activity) getContext()).moveTaskToBack(true);break; //keeps current state 
+                            case 6:  Notify.stopalarm();break;
                             default:
                             }
 

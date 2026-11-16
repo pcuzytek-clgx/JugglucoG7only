@@ -100,7 +100,6 @@ jugglucotext detext {
 .SD="SD: %.2f",
 .glucose_variability="Glukosevariabilität: %.1f%%",
       .menustr0={
-"ChatGPT",
 "Menus",
 "Uhren",
 "Sensor",

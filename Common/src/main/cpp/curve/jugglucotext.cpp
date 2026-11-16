@@ -101,7 +101,6 @@ const jugglucotext engtext {
 	.SD="SD: %.2f",
 	.glucose_variability="Glucose variability: %.1f%%",
      .menustr0={
-		"ChatGPT",
 		"Menus",
 		"Watch",
 		"Sensor",

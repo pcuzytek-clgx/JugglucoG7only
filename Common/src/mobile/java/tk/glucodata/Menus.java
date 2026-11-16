@@ -407,12 +407,6 @@ static private void showNow(MainActivity act) {
 	}); 
 	glucosefloatview.setChecked(Natives.getfloatglucose());
 
-        var chatgptview=view.findViewById(R.id.chatgpt);
-        chatgptview.setOnClickListener(v ->{
-            removeContentView(view);
-            JugglucoChat.show(act);
-
-	        }); 
 
         CheckBox scansview=view.findViewById(R.id.scans);scansview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
 		Natives.setshowscans(isChecked);

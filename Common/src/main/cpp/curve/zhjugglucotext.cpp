@@ -53,7 +53,6 @@ jugglucotext zhtext {
     .SD = "SD: %.2f",
     .glucose_variability = "葡萄糖变异性: %.1f%%",
     .menustr0 = {
-"ChatGPT",
         "主菜单",
         "手表",
         "传感器",

@@ -190,7 +190,6 @@ add_subdirectory(libjuice)
 
 
 if(JUGGLUCO_APP)
-include("${CMAKE_CURRENT_SOURCE_DIR}/jgchat/android/integration.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/net/clarity/integration.cmake")
 endif()
 
