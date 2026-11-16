@@ -791,14 +791,9 @@ extern "C" JNIEXPORT jboolean JNICALL fromjava(getnewLibre3Activation)(JNIEnv *e
     std::lock_guard<std::mutex> lock(newLibre3ReceiverMutex);
     return settings->data()->newLibre3Activation;
     }
-extern  void  setAskForAccount();
 extern "C" JNIEXPORT void JNICALL fromjava(setnewLibre3Activation)(JNIEnv *env,jclass cl,jboolean value) {
     std::lock_guard<std::mutex> lock(newLibre3ReceiverMutex);
     settings->data()->newLibre3Activation=value;
-
-    if(value&&!settings->data()->newLibre3ReceiverIDreceived)  {
-            setAskForAccount();
-            }
     }
 extern "C" JNIEXPORT jboolean JNICALL fromjava(getnewLibre3Takeover)(JNIEnv *env,jclass cl) {
     std::lock_guard<std::mutex> lock(newLibre3ReceiverMutex);
@@ -1069,11 +1064,8 @@ extern "C" JNIEXPORT jstring  JNICALL   fromjava(getnewYuApiKey)(JNIEnv *env, jc
 #endif
 
 extern void startthreads() ;
-extern bool inituploader(JNIEnv *env);
- 
 extern "C" JNIEXPORT void  JNICALL   fromjava(startthreads)(JNIEnv *env, jclass cl) {
     startthreads();
-    inituploader(env);
     }
 
 extern int startmeals() ;
@@ -1435,7 +1427,6 @@ extern "C" JNIEXPORT jstring  JNICALL   fromjava(getnightuploadurl)(JNIEnv *env,
 extern "C" JNIEXPORT jstring  JNICALL   fromjava(getnightuploadsecret)(JNIEnv *env, jclass cl) {
     return myNewStringUTF(env,settings->data()->nightuploadsecret);
     }
-    extern    void enduploaderthread();
 extern "C" JNIEXPORT void  JNICALL   fromjava(setNightUploader)(JNIEnv *env, jclass cl,jstring jurl,jstring jsecret,jboolean active,jboolean v3) {
     settings->data()->nightscoutV3=v3;
     if(jurl!=nullptr) {
@@ -1464,10 +1455,6 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(setNightUploader)(JNIEnv *env, jcl
         name[len]='\0';
         }
     settings->data()->nightuploadon=active;
-    if(active)
-        inituploader(env);
-    else
-         enduploaderthread();
      }
 extern "C" JNIEXPORT void  JNICALL   fromjava(setAndroid13)(JNIEnv *env, jclass cl,jboolean val) {
     settings->data()->android13=val;

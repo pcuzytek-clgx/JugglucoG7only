@@ -152,7 +152,6 @@ jmethodID jtoGarmin=nullptr, jGarmindeletelast=nullptr,jswitchbluetooth=nullptr;
 jmethodID jsetinittext=nullptr;
 jmethodID jrminitlayout=nullptr;
 #endif
-extern void initlibreviewjni(JNIEnv *env);
 
 extern bool jinitmessages(JNIEnv* env);
 #ifndef NOLOG
@@ -292,9 +291,6 @@ if(loadglucoseclass(env)) {
  }
 return JNI_ERR;
 */
-#ifndef WEAROS
-initlibreviewjni(env);
-#endif
 
 
 #ifdef WEAROS_MESSAGES

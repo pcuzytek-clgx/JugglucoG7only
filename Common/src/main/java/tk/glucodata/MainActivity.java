@@ -44,7 +44,6 @@ import static tk.glucodata.Log.showbytes;
 import static tk.glucodata.Natives.getInvertColors;
 import static tk.glucodata.Natives.hasNeedScan;
 import static tk.glucodata.Natives.setShownintro;
-import static tk.glucodata.Natives.wakelibreview;
 import static tk.glucodata.help.hidekeyboard;
 import static tk.glucodata.settings.Settings.removeContentView;
 import android.widget.TextView;
@@ -1244,11 +1243,7 @@ void activateresult(boolean res) {
     if(!isWearable && Build.VERSION.SDK_INT>=28) ActivityHealth.onPause();
         if(!Applic.Nativesloaded)
             return;
-        Natives.wakeuploader();
-        if(!isWearable) {
-            wakelibreview(20);
-            }
-        else {
+        if(isWearable) {
             if(Natives.stopWifi()) {
                 {if(doLog) {Log.i(LOG_ID,"stopWifi");};};
                 UseWifi.stopusewifi();

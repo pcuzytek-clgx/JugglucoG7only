@@ -330,11 +330,6 @@ void startthreads() {
    if(settings->data()->usexdripwebserver) {
         startwatchthread(settings->data()->httpport);
         }
-#ifndef DONT_USE_LIBREVIEW
-    if(settings->data()->uselibre) {
-         startlibrethread();
-         }
-#endif
 
 #endif
 #endif

@@ -120,7 +120,6 @@ import tk.glucodata.GlucoseCurve;
 import tk.glucodata.HealthConnection;
 import tk.glucodata.LabelAdapter;
 import tk.glucodata.Layout;
-import tk.glucodata.Libreview;
 import tk.glucodata.Log;
 import tk.glucodata.MainActivity;
 import tk.glucodata.Menus;
@@ -1650,13 +1649,10 @@ static private void exchanges(MainActivity context, View parent) {
         });
    Layout lay;
     if (isWearable) {
-        var uploader = getbutton(context, R.string.upload);
-        uploader.setOnClickListener(v -> tk.glucodata.NightPost.config(context, thelayout[0]));
-
         lay = new Layout(context, (l, w, h) -> {
             int[] ret = {w, h};
             return ret;
-        },new View[]{uploader,mirrorview}, new View[]{ok});
+        },new View[]{mirrorview}, new View[]{ok});
 
    final var density=tk.glucodata.GlucoseCurve.metrics.density;
         lay.setPadding((int)(density*8.0),(int)(density*25.0),(int)(density*8.0),(int)(density*2.0));
@@ -1667,16 +1663,10 @@ static private void exchanges(MainActivity context, View parent) {
         */
         var clarity = getbutton(context, "Dexcom Clarity");
         clarity.setOnClickListener(v -> tk.glucodata.Clarity.show(context,thelayout[0]));
-        var uploader = getbutton(context, R.string.uploader);
-        uploader.setOnClickListener(v -> tk.glucodata.NightPost.config(context, thelayout[0]));
-        final CheckDirectionBox libreview = new CheckDirectionBox(context);
         final var healthconnect = (isWearable || Build.VERSION.SDK_INT < 28) ? null : getcheckbox(context, "Health Connect", Natives.gethealthConnect());
         final var activities = getbutton(context, R.string.activity_import);
         activities.setOnClickListener(v -> tk.glucodata.ActivitySettings.show(context, thelayout[0]));
         if(isWearable || Build.VERSION.SDK_INT<28 || !tk.glucodata.ActivityHealth.available()) activities.setVisibility(View.GONE);
-        final boolean wasxdrip = Natives.getuselibreview();
-        libreview.setText(R.string.libreviewname);
-        libreview.setChecked(wasxdrip);
         if (Build.VERSION.SDK_INT >= 28) {
             healthconnect.setOnCheckedChangeListener((buttonView, isChecked) -> {
                         Natives.sethealthConnect(isChecked);
@@ -1692,16 +1682,6 @@ static private void exchanges(MainActivity context, View parent) {
         }
         var webserver = getbutton(context, R.string.webserver);
         webserver.setOnClickListener(v -> tk.glucodata.Nightscout.show(context, thelayout[0]));
-        uploader.setOnClickListener(v -> tk.glucodata.NightPost.config(context, thelayout[0]));
-        final boolean[] donothing = {false};
-        libreview.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> {
-                    if (!donothing[0]) {
-                        donothing[0] = true;
-                        libreview.setChecked(!isChecked);
-                        Libreview.config(context, thelayout[0], libreview, donothing);
-                    }
-                });
         var help = getbutton(context, R.string.helpname);
       help.setOnClickListener(v->{help(R.string.exchangehelp,context); });
       var exportview=getbutton(context,R.string.export);
@@ -1715,9 +1695,9 @@ static private void exchanges(MainActivity context, View parent) {
         lay = new Layout(context, (l, w, h) -> {
             int[] ret = {w, h};
             return ret;
-        }, Build.VERSION.SDK_INT >= 28 ?new View[]{healthconnect,activities,clarity,libreview}:new View[]{clarity,libreview}, new View[]{webserver, uploader,exportview,mirrorview} ,                /*new View[]{emulator},*/new View[]{help, ok})
+        }, Build.VERSION.SDK_INT >= 28 ?new View[]{healthconnect,activities,clarity}:new View[]{clarity}, new View[]{webserver,exportview,mirrorview} ,                /*new View[]{emulator},*/new View[]{help, ok})
             .portraitLayout(
-                new View[]{webserver,uploader},new View[]{clarity,libreview},
+                new View[]{webserver,clarity},
                 (Build.VERSION.SDK_INT >= 28)?new View[]{healthconnect,activities}:null,
                 new View[]{exportview,mirrorview},/*new View[]{emulator},*/new View[]{help},new View[]{ok});
 

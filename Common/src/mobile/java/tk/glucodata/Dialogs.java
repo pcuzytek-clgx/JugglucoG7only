@@ -113,7 +113,6 @@ public void showexport(MainActivity activity,int width,int height,View parent) {
         Button stream=exportbutton(activity,activity.getString(R.string.streamname),2);
         Button hist=exportbutton(activity,activity.getString(R.string.historyname),3);
         Button meals=exportbutton(activity,activity.getString(R.string.mealsname),4);
-        Button libreview=exportbutton(activity,activity.getString(R.string.libreviewname),5);
         Button activities=exportbutton(activity,activity.getString(R.string.activity_import),6);
         var extended=getcheckbox(activity,R.string.activity_export_extended,activitiesExtended);
         extended.setOnCheckedChangeListener((buttonView,isChecked)->activitiesExtended=isChecked);
@@ -199,7 +198,7 @@ public void showexport(MainActivity activity,int width,int height,View parent) {
             }, 
             new View[] {calibrated,daylabel,days},
              new View[] {scan,hist,stream},
-             new View[] {num,meals,libreview},
+             new View[] {num,meals},
              new View[] {activities,extended},
             new View[]{exportlabel},
              new View[] {help,close}
