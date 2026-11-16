@@ -293,51 +293,8 @@ applications (Magiskhide or Denylist) and change its own name, both
 are needed. In your case it has problems with the following file)";
 */
 #ifndef WEAROS
-static constexpr const char endstart[]=R"(:</p>)";
-
-extern bool wrongfiles() ;
-extern        std::vector<std::string_view> usedfiles;
-#include "curve/jugglucotext.hpp"
-extern bool rootcheck;
-extern bool magicmounts;
-extern const std::string_view selfmounts;
-
 extern "C" JNIEXPORT jstring  JNICALL   fromjava(advanced)(JNIEnv *env, jclass cl) {
-    if(!rootcheck)
-        return nullptr;
-    if(wrongfiles()) {
-        const int textlen= usedtext->advancedstart.size();
-        int totlen=textlen+sizeof(endstart)-1+(usedfiles.size()>1?1:0);
-        const char tus[]="<br/>\n";
-        constexpr int tuslen=sizeof(tus)-1;
-        for(auto el:usedfiles)
-            totlen+=el.size()+tuslen;
-        if(magicmounts)
-            totlen+=selfmounts.size()+tuslen;
-        char buf[totlen];
-        int it=textlen;
-        memcpy(buf,usedtext->advancedstart.data(),it);
-        if((usedfiles.size()+magicmounts)>1&&usedtext->add_s)
-            buf[it++]='s';
-        memcpy(buf+it,endstart,sizeof(endstart)-1);
-        it+= sizeof(endstart)-1;
-        for(auto el:usedfiles) {
-            memcpy(buf+it,el.data(),el.size());
-            it+=el.size();
-            memcpy(buf+it,tus,tuslen);
-            it+=tuslen;
-            }
-        if(magicmounts) {
-            memcpy(buf+it,selfmounts.data(),selfmounts.size());
-            it+=selfmounts.size();
-            memcpy(buf+it,tus,tuslen);
-            it+=tuslen;
-            }
-        buf[totlen-1]='\0';
-        return env->NewStringUTF(buf);
-        }
-    else
-        return nullptr;
+    return nullptr;
     }
 #endif
 /*
@@ -1799,13 +1756,10 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(setLibreCountry)(JNIEnv *env, jcla
     }
 
 
-extern bool switchgen2();
 
 extern "C" JNIEXPORT void  JNICALL   fromjava(setStreamHistory)(JNIEnv *env, jclass cl,jboolean val) {
     if(val!= settings->data()->streamHistory) {
         settings->data()->streamHistory=val;
-        if(val)
-            switchgen2();
         }
     }
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getStreamHistory)(JNIEnv *env, jclass cl) {

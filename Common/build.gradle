@@ -407,7 +407,6 @@ buildTypes {
     packagingOptions {
         jniLibs {
             useLegacyPackaging = true
-            doNotStrip '**/libcalibrate.so'
             doNotStrip '**/libcalibrat2.so'
             doNotStrip '**/libinit.so'
          //  doNotStrip '**/lib??*.so'

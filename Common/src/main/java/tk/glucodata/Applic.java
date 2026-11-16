@@ -108,8 +108,6 @@ static public final boolean DynamicTheme=!isWearable;
 //static final boolean DontTalk=isWearable;
 static public final boolean DontTalk=false;
 static public final boolean useZXing= BuildConfig.noZXing==0;
-//static public final boolean includeLib= isWearable;
-static public final boolean includeLib= true;
 static public final boolean isRelease= BuildConfig.isRelease==1;
 //static public final boolean isRelease= !BuildConfig.DEBUG;
 

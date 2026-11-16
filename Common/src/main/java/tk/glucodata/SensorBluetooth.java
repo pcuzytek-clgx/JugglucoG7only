@@ -841,20 +841,7 @@ private boolean checkandconnect(SuperGattCallback  cb,long delay) {
     return true;
     }
 SuperGattCallback getGattCallback(String name, long dataptr) {
-    if(libreVersion==3||tk.glucodata.BuildConfig.DexCom==1) {
-        int vers = Natives.getLibreVersion(dataptr);
-        if(libreVersion==3) {
-            if (vers == 3) {
-                return new Libre3GattCallback(name, dataptr);
-                }
-            }
-        if(tk.glucodata.BuildConfig.DexCom==1) {
-            if(vers==0x40) {
-                return new DexGattCallback(name, dataptr);
-                }
-            }
-        }
-    return  new Libre2GattCallback(name,dataptr);
+    return new DexGattCallback(name, dataptr);
     }
 private boolean addDevice(String str,long dataptr) {
     {if(doLog) {Log.d(LOG_ID,"addDevice "+str);};};

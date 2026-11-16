@@ -32,7 +32,6 @@ import static java.util.Objects.nonNull;
 import static tk.glucodata.Applic.app;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Log.doLog;
-import static tk.glucodata.Libre2GattCallback.showCharacter;
 import static tk.glucodata.Natives.dexKnownSensor;
 import static tk.glucodata.Natives.getalarmclock;
 
@@ -64,6 +63,9 @@ import java.util.concurrent.TimeUnit;
 import static tk.glucodata.util.sleep;
 
 public class DexGattCallback extends SuperGattCallback {
+private static void showCharacter(String label, BluetoothGattCharacteristic characteristic) {
+    if(doLog){Log.showbytes(label + " UUID: " + characteristic.getUuid().toString(), characteristic.getValue());};
+    }
 private boolean known=false;
     public DexGattCallback(String SerialNumber, long dataptr) {
         super(SerialNumber, dataptr, 0x40);

@@ -69,11 +69,8 @@ static  {
 
 	}
 
-	public static  native int nfcdata(byte[] uid,byte[] info,byte[] dat);
 	//public stratic native boolean shouldenableStreaming(byte[] uid);
 //	public static native void enabledStreaming(byte[] uid,byte[] info,boolean val);
-	public static native void enabledStreaming(byte[] uid,byte[] info,int val,byte[] address); // address!=null enables, address==null don't ask again
-public static native boolean hasBluetooth(byte[] sensorident,byte[] patchinfo);
 //     public static native void initopengl(boolean started);
      public static native int openglversion();
 	
@@ -122,8 +119,6 @@ public static native void startsensors( );
     public static native int earliersearch();
     public static native int latersearch();
     public static native void stopsearch();
-    public static native byte  activationcommand(byte[] info);
-    public static native byte [] activationpayload(byte[] id,byte[] info,byte person);
     public static native long getdataptr(String sensorname);
 
 public static native long getsensorptr(long dataptr);
@@ -138,19 +133,15 @@ public static native void setDeviceAddress(long dataptr,String deviceAddress );
 public static native String getDeviceAddress(long dataptr,boolean getnew);
 //public static native void backupstream(long dataptr);
 
-    public static native byte[]    sensorUnlockKey(long dataptr);
 	public static native void resetbluetooth(long dataptr);
 //    public static native void saveState(long dataptr);
 
-    public static native long  processTooth(long dataptr, byte[] bluetoothdata);
  //   public static native boolean    iswaiting(long dataptr);
 //    public static native void    setwaiting(long dataptr,boolean val);
     public static native String lastsensorname();
 	public static native long laststarttime();
 
     public static native String[] activeSensors();
-    public static native byte[] bluetoothOnKey(byte[] sensorident, byte[] patchinfo);
-    public static native void bluetoothback( byte[] sensorident,byte[] info);
 //    public static native void setglucose(long time,float glu,String sensor,int index);
     public static native void setmaxsensors(int nr);
     public static native float freey();    
@@ -495,17 +486,11 @@ public static native boolean getusexdripwebserver( );
 public static native void setusexdripwebserver(boolean val);
 //public static native void startwatchserver( );
 //public static native void stopwatchserver( );
-public static native int V1( int i, int i2,byte[]  ar1,byte[]  ar2);
-public static native byte[] V2(int i, int i2, byte[] ar1, byte[] ar2);
-public static native boolean abbottinit();
-public static native boolean abbottreinit();
 public static native byte[] getstreamingAuthenticationData(long dataptr);
 public static native byte[] getsensorident(long dataptr);
 public static native int getLibre2sensorgen(long dataptr);
 public static native int getLibreVersion(long dataptr);
 
-public static native void USenabledStreaming(byte[] sensorident,byte[] jauth,byte[] address);
-public static native void closedynlib( );
 public static native strGlucose lastglucose();
 
 public static native long lastglucosetime( );
@@ -555,7 +540,6 @@ public static native boolean getXdripServerLocal( );
 //s/^extern.*JNIEXPORT[         ]*\([a-zA-Z]*\)[ ]*JNICALL[      ]*fromjava(\([^)]*\)) *(JNIEnv[^,]*,[^,)]*[,)]\([^){]*\)[^a-zA-Z0-9]*$/public static native \1 \2(\3);/g
 //public static native int getlastGen( );
 //public static native void setlastGen(int val);
-public static native boolean switchgen2( );
 
 //public static native void logBluetoothGattCharacteristic(String jmess, BluetoothGattCharacteristic bluetoothGattCharacteristic);
 
@@ -690,7 +674,6 @@ public static native void setBlueMessage(String name,boolean val);
                 
 public static native void setwakelock(boolean val);
 public static native boolean getwakelock( );
-public static native boolean hasRootcheck( );
 public static native void setheartrate(boolean val);
 public static native boolean getheartrate( );
 public static native String[] librelinkRecepters( );

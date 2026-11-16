@@ -167,9 +167,10 @@ private void startall() {
    }
 
 
+static boolean showintro=false;
  void               onceshowintro() {
-                 if(getlibrary.showintro) {
-                   getlibrary.showintro=false;
+                 if(showintro) {
+                   showintro=false;
                    MainActivity act=this;
                    act.themeLightBars();
                    help.help(R.string.introhelp,act,
@@ -301,7 +302,8 @@ private void startdisplay() {
 if(!isWearable) {
     applyScreenOrientation(getResources().getConfiguration());
     }
-    getlibrary.getlibrary(this);//after setfilesdir for settings
+    if(!isWearable&&!Natives.getShownintro())//after setfilesdir for settings
+        showintro=true;
 
     handleIntent(getIntent());
     var langstring=getString(R.string.language);
@@ -996,9 +998,6 @@ if(!isWearable) {
         Natives.setpaused(curve);
         curve.onResume();
         }
-    if(openfile!=null) {
-        openfile.showchoice(this,true);
-        }
     if(Natives.gethidefloatinJuggluco())
         Floating.removeFloating();
     boolean showsdialog=false;
@@ -1160,10 +1159,6 @@ RunOnUiThread(() ->
                return;
                }
             }
-        if(hasTech(techs, "android.nfc.tech.NfcV")) {
-                runNfcV(tag);
-                return;
-                }
         }
     else  {
         if(doLog) 
@@ -1619,7 +1614,6 @@ static  final int REQUEST_BARCODE_SIB2=0x11;
 public static final int REQUEST_EXPORT=0x70;
 //public static final int REQUEST_EXPORT=0x54e806d0;
 public static final int REQUEST_RINGTONE=0x60;
-public static final int REQUEST_LIB=0x200;
 public static final int REQUEST_MASK=0xFFFFFF00;
 public static final int IGNORE_BATTERY_OPTIMIZATION_SETTINGS=0x100;
 static final int OVERLAY_PERMISSION_REQUEST_CODE=0x40;
@@ -1629,7 +1623,6 @@ public static final int REQUEST_WEBPAGES=0x302;
 public static final int REQUEST_WEBTREE=0x303;
 //static final private int REQUEST_CHECK_SETTINGS=0x20;
 //public static final int REQUEST_IGNORE_BATTERY_OPTIMIZATIONS=0x300;
-Openfile openfile=null;
 
 private void    savekey(FileInputStream input,String outkeystr) {
     File outkey=new File(getFilesDir(),outkeystr);
@@ -1685,10 +1678,6 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             Battery.batteryscreen(this,null);
             }
             } ; return;
-        case REQUEST_LIB: {
-            if (resultCode == Activity.RESULT_OK&&openfile!=null) 
-                openfile.getlib(data,this);
-        }; return;
        case PRIVATE_REQUEST:
         case CHAIN_REQUEST:
          if(!isWearable) {
@@ -2209,13 +2198,6 @@ Runnable doswitch=null;
 
 
 
-private void runNfcV(Tag tag) {
-    if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
-        new Thread(() -> ScanNfcV.scan(curve, tag)).start();
-    } else {
-        ScanNfcV.scan(curve, tag);
-    }
-}
 
 
 int mirrorlistcolor=-1;

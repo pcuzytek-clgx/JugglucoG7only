@@ -27,7 +27,7 @@
 #include "fromjava.h"
 #include "destruct.hpp"
 #include "datbackup.hpp"
-#include "jnisubin.hpp"
+#include "scanstate.hpp"
 #include "jniclass.hpp"
 extern void    sendstreaming(SensorGlucoseData *hist);
 extern Sensoren *sensors;
