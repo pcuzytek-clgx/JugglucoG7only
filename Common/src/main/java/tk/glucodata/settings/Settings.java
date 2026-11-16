@@ -404,7 +404,7 @@ static private void advancedalarm(MainActivity context,View parview) {
         final int sidepad=(int)(GlucoseCurve.metrics.density*8);
        getMargins(close).bottomMargin=getMargins(close).bottomMargin=sidepad;
         lay.systembarPadding((left,top,right,bottom)-> {
-              return   new int[]{left+sidepad,top,sidepad+right,bottom*9/10};
+              return   new int[]{left+sidepad,top,sidepad+right,tk.glucodata.DexTabs.isShown()?bottom:bottom*9/10};
               });
        layout=lay;
         }
@@ -825,7 +825,7 @@ new View[]{isvalue},new View[]{ringisvalue},new View[]{alarmis,alarmtype},new Vi
      else {
         final int sidepad=(int)(GlucoseCurve.metrics.density*8);
         layout.systembarPadding((left,top,right,bottom)-> {
-              return   new int[]{left+sidepad,top*2/3,sidepad+right,sidepad+bottom*9/10};
+              return   new int[]{left+sidepad,top*2/3,sidepad+right,sidepad+(tk.glucodata.DexTabs.isShown()?bottom:bottom*9/10)};
               });
         }
     var scroll=new ScrollView(context);    
@@ -1210,7 +1210,7 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
      else {
       final   int pad=(int)(tk.glucodata.GlucoseCurve.metrics.density*8.0);
        lay.systembarPadding((left,top,right,bottom)->
-               new int[]{left+pad,top*3/4,pad+right,pad+bottom*3/4});
+               new int[]{left+pad,top*3/4,pad+right,pad+tk.glucodata.DexTabs.bottomPart(bottom)});
       }
 
     var scroll=new ScrollView(context);
@@ -1275,7 +1275,8 @@ private    void mksettings(MainActivity context) {
              }
 
 
-      if(!useclose)
+      // G7 fork: Settings is a tab of the bottom bar, leave it via the bar.
+      if(!useclose||!isWearable)
      close.setVisibility(GONE);
 //    CheckDirectionBox bluetooth= new CheckDirectionBox(context);
    CheckDirectionBox globalscan = new CheckDirectionBox(context);
@@ -1441,7 +1442,7 @@ private    void mksettings(MainActivity context) {
                 new View[]{calibration,glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
                 new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2]}:null,
-                new View[]{help,intro},new View[]{close}};
+                new View[]{help,intro,close}};
             }
         }
 
@@ -1498,7 +1499,7 @@ private    void mksettings(MainActivity context) {
         }
      else {
        lay.systembarPadding((left,top,right,bottom)->
-               new int[]{left+pad,top*3/4,pad+right,pad+bottom*3/4});
+               new int[]{left+pad,top*3/4,pad+right,pad+tk.glucodata.DexTabs.bottomPart(bottom)});
       }
 
     final    int laywidth=MATCH_PARENT;
@@ -1591,7 +1592,7 @@ static private void exchanges(MainActivity context, View parent) {
     final   int pad=(int)(tk.glucodata.GlucoseCurve.metrics.density*10.0);
     final   int bottompad=(int)(tk.glucodata.GlucoseCurve.metrics.density*5.0);
         lay.systembarPadding((left,top,right,bottom)->
-                new int[]{left,top*3/4,right+pad,bottom*7/8+bottompad});
+                new int[]{left,top*3/4,right+pad,(tk.glucodata.DexTabs.isShown()?bottom:bottom*7/8)+bottompad});
       }
 
     thelayout[0] = lay;

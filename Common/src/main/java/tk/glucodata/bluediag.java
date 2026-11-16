@@ -743,7 +743,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
     var  params = new FrameLayout.LayoutParams(isWearable?WRAP_CONTENT:MATCH_PARENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
     if(isWearable) {
         params.topMargin=(int)(MainActivity.systembarTop*.3f);
-        params.bottomMargin=(int)(MainActivity.systembarBottom*.3f);
+        params.bottomMargin=DexTabs.isShown()?MainActivity.systembarBottom:(int)(MainActivity.systembarBottom*.3f);
         params.leftMargin=(int)(MainActivity.systembarLeft*.3f);
         params.rightMargin=(int)(MainActivity.systembarRight*.3f);
     }

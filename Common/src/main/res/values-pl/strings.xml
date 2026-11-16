@@ -262,7 +262,11 @@
  <string name="libreisviewed">Podgl. ekr.</string>
  <string name="novalue">Brak wartości</string>
  <string name="watches">Zegarek</string>
- <string name="menus">Całe menu</string>
+ <string name="tabglucose">Glukoza</string>
+ <string name="tabstatistics">Statystyki</string>
+ <string name="stopalarmbutton">Zatrzymaj alarm</string>
+ <string name="connections">Połączenia</string>
+ <string name="showcalibratedstream">Pokaż kalibrowany strumień</string>
  <string name="system_ui">Integr. z sys.</string>
  <string name="sensor">Sensor</string>
  <string name="settings">Ustawienia</string>

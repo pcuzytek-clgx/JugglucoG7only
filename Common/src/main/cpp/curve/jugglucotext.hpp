@@ -142,7 +142,7 @@ std::string_view getTrendName(int type) const {
 std::string_view statisticsName() const {
     return 
     #ifdef INJUGGLUCO
-    menustr1[4];
+    menustr1[1];
     #else
     statistics;
     #endif

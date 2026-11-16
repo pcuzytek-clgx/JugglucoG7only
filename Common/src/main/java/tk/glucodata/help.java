@@ -710,10 +710,10 @@ private static final class HelpSearch {
             0,
             MainActivity.systembarRight,
 
-           MainActivity.systembarBottom*3/4
+           DexTabs.bottomPart(MainActivity.systembarBottom)
         ); */
        layouttmp.setLayoutParams(params);
-          layouttmp.systembarMargins((left,top,right,bottom)->new int[]{left,top*3/4,right,bottom*3/4});
+          layouttmp.systembarMargins((left,top,right,bottom)->new int[]{left,top*3/4,right,DexTabs.bottomPart(bottom)});
        layouttmp.requestLayout();
         layouttmp.setBackgroundResource(R.drawable.helpbackground);
            addMyContentView(getActivity(act),layouttmp, params);

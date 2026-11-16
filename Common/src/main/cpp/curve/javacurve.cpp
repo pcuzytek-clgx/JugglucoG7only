@@ -716,6 +716,9 @@ extern bool makepercetages() ;
 extern "C" JNIEXPORT jboolean JNICALL fromjava(makepercentages)(JNIEnv *env, jclass thiz) {
  return makepercetages();
  }
+extern "C" JNIEXPORT void JNICALL fromjava(dexShowNow)(JNIEnv *env, jclass thiz) {
+ appcurve.dexShowNow();
+ }
 extern int numlist;
 extern "C" JNIEXPORT void JNICALL fromjava(makenumbers)(JNIEnv *env, jclass thiz) {
  if(!numlist) {

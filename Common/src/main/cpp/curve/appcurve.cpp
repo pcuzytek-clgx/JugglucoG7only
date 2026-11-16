@@ -329,7 +329,9 @@ void JCurve::dexGeometry() {
     const float R=std::min(W*.2f,H*.095f);
     const float cx=W*.5f,cy=physicalbartop+margin+R*1.3f;
     dexbubble={cx-R,cy-R,cx+R,cy+R};
-    dexcard={left,cy+R*1.3f+margin,right,H-physicalbarbottom-margin};
+    // physicalbarbottom includes the Java bottom tab bar (DexTabs).
+    const float cardtop=cy+R*1.3f+margin;
+    dexcard={left,cardtop,right,H-physicalbarbottom-margin*.5f};
     const float chiptop=dexcard.top+margin;
     const float chipheight=density*36.0f;
     const float gap=density*8.0f;
@@ -355,6 +357,12 @@ int JCurve::dexChipAt(float x,float y) const {
 
 static int dexFollowNow(int duration) {
     return duration*97/100;
+    }
+
+void JCurve::dexShowNow() {
+    diffcurrent=dexFollowNow(duration);
+    doclamp=true;
+    starttime=time(nullptr)-diffcurrent;
     }
 
 void JCurve::setDexRange(int hours) {
@@ -796,6 +804,8 @@ int64_t JCurve::screentap(float x,float y) {
                 setDexRange(hours);
                 return -1LL;
                 }
+            if(!showpers)
+                return -1LL;
             }
 #endif
         if(showmeals) {
@@ -2228,7 +2238,9 @@ void initopengl(float small,float menu,float density,float headin) {
     appcurve.showcalibratedstream=settings->data()->showcalibratedstream;
     appcurve.showcalibratedhistories=settings->data()->showcalibratedhistories;
     appcurve.showscans=settings->data()->showscans;
-    appcurve.showstream=settings->data()->showstream;;
+    // G7-only: the sensor stream is always shown.
+    settings->data()->showstream=true;
+    appcurve.showstream=1;
     // G7-only: amounts (insulin/carbs) are never drawn.
     appcurve.showmeals=false;
     appcurve.shownumbers=false;
@@ -2347,8 +2359,13 @@ tapx=-8000;
                 diffcurrent=dexFollowNow(duration);
                 }
             showDexHeader(avg,nu);
+            {
             DexGraphLayout graph(*this,avg);
-            shown=displaycurve(avg,nu);
+            displaycurve(avg,nu);
+            }
+            // No popup menus in the Dexcom layout: the Java tab bar replaces them.
+            shown=1;
+            nrmenu=0;
             }
         else
             shown=displaycurve(avg,nu);

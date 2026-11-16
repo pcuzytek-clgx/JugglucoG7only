@@ -35,8 +35,6 @@ import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.CheckBox;
 
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -47,7 +45,6 @@ import static tk.glucodata.Natives.getInvertColors;
 import static tk.glucodata.NumberView.smallScreen;
 import static tk.glucodata.settings.Settings.removeContentView;
 
-import tk.glucodata.settings.Settings;
 
 public class Menus {
 static public boolean on=false;
@@ -291,91 +288,29 @@ static private void showNow(MainActivity act) {
 			});
 
     var menusviewview=view.findViewById(R.id.menusview);menusviewview.setOnClickListener(v ->{}); 
-        var menusview=view.findViewById(R.id.menus);menusview.setOnClickListener(v ->{
-				act.poponback();
-			   on=false;
-               waitingForLandscape=false;
-               cancelWindowWait();
-
-   		act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-				act.requestRender();
-		}); 
         var watchview=view.findViewById(R.id.watch);watchview.setOnClickListener(v ->{
-
 				if(!isWearable) {
+				act.poponback();
    		   act.lightBars(!getInvertColors( ));
 					removeContentView(view);
 					tk.glucodata.Watch.show(act);
 					}
-
 	}); 
         var sensorview=view.findViewById(R.id.sensor);sensorview.setOnClickListener(v ->{
-
+				act.poponback();
    		   act.lightBars(!getInvertColors( ));
 				removeContentView(view);
 			       bluediag.start(act);
 		}); 
-        var settingsview=view.findViewById(R.id.settings);settingsview.setOnClickListener(v ->{
-					removeContentView(view);
-					Settings.set(act);
-	}); 
-        var closeview=view.findViewById(R.id.close);closeview.setOnClickListener(v ->{
-		act.moveTaskToBack(true);
-	}); 
         var mirrorview=view.findViewById(R.id.mirror);mirrorview.setOnClickListener(v ->{
+				act.poponback();
 		     removeContentView(view);
 			(new Backup()).mkbackupview(act);
-
 	}); 
-        var statisticsview=view.findViewById(R.id.statistics);statisticsview.setOnClickListener(v ->{
-
-			if(Natives.makepercentages()) {
-   		         act.lightBars(!getInvertColors( ));
-				removeContentView(view);
-				act.requestRender();
-				Stats.mkstats(act);
-				}
-
-		}
-
-			);
- 
-
-
-
-    CheckBox streamview=view.findViewById(R.id.stream);streamview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowstream(isChecked);
-				act.requestRender();
-		}); 
-	streamview.setChecked(Natives.getshowstream() );
-
-
-
-    CheckBox calibratedstreamview=view.findViewById(R.id.calibratedstream);calibratedstreamview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowcalibratedstream(isChecked);
-				act.requestRender();
-		}); 
-	calibratedstreamview.setChecked(Natives.getshowcalibratedstream() );
-
-
-
-
-
-
    
 	  // view.setPadding(0,MainActivity.systembarTop,0,0);
-    if(!isWearable) {
-        /* Edge-to-edge: the overlay occupies the whole window, so keep
-         * its controls out of the system bars explicitly. */
-        WindowInsetsCompat wi=ViewCompat.getRootWindowInsets(act.getWindow().getDecorView());
-        if(wi!=null) {
-            Insets bars=wi.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
-            }
-        }
-    else
-        view.setPadding(MainActivity.systembarLeft,MainActivity.systembarTop*3/4,MainActivity.systembarRight,MainActivity.systembarBottom);
+    // systembarBottom includes the bottom tab bar (DexTabs) when it is shown.
+    view.setPadding(MainActivity.systembarLeft,MainActivity.systembarTop*3/4,MainActivity.systembarRight,MainActivity.systembarBottom);
 
 	act.addMyContentView(view, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
     if(!isWearable)

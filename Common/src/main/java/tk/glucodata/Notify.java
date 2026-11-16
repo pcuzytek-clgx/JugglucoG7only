@@ -37,7 +37,6 @@ import static tk.glucodata.Log.doLog;
 import static tk.glucodata.Natives.getUSEALARM;
 import static tk.glucodata.Natives.getalarmdisturb;
 import static tk.glucodata.Natives.getisalarm;
-import static tk.glucodata.Natives.setisalarm;
 import static tk.glucodata.ScanNfcV.vibrates;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -380,6 +379,11 @@ private static void showoldglucose() {
     //private static boolean isalarm=false;
     private  static Runnable runstopalarm=null;
     private static ScheduledFuture<?> stopschedule=null;
+    private static void setisalarm(boolean val) {
+        Natives.setisalarm(val);
+        if(!isWearable)
+            DexTabs.showAlarm(val);
+        }
     static public void stopalarm() {
         stopalarmnotsend(true);
         }

@@ -261,7 +261,11 @@
  <string name="libreisviewed">Spy views</string>
  <string name="novalue">No value</string>
  <string name="watches">Watch</string>
- <string name="menus">Menus</string>
+ <string name="tabglucose">Glucose</string>
+ <string name="tabstatistics">Statistics</string>
+ <string name="stopalarmbutton">Stop alarm</string>
+ <string name="connections">Connections</string>
+ <string name="showcalibratedstream">Show calibrated stream</string>
  <string name="system_ui">System UI</string>
  <string name="sensor">Sensor</string>
  <string name="settings">Settings</string>

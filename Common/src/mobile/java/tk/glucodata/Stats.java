@@ -181,7 +181,7 @@ static void mkstats(MainActivity act) {
       Button Curve = getbutton(act, R.string.summarygraph);
       Layout layout = new Layout(act, (l, w, h) -> {
          return new int[]{w, h};
-      }, new View[]{history,Days, Help},new View[]{Close,stats, Curve});
+      }, new View[]{history,Days, Help},new View[]{stats, Curve});
 
       layout.setBackgroundColor(Applic.backgroundcolor);
       if(!act.curve.statspresent)

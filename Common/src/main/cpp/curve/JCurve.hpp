@@ -281,6 +281,7 @@ bool dexPhoneLayout() const;
 void dexGeometry();
 void showDexHeader(NVGcontext* avg,uint32_t nu);
 int dexChipAt(float x,float y) const;
+void dexShowNow();
 void setDexRange(int hours);
 #endif
 void setdiffcurrent(bool val) {

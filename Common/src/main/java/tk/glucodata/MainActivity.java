@@ -284,6 +284,8 @@ private void startdisplay() {
       lightBars(!getInvertColors( ));
       }
     setContentView(curve);
+    if(!isWearable)
+        DexTabs.attach(this);
 
 if(!isWearable) {
     applyScreenOrientation(getResources().getConfiguration());
@@ -541,6 +543,8 @@ private void setGraphOrientationModes(boolean locked,boolean currentAsLandscape)
         return;
     graphLockedToFirstLandscape=locked;
     graphUsesCurrentOrientationAsLandscape=currentAsLandscape;
+    if(!isWearable&&geometryChanged)
+        DexTabs.refresh();
     if(curve!=null) {
         curve.syncNativeDisplayRotation();
         if(geometryChanged)
@@ -1232,6 +1236,7 @@ protected void onStop() {
             shownglucosealert=null;
             }
        thisone=null;
+       if(!isWearable) DexTabs.detach(this);
        super.onDestroy();
     }
     @Override
@@ -1683,12 +1688,14 @@ static public int onbacknr() {
 static public void setonback(Runnable run) {
     {if(doLog) {Log.i(LOG_ID,"setonback");};};
     backrun.addFirst(run);
+    if(!isWearable) DexTabs.backStackChanged();
     }
 static public boolean doonback() {
     {if(doLog) {Log.i(LOG_ID,"doonback");};};
     if(!backrun.isEmpty()) {
         Runnable wasback=backrun.removeFirst();
         wasback.run();
+        if(!isWearable) DexTabs.backStackChanged();
         return true;
         }
     return false;
@@ -1696,9 +1703,11 @@ static public boolean doonback() {
 static public void poponback() {
     if(!backrun.isEmpty()) 
         backrun.removeFirst();
+    if(!isWearable) DexTabs.backStackChanged();
     }
 static public void clearonback() {
     backrun.clear();
+    if(!isWearable) DexTabs.backStackChanged();
     }
 boolean backinapp()  {
     {if(doLog) {Log.d(LOG_ID,"backinapp");};};
@@ -2063,6 +2072,8 @@ private static void makeTextSelectable(View view) {
 
 public static void addMyContentView(Activity context,View view, ViewGroup.LayoutParams params) {
     context.addContentView(view,params);
+    if(!isWearable)
+        DexTabs.toFront();
     if(Applic.DynamicTheme)
             DynamicThemeUtils.applyTheme(view);
     makeTextSelectable(view);

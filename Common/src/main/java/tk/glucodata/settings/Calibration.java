@@ -8,7 +8,6 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Applic.backgroundcolor;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Natives.setshowcalibratedstream;
-import static tk.glucodata.Natives.setshowstream;
 import static tk.glucodata.NumberView.avoidSpinnerDropdownFocus;
 import static tk.glucodata.settings.Settings.removeContentView;
 import static tk.glucodata.util.getbutton;
@@ -65,11 +64,16 @@ static public void show(MainActivity act,View parent) {
           Natives.setAllValues(isChecked);
           act.requestRender();
           });
+   var showcalibrated=getcheckbox(act,act.getString(R.string.showcalibratedstream),Natives.getshowcalibratedstream());
+   showcalibrated.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
+          setshowcalibratedstream(isChecked);
+          act.requestRender();
+          });
    var docalibrate=getcheckbox(act,act.getString(R.string.active),Natives.getDoCalibrate());
    docalibrate.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
           Natives.setDoCalibrate(isChecked);
           if(isChecked) {
-            setshowcalibratedstream(true);
+            showcalibrated.setChecked(true);
             }
           act.requestRender();
           });
@@ -95,7 +99,7 @@ static public void show(MainActivity act,View parent) {
             });
          var  buttons=new View[]{help,docalibrate,close};
          var lastrow=new View[]{allvalues,calibratepast} ;
-        views=new View[][]{new View[]{calibrateA}, new View[]{bloodvar,spinner},buttons,     lastrow};
+        views=new View[][]{new View[]{calibrateA}, new View[]{bloodvar,spinner},new View[]{showcalibrated},buttons,     lastrow};
         };
     ViewGroup  layout=new Layout(act, (lay, w, h) -> { return new int[] {w,h};},views );
   if(isWearable) {

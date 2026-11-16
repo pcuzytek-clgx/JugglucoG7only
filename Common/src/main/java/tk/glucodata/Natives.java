@@ -692,6 +692,7 @@ public static native boolean getLibreIsViewed( );
 public static native void setRTL(boolean val);
 public static native boolean getRTL( );
 public static native boolean makepercentages( );
+public static native void dexShowNow( );
 public static native void makenumbers();
 public static native boolean showlastscan( );
 
