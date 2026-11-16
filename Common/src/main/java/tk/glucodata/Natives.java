@@ -195,7 +195,6 @@ public static native void setalarms(float alow, float ahigh, boolean lowalarm, b
 
 
 
-public static native void setunit(int unit);
 public static native boolean setlabel(int pos,String label, float prec,float weight);
 public static native void setnrlabel(int nr);
 public static native boolean shouldsendlabels();

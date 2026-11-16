@@ -77,7 +77,6 @@
  <string name="toolarg">zbyt długo</string>
  <string name="targetrange">"Zakres docelowy: "</string>
  <string name="graphrange">"Zakres wykresu: "</string>
- <string name="unit">"Jednostka: "</string>
  <string name="glucoseaxisleft">Oś glukozy po LEWEJ</string>
  <string name="startsapp">Skanowanie uruchamia aplikację</string>
  <string name="patchedlibrebroadcast">Patched Libre</string>
@@ -89,7 +88,6 @@
  <string name="glucose">Osi gluk.</string>
  <string name="sensorviabluetooth">Sensor przez bluetooth</string>
  <string name="sensorviabluetoothon">W przypadku alarmów w urządzeniach nieobsługujących klonowania należy włączyć opcję „Sensor przez bluetooth”</string>
- <string name="setunitfirst">Najpierw ustaw jednostkę</string>
  <string name="numberlabels">Etykiety wart. liczb.</string>
  <string name="colors">Kolory</string>
  <string name="remindersname">Przypomnienia</string>

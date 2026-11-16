@@ -120,7 +120,7 @@ public  ArrayList<String> getlabels() {
     }
 public tk.glucodata.nums.AllData numdata=null;
 public GlucoseCurve curve=null;
-    public static int unit=0;
+    public static int unit=2;
 public void redraw() {
     var tmpcurve=curve;
     if(tmpcurve!=null)
@@ -204,18 +204,6 @@ public Applic() {
 void setnotify(boolean on) {
     Notify.alertwatch=on;
     {if(doLog) {Log.i(LOG_ID,"setnotify="+on);};};
-    }
-public void setunit(int unit)  {
-     if(Applic.unit!=unit)
-        SuperGattCallback.previousglucosevalue=0.0f;
-    Natives.setunit(unit);
-    Applic.unit=unit;
-    Notify.mkunitstr(app,unit);
-    // Kerfstok and the Libre3/Kerfstok superset share the GLUNITS protocol.
-    // This also updates a direct-Libre3 watch when no phone glucose packets are
-    // currently being sent (those packets normally carry the unit themselves).
-    if(!isWearable && numdata!=null && Natives.gethasgarmin())
-        numdata.sendunits(unit);
     }
 public void sendlabels() {
     if(!isWearable) {

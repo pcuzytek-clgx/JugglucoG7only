@@ -77,7 +77,6 @@
  <string name="toolarg"> is too long</string>
  <string name="targetrange">"Target range: "</string>
  <string name="graphrange">"Graph range: "</string>
- <string name="unit">"Unit: "</string>
  <string name="glucoseaxisleft">Glucose-axis LEFT</string>
  <string name="startsapp">Scanning starts app</string>
  <string name="patchedlibrebroadcast">Patched Libre</string>
@@ -89,7 +88,6 @@
  <string name="glucose">Glucose</string>
  <string name="sensorviabluetooth">Sensor via bluetooth</string>
  <string name="sensorviabluetoothon">For Alarms in non-Mirror devices \'Sensor via bluetooth\' should be turned on</string>
- <string name="setunitfirst">Set unit first</string>
  <string name="numberlabels">Number Labels</string>
  <string name="colors">Colors</string>
  <string name="remindersname">Reminders</string>

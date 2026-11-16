@@ -185,12 +185,6 @@ public static void set(MainActivity act) {
     }
 private class Closerun implements Runnable {
  public  void run() {
-        int unit=mmolL.isChecked()?1:(mgdl.isChecked()?2:0);
-        if(unit==0) {
-           activity.setonback(this);
-           Applic.argToaster(activity, R.string.setunitfirst,Toast.LENGTH_SHORT);
-           return;
-           }
         hidekeyboard();
         finish();
          activity.lightBars(!getInvertColors( ));
@@ -207,12 +201,6 @@ private void makesettingsin(MainActivity act) {
        /*
     final Runnable[] closerun=new Runnable[1]; //to get rid of may not be initialize nonsense
     closerun[0]=() -> {
-        int unit=mmolL.isChecked()?1:(mgdl.isChecked()?2:0);
-        if(unit==0) {
-           act.setonback(closerun[0]);
-           Applic.argToaster(act, R.string.setunitfirst,Toast.LENGTH_SHORT);
-           return;
-           }
         hidekeyboard();
         finish();
            act.lightBars(!getInvertColors( ));
@@ -272,8 +260,6 @@ static int getbackgroundcolor(Context context) {
 
 //HorizontalScrollView settinglayout=null;
 FrameLayout settinglayout=null;
-    CheckDirectionRadio mmolL;
-    CheckDirectionRadio mgdl;
 
 static View[] mkalarm(MainActivity context,String label1,boolean show,Float value,int kind) {
 
@@ -338,11 +324,6 @@ static float round(float value,float size)  {
    return Math.round(value*size)/size;
    }
 void setvalues() {
-      final var unit= Natives.getunit();
-        switch(unit) {
-            case 1: mmolL.setChecked(true);break;
-            case 2: mgdl.setChecked(true);break;
-        }
 
 //        alow.setText( float2string(value));
     }
@@ -1280,29 +1261,7 @@ Runnable closerun= () -> {
 private    void mksettings(MainActivity context) {
 
     if(settinglayout==null) {
-        mmolL = new CheckDirectionRadio(context);
 
-        mmolL.setOnClickListener(v-> {
-         ((Applic) context.getApplication()).setunit(1);
-                  mgdl.setChecked(false);
-                 recreate();
-                });
-
-            mmolL.setText(R.string.mmolL);
-         mgdl = new CheckDirectionRadio(context);
-        mgdl.setOnClickListener(v-> {
-            ((Applic) context.getApplication()).setunit(2);
-            mmolL.setChecked(false);
-              recreate();
-           });
-
-        mgdl.setText(R.string.mgdL);
-
-         final   int padmg=!isWearable?(int)(tk.glucodata.GlucoseCurve.metrics.density*40.0):0;
-        mgdl.setPaddingRelative(0,0,padmg,0);
-        mmolL.setPadding(0,0,0,0);
-        var leftspace=new Space(context);
-       View[] row0;
 
         Button changelabels=new Button(context);
         Button help =new Button(context);
@@ -1310,16 +1269,8 @@ private    void mksettings(MainActivity context) {
         help.setOnClickListener(v->{help(R.string.settinghelp,(MainActivity)(v.getContext())); });
 
       var close=getbutton(context,R.string.closename);
-        if(isWearable) {
-             row0=new View[]{leftspace,mmolL, mgdl,new Space(context)};
-            }
-        else {
-            TextView unitlabel = new TextView(context);
-            unitlabel.setText(R.string.unit);
+        if(!isWearable) {
             int hormarg= (int)(tk.glucodata.GlucoseCurve.metrics.density*15.0);
-            getMargins(unitlabel).setMarginStart(hormarg);
-            getMargins(mgdl).setMarginEnd(hormarg);
-             row0 = new View[]{unitlabel, mmolL, mgdl};
             getMargins(help).setMarginStart(hormarg);
             getMargins(close).setMarginEnd(hormarg);
              }
@@ -1369,22 +1320,12 @@ private    void mksettings(MainActivity context) {
     //bluetooth.setChecked(blueused);
     var alarmbut=getbutton(context,R.string.alarms);
         alarmbut.setOnClickListener(v->{
-            int unit=mmolL.isChecked()?1:(mgdl.isChecked()?2:0);
-            if(unit==0) {
-                Applic.argToaster(context, R.string.setunitfirst,Toast.LENGTH_SHORT);
-               return;
-               }
             alarmsettings(context,settinglayout);
             });
 
 
 
     close.setOnClickListener(v->{
-            int unit=mmolL.isChecked()?1:(mgdl.isChecked()?2:0);
-            if(unit==0) {
-            Applic.argToaster(context, R.string.setunitfirst,Toast.LENGTH_SHORT);
-               return;
-            }
            context.poponback();
             hidekeyboard();
             finish();
@@ -1450,11 +1391,11 @@ private    void mksettings(MainActivity context) {
         floatglucose.setOnCheckedChangeListener( (buttonView,  isChecked) -> Floating.setfloatglucose(context,isChecked) ) ;
         View[] camornum=new View[] {alarmbut,numalarm};
         if(BuildConfig.minSDK>=26) {
-            views = new View[][]{new View[]{displayview},row0, hasnfc ? (new View[]{globalscan, nfcsound}) : null,new View[]{floatconfig, floatglucose},new View[]{complications},talkrow, new View[]{exchanges },new View[]{calibration},   camornum, new View[]{close}, new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
+            views = new View[][]{new View[]{displayview}, hasnfc ? (new View[]{globalscan, nfcsound}) : null,new View[]{floatconfig, floatglucose},new View[]{complications},talkrow, new View[]{exchanges },new View[]{calibration},   camornum, new View[]{close}, new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
             ;
         }
         else{
-            views = new View[][]{new View[]{displayview},row0,    hasnfc ? (new View[]{globalscan, nfcsound}) : null, new View[]{floatconfig, floatglucose},talkrow,  new View[]{exchanges },new View[]{calibration},     camornum,new View[]{close},  new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
+            views = new View[][]{new View[]{displayview},    hasnfc ? (new View[]{globalscan, nfcsound}) : null, new View[]{floatconfig, floatglucose},talkrow,  new View[]{exchanges },new View[]{calibration},     camornum,new View[]{close},  new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
             ;
         }
         }
@@ -1497,12 +1438,10 @@ private    void mksettings(MainActivity context) {
 
         View[] rowglu=new View[]{floatconfig,calibration,glucosenotify};
 //        View[] rowglu=new View[]{floatconfig,glucosenotify};
-        views=new View[][]{row0, hasnfc?new View[]{nfcsound, globalscan,camera}:null,rowglu,new View[]{exchanges,numalarm,alarmbut},numdis, row9};
+        views=new View[][]{hasnfc?new View[]{nfcsound, globalscan,camera}:null,rowglu,new View[]{exchanges,numalarm,alarmbut},numdis, row9};
 
         if(advhelp!=null) {
             portraitViews=new View[][]{
-                row0,
-//                new View[]{row0[0]},new View[]{row0[1],row0[2]},
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
                 new View[]{floatconfig,calibration},new View[]{glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
@@ -1511,8 +1450,6 @@ private    void mksettings(MainActivity context) {
             }
         else {
             portraitViews=new View[][]{
-                row0,
-//                new View[]{row0[0]},new View[]{row0[1],row0[2]},
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
                 new View[]{floatconfig,calibration},new View[]{glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
@@ -1583,11 +1520,6 @@ private    void mksettings(MainActivity context) {
         new tk.glucodata.setNumAlarm().mkviews(context,settinglayout);
         });
     displayview.setOnClickListener(v-> {
-        int unit=mmolL.isChecked()?1:(mgdl.isChecked()?2:0);
-        if(unit==0) {
-            Applic.argToaster(context, R.string.setunitfirst,Toast.LENGTH_SHORT);
-           return;
-           }
          displaysettings(context,this);
          });
         }

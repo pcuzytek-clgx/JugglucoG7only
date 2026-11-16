@@ -1098,8 +1098,9 @@ uint32_t targethigh() const {
 bool usemmolL() const {
     return data()->unit==1;
     }
-void setunit(int unit) {
-    LOGGER("setunit(%d)\n",unit);
+void setunit(int) {
+    // Only mg/dL is supported.
+    const int unit=2;
     if((data()->unit=unit)==1) {
         convertmult= convertmultmmol;
         gformat="%.1f";
