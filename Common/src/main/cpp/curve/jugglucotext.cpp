@@ -109,10 +109,7 @@ const jugglucotext engtext {
 		"Stop Alarm"
 		},
 	.menustr1={
-		"Export",
 		"Mirror",
-		engtext.newamount,
-		"List", 
 #else
        .statistics=
 #endif //INJUGGLUCO
@@ -120,15 +117,7 @@ const jugglucotext engtext {
 #ifdef INJUGGLUCO
 		"Float"
 		},
-	.menustr2= {"Stream",
-	"Amounts"},
-	.menustr3= {hourminstr,
-	"Search",
-	"Date",
-	"Day back",
-	"Day later",
-	"Week back",
-	"Week later"},
+	.menustr2= {"Stream"},
 #endif //INJUGGLUCO
 #else
  .amount="Amount",

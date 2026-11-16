@@ -470,26 +470,7 @@ std::span<char> getextendedactivities(int startpos,int,uint32_t start,uint32_t e
     return activitydata(startpos,start,end,header,maxcount,true);
 }
 
-#ifdef JUGGLUCO_APP
-bool  exportdata(uint32_t starttimein, uint32_t duration,int intype,int fd,float days) {
-	uint32_t endtime=std::min(starttimein+duration,(uint32_t)time(nullptr));
-	uint32_t starttime=endtime-days*24*60*60;
-    int type=intype&7;
-    bool calibrated=intype&8;
-	switch(type) {
-		case 0: return exportnums(fd,starttime,endtime);	;
-		case 1: return exportscans<true>(fd, &SensorGlucoseData::scanInperiod,starttime,endtime,INT_MAX,calibrated,settings->data()->CalibratePast);
-		case 2: return exportscans<false>(fd, &SensorGlucoseData::streamInperiod,starttime,endtime,INT_MAX,calibrated,settings->data()->CalibratePast);
-		case 3: return exporthistory(fd,starttime,endtime,INT_MAX,calibrated,settings->data()->CalibratePast);
-#ifdef USE_MEAL
-		case 4: return allsavemeals(fd,starttime,endtime);
-#endif
-		case 6: return exportactivities(fd,starttime,endtime,false);
-		case 7: return exportactivities(fd,starttime,endtime,true);
-		};
-	return false;
-	}
-#else
+#ifndef JUGGLUCO_APP
 template bool exportscans<true>(int handle,  CurData  (SensorGlucoseData::*proc)(const uint32_t,const uint32_t) const,uint32_t,uint32_t,int,bool,bool) ;
 
 template bool exportscans<false>(int handle, CurData (SensorGlucoseData::*proc)(const uint32_t,const uint32_t) const,uint32_t,uint32_t,int,bool,bool) ;

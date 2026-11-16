@@ -323,48 +323,11 @@ static private void showNow(MainActivity act) {
         var closeview=view.findViewById(R.id.close);closeview.setOnClickListener(v ->{
 		act.moveTaskToBack(true);
 	}); 
-        var exportview=view.findViewById(R.id.export);exportview.setOnClickListener(v ->{
-		var c=Applic.app.curve;
-		  if(c!=null) {
-			  {if(doLog) {Log.i(LOG_ID,"EXPORT");};};
-   		   act.lightBars(!getInvertColors( ));
-		     removeContentView(view);
-		     c.dialogs.showexport(act,c.getWidth(),c.getHeight(),null); 
-		     }
-
-	}); 
         var mirrorview=view.findViewById(R.id.mirror);mirrorview.setOnClickListener(v ->{
 		     removeContentView(view);
 			(new Backup()).mkbackupview(act);
 
 	}); 
-        var newamountview=view.findViewById(R.id.newamount);newamountview.setOnClickListener(v ->{
-					if(Natives.staticnum()) {
-        					help.help(R.string.staticnum,act);
-						}
-					else {
-						var c=Applic.app.curve;
-						if (c != null) {
-   		         act.lightBars(!getInvertColors( ));
-							removeContentView(view);
-							c.numberview.addnumberview(act);
-							if (!smallScreen)
-								c.showkeyboard(act);
-						}
-					}
-
-	}); 
-        var listview=view.findViewById(R.id.list);listview.setOnClickListener(v -> {
-				var c = Applic.app.curve;
-				if (c != null) {
-   		         act.lightBars(!getInvertColors( ));
-					removeContentView(view);
-					Natives.makenumbers();
-					act.requestRender();
-					c.getnumcontrol(act);
-				}
-			}
-						);
         var statisticsview=view.findViewById(R.id.statistics);statisticsview.setOnClickListener(v ->{
 
 			if(Natives.makepercentages()) {
@@ -401,67 +364,9 @@ static private void showNow(MainActivity act) {
 
 
 
-        CheckBox amountsview=view.findViewById(R.id.amounts);amountsview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-	 Natives.setshownumbers(isChecked); 
-				act.requestRender();
-
-	}); 
-	amountsview.setChecked(Natives. getshownumbers()) ;
 
 
 
-        var nowview=view.findViewById(R.id.now);nowview.setOnClickListener(v ->{
-
-               act.lightBars(!getInvertColors( ));
-		removeContentView(view);
-	Natives.settonow();
-				act.requestRender();
-
-	});
-        var searchview=view.findViewById(R.id.search);searchview.setOnClickListener(v ->{
-		  var c=Applic.app.curve;
-		  if(c!=null) {
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-			c.startsearch();
-			}
-		}); 
-
-        var dateview=view.findViewById(R.id.date);dateview.setOnClickListener(v ->{
-		  var c=Applic.app.curve;
-		  if(c!=null) {
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-			  c.startdatepick(Natives.getstarttime());
-			  }
-		
-		}); 
-        var daybackview=view.findViewById(R.id.dayback);daybackview.setOnClickListener(v ->{
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.prevday(1);
-				act.requestRender();
-		}); 
-        var daylaterview=view.findViewById(R.id.daylater);daylaterview.setOnClickListener(v ->{
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.nextday(1);
-				act.requestRender();
-		}); 
-        var weekbackview=view.findViewById(R.id.weekback);weekbackview.setOnClickListener(v ->{
-
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.prevday(7);
-				act.requestRender();
-	}); 
-        var weeklaterview=view.findViewById(R.id.weeklater);weeklaterview.setOnClickListener(v ->{
-
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.nextday(7);
-				act.requestRender();
-		}); 
    
 	  // view.setPadding(0,MainActivity.systembarTop,0,0);
     if(!isWearable) {

@@ -122,7 +122,6 @@ static View[] reopen=new View[8]; //6 needed
 static int reopennr=0;
     //    SearchLayout search;
     Layout search;
-    public Dialogs dialogs;
     private static final String LOG_ID = "GlucoseCurve";
 static   public float smallfontsize;
     Calendar cal = Calendar.getInstance();
@@ -386,7 +385,6 @@ public GlucoseCurve(MainActivity context) {
     setRenderer(render);
     setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     metrics= getResources().getDisplayMetrics();
-    dialogs=new Dialogs(metrics.density);
     }
 @Override
 protected void onAttachedToWindow() {
@@ -621,15 +619,6 @@ final    private ScaleGestureDetector.SimpleOnScaleGestureListener mScaleListene
         }
     };
 
-    long reldate;
-     void startdatepick(long tim) {
-        reldate=tim;
-        numberview.getdateviewal((MainActivity)getContext(),tim,    (year,month,day)-> {
-            Natives.movedate(reldate, year, month, day);
-            requestRender();
-        });
-
-    }
 class GestureListener implements GestureDetector.OnGestureListener {
         @Override
         public boolean onDown(MotionEvent e) {
@@ -703,29 +692,9 @@ static private boolean startv1=true;
                             break;
              case 1: {
                 switch(item&0xF) {
-                                    case 0: dialogs.showexport(( MainActivity)getContext(),getWidth(),getHeight(),null); break;
-
-
-                   case 1: (new Backup()).mkbackupview(( MainActivity)getContext());break;
-                case 2: {
-                       MainActivity activity = (MainActivity) getContext();
-                    if(Natives.staticnum()) {
-                  if(isWearable)
-                     Specific.blockedNum(activity);
-                  else   {
-                           activity.themeLightBars();
-                            help.help(R.string.staticnum,activity,l->activity.lightBars(!Natives.getInvertColors( ))); 
-                            }
-                        }
-                    else {
-                        numberview.addnumberview(activity);
-                        if(!smallScreen)
-                            showkeyboard(activity);
-                        }
-                    }; break;
-                case 3: getnumcontrol((MainActivity) getContext());return true;
-                case 4: Stats.mkstats((MainActivity) getContext());break;
-                case 5:  Floating.setfloatglucose((MainActivity) getContext(),!Natives.getfloatglucose()) ;break;
+                   case 0: (new Backup()).mkbackupview(( MainActivity)getContext());break;
+                case 1: Stats.mkstats((MainActivity) getContext());break;
+                case 2:  Floating.setfloatglucose((MainActivity) getContext(),!Natives.getfloatglucose()) ;break;
                 };
                 };break;
             case 2: {
@@ -735,14 +704,6 @@ static private boolean startv1=true;
  //               var main=(MainActivity) getContext();
   //              main.lightBars(light);
                 };break;
-            case 3:
-                switch (item) {
-                    case 1: startsearch();
-                                    break;
-                    case 2:
-                                startdatepick(Natives.getstarttime());
-                                    break;
-                            };break;
                     case 0xe: {
               if(reopennr>0)
                   return true;

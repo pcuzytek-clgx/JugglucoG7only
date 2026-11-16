@@ -107,7 +107,6 @@ public static native void startsensors( );
 
     public static native long oldestdatatime();
 
-    public static native void movedate(long date,int year,int month,int day);
      public static native long getendtime();
 //     public static native void search(time[0],time[1],labelsel,funder,fabove,fgunder,fgabove,minutes[0],minutes[1]);
     public static native int search(int label,float vunder,float vabove,int frommin,int tomin,boolean forward,String regexingr,float amount); 
@@ -230,7 +229,6 @@ public static native boolean islogcat( );
 
 
 public static native String advanced();
-public static native boolean exportdata(int type,int fd,float showdays);
 //public static native void setlibversion(String version);
 public static native int getcolumns(int width);
 
@@ -672,12 +670,6 @@ public static native long[] libre3EmulatorLatest();
 
 public static native void isGalaxyWatch(boolean val);
 
-public static native long novopentype(String serial);
-public static native int savenovopen(long time,String serial,int type,byte[] gegs,boolean last);
-//public static native long lasttimenovopen(String serial);
-public static native boolean oldnovopenvalue(long referencetime,String serial,byte[] rawdoses);
-
-public static native void setnovopenttimeandtype(long time,int type,String serial);
 
 public static native String mirrorStatus(int allindex);
 public static native void setWearosdefaults(String jident,boolean galaxy);
@@ -714,7 +706,6 @@ public static native void setRTL(boolean val);
 public static native boolean getRTL( );
 public static native boolean makepercentages( );
 public static native void makenumbers();
-public static native void settonow();
 public static native boolean showlastscan( );
 
 

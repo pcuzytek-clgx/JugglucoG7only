@@ -3,7 +3,6 @@ package tk.glucodata.NovoPen.opennov;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.NovoPen.opennov.BaseMessage.d;
 import static tk.glucodata.NovoPen.opennov.FSA.Action.WRITE_READ;
-import static tk.glucodata.Natives.oldnovopenvalue;
 
 import tk.glucodata.NovoPen.opennov.HexDump;
 import tk.glucodata.NovoPen.opennov.mt.EventReport;
@@ -122,8 +121,7 @@ public class Machine {
         {
             String serial;
             var  doses=opcontext.doses;
-            OpContext.Doses dose;
-            if(opcontext.specification != null && (serial = opcontext.specification.getSerial())!= null && serial.length() > 3 && (er.count == 0 || (doses.size()>0&&(dose=doses.get(doses.size()-1))!=null&&oldnovopenvalue(dose.referencetime,serial,dose.rawdoses)))) {
+            if(opcontext.specification != null && (serial = opcontext.specification.getSerial())!= null && serial.length() > 3 && (er.count == 0 || tk.glucodata.NovoPen.Scan.enoughDoses(doses))) {
                 {if(doLog) {Log.d(TAG, "No new data so requesting close");};};
                 setLastReadSuccess(true); // completed receiving data
                 return doCloseDown(msg);

@@ -1498,8 +1498,6 @@ public static final int CHAIN_REQUEST=0x81;
 private static  final int REQUEST_NOTIFICATION=0x50;
 static  final int REQUEST_BARCODE=0x10;
 static  final int REQUEST_BARCODE_SIB2=0x11;
-public static final int REQUEST_EXPORT=0x70;
-//public static final int REQUEST_EXPORT=0x54e806d0;
 public static final int REQUEST_RINGTONE=0x60;
 public static final int REQUEST_MASK=0xFFFFFF00;
 public static final int IGNORE_BATTERY_OPTIMIZATION_SETTINGS=0x100;
@@ -1623,48 +1621,6 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         };break;
 
     };
-    if(!isWearable) {
-        if ((requestCode & (REQUEST_MASK | REQUEST_EXPORT)) == REQUEST_EXPORT) {
-            try {
-                if (resultCode == Activity.RESULT_OK) {
-                    int type = requestCode & 0xF;
-                    Uri uri;
-                    if (data == null || (uri = data.getData()) == null) {
-                        curve.dialogs.exportlabel.setText(R.string.nodata);
-                        return;
-                    }
-                    int fd = -1;
-                    try(ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "w")) {
-                        if (parcelFileDescriptor != null)
-                            fd = parcelFileDescriptor.detachFd();
-                        else {
-                            curve.dialogs.exportlabel.setText("Can't save: parcelFileDescriptor == null");
-                            return;
-                        }
-
-                    } catch (IOException e) {
-
-                        Log.stack(LOG_ID, e);
-                        curve.dialogs.exportlabel.setText(R.string.failedbyexception);
-                        return;
-                    }
-                    if (Natives.exportdata(type, fd,Dialogs.showdays)) {
-                        curve.dialogs.exportlabel.setText(R.string.saved);
-                    } else {
-                        curve.dialogs.exportlabel.setText(R.string.savefailed);
-                    }
-                } else {
-
-                    curve.dialogs.exportlabel.setText(R.string.notsaved);
-                }
-
-            } catch (Throwable th) {
-                Log.stack(LOG_ID, "onActivityResult", th);
-            }
-            hidekeyboard(this);
-            return;
-        }
-    }
         if ((requestCode & (REQUEST_MASK|REQUEST_RINGTONE)) == REQUEST_RINGTONE) {
             if (resultCode == Activity.RESULT_OK) {
                 try {

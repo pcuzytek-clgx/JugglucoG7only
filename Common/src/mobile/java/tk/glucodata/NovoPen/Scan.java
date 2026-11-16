@@ -21,57 +21,34 @@
 
 package tk.glucodata.NovoPen;
 
-import static android.graphics.Typeface.BOLD;
-import static android.graphics.Typeface.DEFAULT_BOLD;
-import static android.view.View.INVISIBLE;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static tk.glucodata.Dialogs.fdatename;
 import static tk.glucodata.Log.doLog;
-import static tk.glucodata.Natives.novopentype;
-import static tk.glucodata.Natives.savenovopen;
-import static tk.glucodata.Natives.setnovopenttimeandtype;
 import static tk.glucodata.Log.showbytes;
-import static tk.glucodata.NumberView.avoidSpinnerDropdownFocus;
 import static tk.glucodata.ScanNfcV.failure;
 import static tk.glucodata.ScanNfcV.getvibrator;
 import static tk.glucodata.ScanNfcV.startvibration;
-import static tk.glucodata.settings.Settings.removeContentView;
-import static tk.glucodata.util.getbutton;
-import static tk.glucodata.util.getlabel;
 
-import android.view.Gravity;
-import android.widget.FrameLayout;
-import androidx.appcompat.app.AlertDialog;
-import android.content.DialogInterface;
 import android.nfc.Tag;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Space;
-import android.widget.Spinner;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
-import tk.glucodata.NovoPen.opennov.OpContext;
-import tk.glucodata.NovoPen.opennov.OpenNov;
-
 import tk.glucodata.Applic;
-import tk.glucodata.GlucoseCurve;
-import tk.glucodata.LabelAdapter;
-import tk.glucodata.Layout;
 import tk.glucodata.Log;
 import tk.glucodata.MainActivity;
-import tk.glucodata.Natives;
+import tk.glucodata.NovoPen.opennov.OpContext;
+import tk.glucodata.NovoPen.opennov.OpenNov;
 import tk.glucodata.R;
-import tk.glucodata.help;
 
-//import android.nfc.Tag;
-
+// G7-only: doses read from a NovoPen are only shown, never stored or drawn.
 public class Scan {
     static final private String LOG_ID="Scan";
+    static final private int SHOWN_DOSES=10;
+    static final private int DOSE_SIZE=12;
+
     static public void onTag(MainActivity act, Tag tag) {
         {if(doLog){showbytes("onTag", tag.getId());};}
         var vibrator = getvibrator(act);
@@ -81,188 +58,88 @@ public class Scan {
         vibrator.cancel();
         if (op == null) {
             failure(vibrator);
-            final var failread = act.getString(R.string.penfailed);
             Log.e(LOG_ID, "processTag failed");
+        } else if (op.specification == null) {
+            Log.e(LOG_ID, "op.specification==null");
+        } else if (op.doses == null) {
+            Log.e(LOG_ID, "op.doses==null");
         } else {
-            if (op.specification == null) {
-                Log.e(LOG_ID, "op.specification==null");
-            } else {
-                    if (op.doses == null) {
-                        Log.e(LOG_ID, "op.eventReport.doses==null");
-                    } else {
-                        Applic.RunOnUiThread(() -> setInsulin(act, op));
-                        return;
-                }
-            }
-        }
-
-        final var failread =act.getString(R.string.penfailed);
-        Applic.Toaster(failread);
-    }
-    private static void earlytimeconfirmation(MainActivity act) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(act);
-        builder.setTitle("To get older values you have to scan again").
-           setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                }) .show().setCanceledOnTouchOutside(false);
-    }
-private static void changeTypeconfirmation(MainActivity act,String type,Runnable save) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(act);
-        builder.setTitle(act.getString(R.string.changeinsulin)+type+"?").
-           setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                save.run();
-                    }
-                }) .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        }).show().setCanceledOnTouchOutside(false);
-    }
-//static  public final DateFormat fhourmin=             new SimpleDateFormat("HH:mm", Locale.US);
-
-static void setInsulin(MainActivity context, OpContext op) {
-    if(Natives.staticnum()) {
-            help.help(R.string.staticnum,context);
+            Applic.RunOnUiThread(() -> showDoses(act, op));
             return;
-           }
- 
-    String serial=op.specification.getSerial();
-    final long typetime =novopentype(serial);
-    int type;
-    long lasttime;
-    if(typetime!=-1L) {
-        type=(int)(typetime>>32);
-        long sectime=(typetime&0xFFFFFFFFL);
-        lasttime=sectime*1000L;
-        final String datestr=fdatename.format(lasttime)      ;
-        {if(doLog) {Log.i(LOG_ID,"type= "+type+" Last time: "+String.format("typetime=%X seconds=%X %d",typetime,sectime,sectime)+ " "+datestr);};};
         }
-    else {
-        type=-1;
-        lasttime=0L;
+        Applic.Toaster(act.getString(R.string.penfailed));
+    }
+
+    record Dose(long time, float units) {}
+
+    private static int u8(byte b) { return b&0xFF; }
+
+    /* Same record layout and validity checks as the former native savedoses():
+       reltime[4] big endian, sign1 (0x00FF), units[2] big endian *0.1, sign2 (low 24 bits == 8). */
+    static List<Dose> parseDoses(List<OpContext.Doses> blocks,long nowsec) {
+        var all=new ArrayList<Dose>();
+        final long old=nowsec-100L*24*60*60;
+        for(var block:blocks) {
+            final byte[] raw=block.rawdoses;
+            if(raw==null)
+                continue;
+            for(int off=0;off+DOSE_SIZE<=raw.length;off+=DOSE_SIZE) {
+                if(u8(raw[off+4])!=0xFF||raw[off+5]!=0||raw[off+8]!=8||raw[off+9]!=0||raw[off+10]!=0)
+                    continue;
+                long rel=((long)u8(raw[off])<<24)|(u8(raw[off+1])<<16)|(u8(raw[off+2])<<8)|u8(raw[off+3]);
+                long time=block.referencetime+rel;
+                float units=((u8(raw[off+6])<<8)|u8(raw[off+7]))*0.1f;
+                if(time<old||time>nowsec||!(units>0.0f)||units>60.0f)
+                    continue;
+                all.add(new Dose(time,units));
+            }
         }
-
-    Spinner spinner=new Spinner(context);
-//    final int minheight= GlucoseCurve.dpToPx(48);
-//    spinner.setMinimumHeight(minheight);
-    avoidSpinnerDropdownFocus(spinner);
-    int[] selected={type<0?0:type};
-    final var labels=Natives.getLabels();
-    LabelAdapter<String> numspinadapt=new LabelAdapter<String>(context,labels,1);
-        spinner.setAdapter(numspinadapt);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-        @Override
-        public  void onItemSelected (AdapterView<?> parent, View view, int position, long id) {
-            if(position>=0&&position<labels.size()) {
-                selected[0]=position;
-                {if(doLog) {Log.i(LOG_ID, "selected " + labels.get(position));};};
-                }
-            else
-                {if(doLog) {Log.i(LOG_ID,"selected "+position);};};
+        all.sort((a,b)->Long.compare(b.time,a.time));
+        var result=new ArrayList<Dose>();
+        boolean used=false;
+        long nexttime=0;
+        for(var dose:all) {
+            if(used&&dose.units<=2.0f&&(nexttime-dose.time)<60) {
+                // priming shot just before a real dose
+                used=false;
+                continue;
             }
-        @Override
-        public  void onNothingSelected (AdapterView<?> parent) {
+            used=true;
+            nexttime=dose.time;
+            result.add(dose);
+            if(result.size()>=SHOWN_DOSES)
+                break;
+        }
+        return result;
+    }
 
-        } });
-    spinner.setSelection(selected[0]);
-    float density=GlucoseCurve.metrics.density;
-    int laypad=(int)(density*4.0);
+    // Stop reading the pen as soon as enough doses for the list have been received.
+    public static boolean enoughDoses(List<OpContext.Doses> doses) {
+        return doses!=null&&parseDoses(doses,System.currentTimeMillis()/1000L).size()>=SHOWN_DOSES;
+    }
 
-
-    var after=getlabel(context,context.getString(R.string.dosesprior));
-    after.setPadding((int)(density*5.0f),laypad*2,laypad*3,0);
-    var label=getlabel(context,"PEN"+serial);
-    label.setTypeface(DEFAULT_BOLD,BOLD);
-        var cancel=getbutton(context,R.string.cancel);
-        var typestr=getlabel(context,context.getString(R.string.type));
-    typestr.setPadding(laypad*2,0,0,laypad*5);
-    var ok=getbutton(context, R.string.save);
-    long[] newtime={lasttime};
-    final    var datebutton=getbutton(context, DateFormat.getDateInstance(DateFormat.DEFAULT).format(lasttime));
-    var cal = Calendar.getInstance();
-        datebutton.setOnClickListener(
-                v -> { 
-            context.getnumberview().getdateviewal(context,newtime[0], (year,month,day)-> {
-             cal.set(Calendar.YEAR,year);
-             cal.set(Calendar.MONTH,month);
-             cal.set(Calendar.DAY_OF_MONTH,day);
-             long newmsec= cal.getTimeInMillis();
-             newtime[0]=newmsec;
-            datebutton.setText(DateFormat.getDateInstance(DateFormat.DEFAULT).format(newmsec));
-            });
-
-        });    
-
-    cal.setTimeInMillis(newtime[0]);
-    int[] hour={cal.get(Calendar.HOUR_OF_DAY)};
-    int[]  min={cal.get(Calendar.MINUTE)};
-    var timebutton=getbutton(context,  String.format(Locale.US,"%02d:%02d",hour[0],min[0] ));
-    Layout.getMargins(ok).bottomMargin=Layout.getMargins(cancel).bottomMargin=(int)(density*18.0f);
-    var  layout=new Layout(context,new View[]{label},new View[]{after},new View[]{datebutton,timebutton},new View[]{typestr,spinner},new View[]{ok,cancel});
-    timebutton.setOnClickListener(v-> {
-        layout.setVisibility(INVISIBLE);
-            context.getnumberview().gettimepicker(context,hour[0], min[0], (h,m) -> {
-                hour[0]=h;
-                min[0]=m;
-                cal.set(Calendar.HOUR_OF_DAY,h);
-                cal.set(Calendar.MINUTE,m);
-                     newtime[0]= cal.getTimeInMillis();
-                timebutton.setText(String.format(Locale.US,"%02d:%02d",h,m));
-               },()-> layout.setVisibility(View.VISIBLE));});
-        layout.setBackgroundColor(Applic.backgroundcolor);
-    int pad=(int)(10.0*density);
-    layout.setPadding(pad,pad,pad,0);
-
-    context.setonback(() -> removeContentView(layout) );
-    ok.setOnClickListener(v -> {
-            var doses=op.doses;
-            int ty=selected[0];
-            Runnable saveall=()-> {
-                int nr=0;
-                int lastdose=doses.size()-1;
-                for(int d=0;d<=lastdose;++d) {
-                    var dose=doses.get(d);
-                    int back=savenovopen(dose.referencetime,serial,ty,dose.rawdoses,d==lastdose);
-                    if(back<0)  {
-                        Applic.Toaster(context.getString(R.string.wentwrong));
-                        context.doonback();
-                        return;
-                        }
-                    else
-                        nr+=back;
-                    }
-                Applic.Toaster(nr+(nr==1?context.getString(R.string.dosis):context.getString(R.string.doses))+context.getString(R.string.saved));
-                if(nr>0) context.requestRender();
-                context.doonback();
-                };
-            Runnable testtype=() -> {
-                if(ty==type) {
-                    saveall.run();
-                    }
-                else {
-                    changeTypeconfirmation(context,labels.get(ty), saveall);
-                    }
-                };
-            if(lasttime==newtime[0]) {
-                testtype.run();
-                }
-            else {
-                setnovopenttimeandtype(newtime[0],ty,serial);
-                if(lasttime<newtime[0]) {
-                    testtype.run();
-                    }
-                else {
-                    context.doonback();
-                    earlytimeconfirmation(context);
-                    }
-                }
+    static void showDoses(MainActivity context, OpContext op) {
+        final String serial=op.specification.getSerial();
+        final var doses=parseDoses(op.doses,System.currentTimeMillis()/1000L);
+        final String message;
+        if(doses.isEmpty()) {
+            message=context.getString(R.string.nodoses);
+        } else {
+            var format=DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT);
+            var unit=context.getString(R.string.insulinunit);
+            var sb=new StringBuilder();
+            for(var dose:doses) {
+                if(sb.length()>0)
+                    sb.append('\n');
+                sb.append(format.format(dose.time*1000L)).append("   ")
+                  .append(String.format(Locale.getDefault(),"%.1f",dose.units)).append(' ').append(unit);
             }
-            );
-    cancel.setOnClickListener(v -> context.doonback());
-//    var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
-    var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
-    params.topMargin=MainActivity.systembarTop*4/5;
-    context.addMyContentView(layout, params);
+            message=sb.toString();
+        }
+        new AlertDialog.Builder(context)
+            .setTitle("NovoPen "+serial)
+            .setMessage(message)
+            .setPositiveButton(R.string.ok,null)
+            .show();
     }
 }

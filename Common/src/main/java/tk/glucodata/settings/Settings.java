@@ -1488,10 +1488,10 @@ private    void mksettings(MainActivity context) {
                 Button logview;
                 logview=getbutton(context,R.string.logging);
                 logview.setOnClickListener(v->LogConfig.make(context,thelayout[0]));
-                numdis= new View[]{changelabels,logview,googlescan,displayview};
+                numdis= new View[]{logview,googlescan,displayview};
                 }
           else {
-                numdis= new View[]{changelabels,googlescan,displayview};
+                numdis= new View[]{googlescan,displayview};
                 }
         floatconfig.setOnClickListener(v-> tk.glucodata.FloatingConfig.show(context,thelayout[0]));
 
@@ -1506,7 +1506,7 @@ private    void mksettings(MainActivity context) {
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
                 new View[]{floatconfig,calibration},new View[]{glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
-                new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2],numdis[3]}:new View[]{numdis[2]},
+                new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2]}:null,
                 new View[]{help,advanced},new View[]{intro,close}};
             }
         else {
@@ -1516,7 +1516,7 @@ private    void mksettings(MainActivity context) {
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
                 new View[]{floatconfig,calibration},new View[]{glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
-                new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2],numdis[3]}:new View[]{numdis[2]},
+                new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2]}:null,
                 new View[]{help,intro},new View[]{close}};
             }
         }
@@ -1653,7 +1653,6 @@ static private void exchanges(MainActivity context, View parent) {
         webserver.setOnClickListener(v -> tk.glucodata.Nightscout.show(context, thelayout[0]));
         var help = getbutton(context, R.string.helpname);
       help.setOnClickListener(v->{help(R.string.exchangehelp,context); });
-      var exportview=getbutton(context,R.string.export);
         var hormarg=(int)(tk.glucodata.GlucoseCurve.metrics.density*15.0);
 
       getMargins(help).setMarginStart(hormarg);
@@ -1664,22 +1663,16 @@ static private void exchanges(MainActivity context, View parent) {
         lay = new Layout(context, (l, w, h) -> {
             int[] ret = {w, h};
             return ret;
-        }, new View[]{healthconnect,activities,clarity}, new View[]{webserver,exportview,mirrorview} ,                /*new View[]{emulator},*/new View[]{help, ok})
+        }, new View[]{healthconnect,activities,clarity}, new View[]{webserver,mirrorview} ,                /*new View[]{emulator},*/new View[]{help, ok})
             .portraitLayout(
                 new View[]{webserver,clarity},
                 new View[]{healthconnect,activities},
-                new View[]{exportview,mirrorview},/*new View[]{emulator},*/new View[]{help},new View[]{ok});
+                new View[]{mirrorview},/*new View[]{emulator},*/new View[]{help},new View[]{ok});
 
     final   int pad=(int)(tk.glucodata.GlucoseCurve.metrics.density*10.0);
     final   int bottompad=(int)(tk.glucodata.GlucoseCurve.metrics.density*5.0);
         lay.systembarPadding((left,top,right,bottom)->
                 new int[]{left,top*3/4,right+pad,bottom*7/8+bottompad});
-        exportview.setOnClickListener(v ->{
-            var c=Applic.app.curve;
-            if(c!=null) {
-                c.dialogs.showexport(context,c.getWidth(),c.getHeight(),lay);
-            }
-        });
       }
 
     thelayout[0] = lay;

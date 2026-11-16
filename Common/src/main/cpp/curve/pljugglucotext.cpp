@@ -107,10 +107,7 @@ jugglucotext pltext {
 		"Zatrzymaj alarm"
 		},
 	.menustr1={
-		"Eksport",
 		"Klonowanie",
-		pltext.newamount,
-		"Lista", 
 #else
        .statistics=
 #endif //INJUGGLUCO
@@ -118,15 +115,7 @@ jugglucotext pltext {
 #ifdef INJUGGLUCO
 		"Pływ. wart."
 		},
-	.menustr2= {"Strumień",
-	"Wartości"},
-	.menustr3= {hourminstr,
-	"Wyszukaj",
-	"Data",
-	"Dzień wstecz",
-	"Dzień później",
-	"Tydzień wstecz",
-	"Tydzień później"},
+	.menustr2= {"Strumień"},
 #endif //INJUGGLUCO
 #else
  .amount="Wartość",

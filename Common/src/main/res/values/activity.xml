@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="activity_import">Activities</string>
-    <string name="activity_export_extended">Extended</string>
     <string name="activity_details">Activity</string>
     <string name="activity_retrieve">Retrieve</string>
     <string name="activity_permissions">Permissions</string>

@@ -621,28 +621,18 @@ int64_t JCurve::doehier(int menu,int item,bool right) {
                 };break;
         case 1: switch(item) {
 //                case 0: notify=!notify;return menu|item*0x10|(notify<<8);
-                case 2: nrmenu=0;
-//                    if(settings->staticnum()) return -1LL;
-                    break;
-                case 3:    nrmenu=0; 
-                   if(!numlist) {
-                      numiterinit();
-                      numlist=1;
-                      }
-                    break;
-
 #ifdef PERCENTILES
-                case 4:  nrmenu=0; if(!makepercetages())
+                case 1:  nrmenu=0; if(!makepercetages())
                         return -1LL;
                     ;break;
 #endif
-                case 5:break;
+                case 2:break;
                 default:
                     nrmenu=0;
                     break;
                 };break;
         case 2: {
-                constexpr const int displayitems[]={2,4};
+                constexpr const int displayitems[]={2};
                 if(item>=0&&item<(int)std::size(displayitems))
                     item=displayitems[item];
                 switch(item)     {
@@ -667,28 +657,9 @@ int64_t JCurve::doehier(int menu,int item,bool right) {
                                         }
                                  showcalibratedstream=!showcalibratedstream; setshowcalibratedstream(showcalibratedstream);
                                  return -1ll;
-                        case 4: shownumbers=!shownumbers; setshownumbers(shownumbers);return -1ll;
                         };
                     break;
                    }
-        case 3: {
-        nrmenu=0;
-        switch(item) {
-            case 0: {
-            auto max=time(nullptr);
-        //    starttime=starttimefromtime(max);
-//            if((starttime+duration)<max) 
-            setstarttime(max-duration*3/5);
-            return -1;
-                };
-            case 3: prevdays(1); return -1;
-            case 4: nextdays(1);return -1;
-            case 5: prevdays(7); return -1;
-            case 6: nextdays(7);return -1;        
-            default: break;
-            };
-            };break;
-
         default: nrmenu=0;
         }
     return menu+item*0x10;
@@ -2259,8 +2230,9 @@ void initopengl(float small,float menu,float density,float headin) {
     appcurve.showcalibratedhistories=settings->data()->showcalibratedhistories;
     appcurve.showscans=settings->data()->showscans;
     appcurve.showstream=settings->data()->showstream;;
-    appcurve.showmeals=settings->data()->showmeals;
-    appcurve.shownumbers=settings->data()->shownumbers;
+    // G7-only: amounts (insulin/carbs) are never drawn.
+    appcurve.showmeals=false;
+    appcurve.shownumbers=false;
     appcurve.showhistories=settings->data()->showhistories;
     openglstarted=true;
     appcurve.initfont(::genVG);    
@@ -2292,14 +2264,14 @@ const int *menuopt0[]={&menus,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
 
 
 const int *menuopt0b[]={nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
-const int *menuopt1[]={&appcurve.showstream,&appcurve.shownumbers,nullptr,nullptr,nullptr,nullptr,nullptr};
+const int *menuopt1[]={&appcurve.showstream,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
 const int **optionsmenu[]={menuopt0,menuopt0b,menuopt1,nullptr};
 const int *premenuopt1[]={&appcurve.showcalibratedstream,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr};
 const int **preoptionsmenu[]={nullptr,nullptr,premenuopt1,nullptr};
 #define arsizer(x) sizeof(x)/sizeof(x[0])
 constexpr const int menulen[]={arsizer(jugglucotext::menustr0),arsizer(jugglucotext::menustr1),arsizer(jugglucotext::menustr2),arsizer(jugglucotext::menustr3)};
-// G7-only: the display menu has only Stream and Amounts.
-constexpr const int displaymenulen=2;
+// G7-only: the display menu has only Stream.
+constexpr const int displaymenulen=1;
 int getmenulen(const int menu) {
     int len=menulen[menu];
     if(!menu) {
@@ -2307,13 +2279,13 @@ int getmenulen(const int menu) {
         return alarmongoing?mainmenulen:mainmenulen-1;
         }
     if(menu==1)
-        return 6;
+        return 3;
     if(menu==2)
         return displaymenulen;
     return len;    
     }
 void setfloatptr() {
-    menuopt0b[5]=&settings->data()->floatglucose;
+    menuopt0b[2]=&settings->data()->floatglucose;
     }
 
 //void setnewamount() { }
@@ -2326,11 +2298,13 @@ void      removemenus(const jugglucotext* text) {
 
 
 constexpr const int maxmenulen= *std::max_element(std::begin(menulen),std::end(menulen));
-constexpr int maxmenu=arsizer(jugglucotext::menustr);
 #ifdef WEAROS
+constexpr int maxmenu=arsizer(jugglucotext::menustr);
 static_assert(maxmenu==2);
 #else
-static_assert(maxmenu==4);
+// G7-only: the navigation menu (menu 3) was removed; scroll with gestures.
+constexpr int maxmenu=3;
+static_assert(maxmenu<=arsizer(jugglucotext::menustr));
 #endif
 
 
@@ -2659,10 +2633,6 @@ void JCurve::showtext(NVGcontext* avg, time_t nu, int menu) {
         setnowmenu(nu);
 //      setnewamount();
     }
-#else
-    if(menu==3)
-        setnowmenu(nu);
-//  if(menu==1) setnewamount();
 #endif
 
     if(portraitReadable()) {

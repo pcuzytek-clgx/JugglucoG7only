@@ -647,17 +647,6 @@ extern "C" JNIEXPORT jint JNICALL fromjava(search) (JNIEnv *env, jclass clazz,ji
  return res;
  }
 #endif
-extern "C" JNIEXPORT void JNICALL fromjava(movedate) (JNIEnv *env, jclass clazz,jlong milli,jint year,jint month,jint day) {
- time_t tim=milli/1000LL;
- struct tm      stm{};
- localtime_r(&tim,&stm);
- stm.tm_year=year-1900;
- stm.tm_mon=month;
- stm.tm_mday=day;
- time_t timto=mktime(&stm);
- appcurve.setstarttime(appcurve.starttime+uint32_t((int64_t)timto-(int64_t)tim));
- appcurve.begrenstijd() ;
- };
 extern "C" JNIEXPORT void JNICALL fromjava(setStartTime) (JNIEnv *env, jclass clazz,jlong milli) {
  appcurve.setstarttime(milli/1000LL);
  appcurve.begrenstijd() ;
@@ -867,10 +856,6 @@ extern "C" JNIEXPORT jlong JNICALL fromjava(saylastglucose)(JNIEnv *env, jclass 
 #ifndef WEAROS
 //MENUS functions:
 
-extern "C" JNIEXPORT void JNICALL fromjava(settonow)(JNIEnv *env, jclass thiz) {
- auto max=time(nullptr);
- appcurve.setstarttime(max-appcurve.duration*3/5);
- }
 
 
 extern struct lastscan_t scantoshow;
@@ -949,12 +934,6 @@ extern "C" JNIEXPORT jlong JNICALL fromjava(percentileEndtime) (JNIEnv *env, jcl
  return endtime;
  }
 
-#endif
-#if defined(JUGGLUCO_APP)&&!defined(WEAROS)
-extern bool  exportdata(uint32_t starttime, uint32_t duration,int type,int fd,float days) ;
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(exportdata)(JNIEnv *env, jclass cl,jint type,jint fd,jfloat days) {
- return  exportdata(appcurve.starttime, appcurve.duration,type,fd,days);
- }
 #endif
 
 extern "C" JNIEXPORT void  JNICALL   fromjava(setfixatex)(JNIEnv *env, jclass cl,jboolean val) {
