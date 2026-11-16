@@ -781,17 +781,6 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(hasNeedScan)(JNIEnv *env, jcla
           }
    return false;
     } 
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(hasAidexX)(JNIEnv *env, jclass cl) {
-    setusedsensors();
-    const int len= usedsensors.size();
-     for(int i=0;i<len;i++) {
-         const int index=usedsensors[i];
-         const SensorGlucoseData *sens=sensors->getSensorData(index );
-         if(sens->isAidexX())
-            return true;
-          }
-    return false;
-    } 
 extern "C" JNIEXPORT jlongArray JNICALL   fromjava(activeSensorPtrs)(JNIEnv *env, jclass cl) {
     setusedsensors();
     const int len= usedsensors.size();

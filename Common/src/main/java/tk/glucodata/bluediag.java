@@ -178,24 +178,13 @@ void showinfo(final SuperGattCallback gatt,MainActivity act) {
     if(Natives.optionStreamHistory(gatt.dataptr)) {
        streamhistory.setVisibility(VISIBLE);
       alarmclock.setVisibility(GONE);
-      resetbutton.setVisibility(GONE);
         }
     else  {
       streamhistory.setVisibility(GONE);
       alarmclock.setVisibility(gatt.sensorgen==3||gatt.sensorgen==0x30||gatt.sensorgen==0x40?VISIBLE:GONE);
-      final boolean resetvis=gatt.sensorgen==0x10&&Natives.getSiSubtype(gatt.dataptr)==3;
-      resetbutton.setVisibility(resetvis?VISIBLE:GONE);
       }
 
     starttimeV.setText(datestr(gatt.starttime));
-   if(gatt.sensorgen==0x50) {
-         clear.setVisibility(VISIBLE);
-         divorcebutton.setVisibility(VISIBLE);
-         } 
-    else {
-        clear.setVisibility(GONE);
-        divorcebutton.setVisibility(GONE);
-        }
     if(gatt.sensorgen<=2) {
         if(gatt.streamingEnabled() ) {
             streaming.setText(R.string.streamingenabled);
@@ -243,23 +232,7 @@ void showinfo(final SuperGattCallback gatt,MainActivity act) {
         }
     else {
 //        address.setBackgroundColor(BLUE); address.setTextColor(WHITE);
-        if(gatt.sensorgen == 0x10)  {
-            long dataptr=gatt.dataptr;
-            if(Natives.siNewSI(dataptr)) {
-                 switch(Natives.getSiSubtype(dataptr)) {
-                    case 0:address.setTextColor(RED);break;
-                    case 1: address.setTextColor(CYAN);break;
-                    case 2: address.setTextColor(MAGENTA);break;
-                    default: address.setTextColor(LTGRAY);break;
-                    };
-                  }
-             else {
-                   address.setTextColor(YELLOW);;
-                }
-             
-            }
-        else
-            address.setTextColor(YELLOW);
+        address.setTextColor(YELLOW);
            //address.setTextColor(GREEN);
            //address.setTextColor(CYAN);
            // address.setTextColor(YELLOW);
@@ -286,9 +259,6 @@ private BluetoothAdapter mBluetoothAdapter=null;
 CheckDirectionBox usebluetooth;
 boolean wasuse;
 CheckDirectionBox priority,streamhistory, alarmclock,disconnectsensor;
-Button resetbutton;
-Button divorcebutton;
-Button clear;
 
 Button locationpermission;
 TextView scanview;
@@ -525,24 +495,17 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
     streamhistory=getcheckbox(act,R.string.streamhistory,Natives.getStreamHistory());
     alarmclock=getcheckbox(act,R.string.alarmclock,Natives.getalarmclock());
     alarmclock.setVisibility(GONE);
-    resetbutton=getbutton(act,R.string.resetname);
-    resetbutton.setVisibility(GONE);
-    divorcebutton=getbutton(act,R.string.divorcename);
-    divorcebutton.setVisibility(GONE);
 
     FrameLayout sensorAction=new FrameLayout(act);
     FrameLayout.LayoutParams sensorActionParams=new FrameLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT);
     sensorAction.addView(streamhistory,sensorActionParams);
     sensorAction.addView(alarmclock,new FrameLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT));
-    sensorAction.addView(resetbutton,new FrameLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT));
-    sensorAction.addView(divorcebutton,new FrameLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT));
 
     scanview=getlabel(act,"");
     spin=new Spinner(act);
     address=getlabel(act,"");
     forget=getbutton(act,R.string.forget);
     streaming=getlabel(act,"");
-    clear=getbutton(act,R.string.clear);
 
     usebluetooth=getcheckbox(act,R.string.use_bluetooth,Natives.getusebluetooth());
     priority=getcheckbox(act,R.string.high_priority,Natives.getpriority());
@@ -566,7 +529,6 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
         disconnectsensor=getcheckbox(act,R.string.disconnectsensor,Natives.getDisconnectSensor());
         disconnectsensor.setOnCheckedChangeListener(
                 (buttonView,isChecked)->Natives.setDisconnectSensor(isChecked));
-        clear.setVisibility(GONE);
         bluestate.setPaddingRelative(0,0,dp(5),0);
        diagnosticGrid.setLayoutParams( new ViewGroup.MarginLayoutParams(MATCH_PARENT,WRAP_CONTENT));
              scanview.setLayoutParams( new ViewGroup.MarginLayoutParams(MATCH_PARENT,WRAP_CONTENT));
@@ -576,7 +538,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
         content=new Layout(act,
                 new View[]{bluestate,usebluetooth,sensorAction,priority,disconnectsensor,info},
                 new View[]{scanview},
-                new View[]{spin,address,forget,streaming,clear,android13},
+                new View[]{spin,address,forget,streaming,android13},
                 new View[]{diagnosticGrid},
                 new View[]{close,rssiview});
         content.setPadding(dp(30),dp(18),dp(8),dp(30));
@@ -617,7 +579,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
         content=new Layout(act,
                 new View[]{bluestate,info,finish,sensorAction,locationpermission},
                 new View[]{scanview},
-                new View[]{spin,address,forget,streaming,clear},
+                new View[]{spin,address,forget,streaming},
                 new View[]{diagnosticScroll},
                 new View[]{help,usebluetooth,background},
                 new View[]{priority,android13,rssiview,close})
@@ -629,7 +591,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
                 new View[]{scanview},
                 new View[]{spin,address},
                 new View[]{forget,rssiview},
-                new View[]{streaming,clear},
+                new View[]{streaming},
                 new View[]{diagnosticScroll},
                 new View[]{help,usebluetooth},
                 new View[]{background,priority},
@@ -689,71 +651,6 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
 
     streamhistory.setOnCheckedChangeListener( (buttonView,  isChecked) -> Natives.setStreamHistory(isChecked) );
     alarmclock.setOnCheckedChangeListener( (buttonView,  isChecked) -> Natives.setalarmclock(isChecked) );
-    divorcebutton.setOnClickListener( v -> {
-            if(gatts!=null&&gattselected<gatts.size()) {
-                final SuperGattCallback gatt = gatts.get(gattselected);
-                  {
-                    if(gatt.sensorgen!=0x50) {
-                        final String message="ERROR: divorcebutton on sensorgen="+gatt.sensorgen;
-                        Log.i(LOG_ID,message);
-                        Applic.Toaster(message);
-                        }
-                    Confirm.ask(act,gatt.SerialNumber,act.getString(R.string.divorcemessage),()-> {
-                        var aid=(AidexXGattCallback)gatt;
-                        aid.startUnpair( new UnpairOverlayHost(act,R.string.releasingsensor),res -> {
-                            aid.finishSensor();
-                            SensorBluetooth.sensorEnded(aid.SerialNumber);
-                            act.requestRender();
-                            return true;
-                            });
-                        act.doonback();
-                     });
-                     }
-              }
-      });
-    clear.setOnClickListener( v -> {
-            if(gatts!=null&&gattselected<gatts.size()) {
-                final SuperGattCallback gatt = gatts.get(gattselected);
-                if(gatt.sensorgen!=0x50) {
-                    final String message="ERROR: clear on sensorgen="+gatt.sensorgen;
-                    Log.i(LOG_ID,message);
-                    Applic.Toaster(message);
-                    }
-                Confirm.ask(act,gatt.SerialNumber,act.getString(R.string.clearmessage),()-> {
-                    var aid=(AidexXGattCallback)gatt;
-                    aid.startClear( new UnpairOverlayHost(act,R.string.clearingmemory),res -> {
-                        act.requestRender();
-                        return true;
-                        });
-                    act.doonback();
-                    }
-                  );
-             }
-      });
-    resetbutton.setOnClickListener( v -> {
-            Confirm.ask(act,act.getString(R.string.resettitle),act.getString(R.string.resetmessage),()-> {
-                if(gatts!=null&&gattselected<gatts.size()) {
-                    final SuperGattCallback gatt = gatts.get(gattselected);
-                    if(gatt.sensorgen!=0x10) {
-                        final String message="ERROR: resetbutton on sensorgen="+gatt.sensorgen;
-                        Log.i(LOG_ID,message);
-                        Applic.Toaster(message);
-                        return;
-                        }
-                     final int subtype=Natives.getSiSubtype(gatt.dataptr);
-                     if(subtype!=3) {
-                        final String message="ERROR: resetbutton on "+subtype;
-                        Log.i(LOG_ID,message);
-                        Applic.Toaster(message);
-                        return;
-                        }
-                    Log.i(LOG_ID,"resetbutton");
-                    Natives.setResetSibionics2(gatt.dataptr,true);
-    //                Log.showbytes("Reset Bytes",Natives.getSIResetBytes());
-                    Applic.Toaster("Resetted ");
-                    }
-                });
-            });
 
      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
     priority.setOnCheckedChangeListener(

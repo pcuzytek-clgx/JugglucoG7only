@@ -324,19 +324,7 @@ static public void show(MainActivity context,View parent) {
                         Runnable doswitch=()-> {
                             Applic.switchbluetooth(name,netinfo,watchdirect);
                             };
-                        if(Natives.hasAidexX()) {
-                            if(!wasdirect&&watchdirect) {
-                                SensorBluetooth.afterUnpair(context,res->doswitch.run());
-                                }
-                            else {
-                                if(wasdirect&&!watchdirect)  {
-                                    returnSensorToPhone(context,name,netinfo);
-                                    }
-                                else
-                                    doswitch.run();
-                                }
-                            }
-                        else {
+                        {
                             doswitch.run();
                             }
                         }
@@ -401,20 +389,6 @@ static String makenodename(WatchTarget target) {
     return target.label;
     }
 
-private static void returnSensorToPhone(MainActivity context,String name,byte[] netinfo) {
-    // Install the reply handler before sending: an authenticated BLE peer can
-    // answer immediately, before sendbluetooth() returns to this UI thread.
-    var unpair=new UnpairOverlayHost(context,R.string.releasingsensor);
-    unpair.postMessage(context.getString(R.string.unpairingwatch));
-    context.unpairer=unpair;
-    context.doswitch=()->Applic.setbluetooth(context,true);
-    if(!sendbluetooth(name,netinfo,false)) {
-        context.unpairer=null;
-        context.doswitch=null;
-        unpair.postFinished(context.getString(R.string.failed),false);
-        unpair.postCloser();
-    }
-}
 
 
 

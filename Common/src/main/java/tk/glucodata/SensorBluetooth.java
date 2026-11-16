@@ -1217,56 +1217,7 @@ private boolean initializeBluetooth() {
 
     return false;
     }
-    /*
-static boolean hasAidexX() {
-   var one=blueone;
-   if(one==null)
-      return false;
-    for(var cb: one.gattcallbacks)  {
-        if(cb.sensorgen==0x50)
-            return true;
-        };
-    return false;
-    } */
 static void afterUnpair(MainActivity act,BooleanConsumer runnable) {
-       
-       var one=blueone;
-       if(one!=null) {
-         var gatts=one.gattcallbacks;
-         int tot=gatts.size();
-        AidexXGattCallback[] ais=new AidexXGattCallback[tot];
-         int iter=0;
-         for(var cb: gatts)  {
-                if(cb.sensorgen==0x50)
-                    ais[iter++]=(AidexXGattCallback)cb;
-                };
-        if(iter>0) {
-            Log.i(LOG_ID,"afterUnpair iter="+iter+ " activity="+(act!=null));
-            var up=act!=null?new UnpairOverlayHost(act,R.string.releasingsensor):null;
-            if(iter==1) {
-                ais[0].startUnpair(up,res->{
-                    Log.i(LOG_ID,"unpair 1");
-                    runnable.accept(res);
-                    return true;
-                    });
-                }
-           else {
-             AtomicInteger remaining = new AtomicInteger(iter);
-             for(int i=0;i<iter;++i) {
-                ais[i].startUnpair(up,res ->{
-                    Log.i(LOG_ID,"unpair 2");
-                  if(remaining.decrementAndGet() == 0) {
-                     runnable.accept(res);
-                     return true;
-                     }
-                    return false;
-                     });
-
-                }
-               }
-            return;
-            }
-        }
      runnable.accept(false);
      }
 

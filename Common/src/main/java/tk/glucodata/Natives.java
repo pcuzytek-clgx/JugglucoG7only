@@ -245,7 +245,6 @@ public static native String getLibraryName();
 //s/^extern.*JNIEXPORT[         ]*j*\([a-zA-Z]*\)[ ]*JNICALL[      ]*fromjava(\([^)]*\))(JNIEnv[^,]*,[^,)]*[,)]\([^){]*\)[^a-zA-Z0-9]*$/public static native \1 \2(\3);/g
 
 public static native long sensorends();
-public static native String getserial(byte[] uid,byte[] info);
 public static native ArrayList<ArrayList<Object>> getShortcuts();
 public static native int setShortcut(int index,String name,String value);
 public static native void setnrshortcuts(int nr);
@@ -439,7 +438,6 @@ public static native void setuseflash(boolean val);
 //public static native void zeromeal( );
 public static native boolean getwaitwithenablestreaming();
 public static native void setwaitwithenablestreaming(boolean val);
-public static native void setscreenwidthcm(float val);
 public static native boolean nfcsound();
 public static native void setnfcsound(boolean val);
 //public static native void setxinfuus(boolean val);
@@ -529,8 +527,6 @@ public static native boolean getXdripServerLocal( );
 
 //public static native void logBluetoothGattCharacteristic(String jmess, BluetoothGattCharacteristic bluetoothGattCharacteristic);
 
-public static native void  clearlibreFromMSec(long from);
-public static native void wakelibreview(int min );
 
 
 public static native void setlibrebaseurl(boolean l3,String baseurl);
@@ -544,7 +540,6 @@ public static native String getlibrepass( );
 public static native String getlibreDeviceID( boolean l3);
 
 public static native void setlibreAccountID(String AccountID);
-public static native void askServerforAccountID();
 public static native long getlibreAccountIDnumber();
 public static native void setlibreAccountIDnumber(long num);
 
@@ -558,8 +553,6 @@ public static native long getnewLibre3ReceiverID();
 public static native void setnewLibre3ReceiverID(long value);
 public static native long getnewLibre3ReceiverGeneration();
 public static native boolean savenewLibre3ReceiverID(long value,long generation);
-public static native void libreReceiverInit(String path,byte[] privateKey,byte[] wrapKey) throws java.io.IOException;
-public static native byte[] libreReceiverCrypt(int operation,byte[] input,byte[] iv) throws java.io.IOException;
 
 public static native String getlibreAccountID( );
 
@@ -567,8 +560,6 @@ public static native void setlibreUserToken(boolean l3, String UserToken);
 public static native String getlibreUserToken(boolean l3 );
 public static native void setnewYuApiKey(boolean l3,String jpass);
 public static native String getnewYuApiKey(boolean l3 );
-public static native boolean getuselibreview( );
-public static native void setuselibreview(boolean val);
 public static native void savelibrerubbish(String FirstName,String LastName,int dat,String GardianFirstName,String GuardianLastName);
 /*
 public static native int getDateOfBirth( );
@@ -580,35 +571,10 @@ public static native String getGuardianLastNameName( );
 
 
 //public static native long interpret3NFC1(byte[] b);
-//public static native long interpret3NFC2(byte[] nfc1,byte[] b,long time);
-public static native String interpret3NFC2( byte[]  nfc1ar,byte[] jnfcout,long now,long[] longreturn);
-public static native long getLibre3secs(byte[]  nfc1ar);
-public static native long getLibre3Sensorptr(String sensorid,long starttime);
-public static native long getLibre3SensorptrPD(String sensorid,long starttime,byte[] pin,String deviceaddress);
-public static native long saveLibre3MinuteL(long sensorptr,byte[] mindata,long nowmsec);
-public static native long saveLingoMinuteL(long sensorptr,byte[] mindata,long nowmsec);
-public static native boolean saveLingoHistory(long sensorptr,byte[] history);
-public static native boolean saveLingoFastData(long sensorptr,byte[] fastdata);
-public static native byte[] lingoControlHistory(int arg,int from);
-public static native byte[] lingoClinicalControl(int arg,int from);
 /** Zero for Libre 3; otherwise the Lingo version, or -1 when unknown. */
-public static native int getLingoSecurityVersion(long sensorptr);
 /** Classify the already-read NFC patch info without writing to the sensor. */
-public static native int lingoPatchSecurityVersion(byte[] patchInfo);
-public static native boolean saveLibre3fastData(long sensorptr,byte[] mindata);
-public static native boolean saveLibre3History(long sensorptr,byte[] mindata);
-public static native int libre3EventLog(long sensorptr,byte[] logs);
-public static native void setLibre3kAuth(long sensorptr,byte[] kauthin);
-public static native byte[] getLibre3kAuth(long sensorptr);
-public static native int libre3processpatchstatus( long sensorptr,byte[] status);
-public static native byte[] getpin(long sensorptr);
-public static native int getlastLifeCountReceived(long sensorptr);
-public static native int getlastHistoricLifeCountReceived(long sensorptr);
 
 
-public static native byte[] libre3ControlHistory( int arg,int from);
-public static native byte[] libre3ClinicalControl( int arg,int from);
-public static native byte[] libre3EventLogControl( int arg);
 
 
 public static native void initjuggluco(String filesdir);
@@ -621,23 +587,10 @@ public static native boolean getWifi( );
 public static native void showbytes(String mess,byte[] ar);
 //public static native boolean loadECDHCrypto( );
 //public static native boolean loadNFC( );
-public static native int startTimeIDsum(byte[] uit, long time, long accountID);
 
 
 
 
-static native long libre3BeginSecurityHandshake(long securityContext);
-static native void libre3FreeSecurityContext(long securityContext);
-static native int libre3SelectAppKeyAndSavedAuthorization(long securityContext, int securityVersion, byte[] savedAuthorization);
-static native int libre3AcceptPatchCertificate(long securityContext, byte[] patchCertificate);
-static native byte[] libre3CreateEphemeralPublicKey(long securityContext);
-static native int libre3DeriveAuthorizationRoot(long securityContext, byte[] patchEphemeralPublicKey);
-static native byte[] libre3EncryptChallengeReply(long securityContext, byte[] nonce, byte[] plaintext);
-static native byte[] libre3DecryptChallengeResponse(long securityContext, byte[] nonce, byte[] ciphertext);
-static native byte[] libre3EmulatorDecryptReply(long context, byte[] nonce, byte[] ciphertext);
-static native byte[] libre3EmulatorEncryptResponse(long context, byte[] nonce, byte[] plaintext);
-static native byte[] libre3ExportChallengeContext(long securityContext);
-static native byte[] libre3ExportSavedAuthorization(long securityContext);
 
 
 public static native boolean getShownintro( );
@@ -711,8 +664,6 @@ public static native boolean getuseuploader( );
 public static native String getnightuploadurl( );
 public static native String getnightuploadsecret( );
 public static native void setNightUploader(String jurl,String Secret,boolean active,boolean v3);
-public static native void wakeuploader( );
-public static native void resetuploader( );
 public static native void setAndroid13(boolean val);
 public static native boolean getAndroid13( );
 public static native long[] getlastGlucose( );
@@ -812,11 +763,6 @@ public static native void setHostDeactivated(int pos,boolean val);
 
 //public static native long makeSIdataptr(String gegs);
 //public static native int getSIindex(long dataptr);
-public static native void siSaveDeviceName(long dataptr,String deviceName);
-public static native String siGetDeviceName(long dataptr);
-public static native long SIprocessData(long dataptr, byte[] bluetoothdata,long mmsec);
-public static native String getSiBluetoothNum(long dataptr);
-public static native byte[] siAsknewdata(long dataptr);
 public static native String addSIscangetName(String jgegs,int[] indexptr);
 public static native boolean hasNeedScan( );
 //public static native String getShowSensorName(long dataptr);
@@ -827,19 +773,6 @@ public static native void setthreshold(float val);
 public static native void systembar(int left,int top,int right,int bottom);
 public static native void sethour24(boolean val);
 public static native boolean gethour24( );
-public static native void setComplicationArrowColor(int val);
-public static native int getComplicationArrowColor( );
-public static native void setComplicationTextColor(int val);
-public static native int getComplicationTextColor( );
-public static native void setComplicationBackgroundColor(int val);
-public static native int getComplicationBackgroundColor( );
-public static native void setComplicationTextBorderColor(int val);
-public static native int getComplicationTextBorderColor( );
-public static native byte[] ingredientNameBytes(int index);
-public static native byte[] getSItimecmd( );
-public static native byte[] siAuthBytes(long dataptr);
-public static native boolean siNewSI(long dataptr);
-public static native byte[] getSIActivation( );
 
 public static native boolean dexPutPubKey(long dataptr,int which ,byte[] input);
 
@@ -858,7 +791,6 @@ public static native void dexSaveDeviceName(long dataptr,String deviceName);
 public static native String dexGetDeviceName(long dataptr);
 public static native boolean dexCandidate(long dataptr,String deviceName,String address);
 public static native void dexEndBackfill(long dataptr);
-public static native void EverSenseClear(long dataptr);
 public static native void setdexcomPredict(boolean val);
 public static native boolean getdexcomPredict( );
 public static native boolean hasData();
@@ -875,10 +807,7 @@ public static native String sensortextfromSensorptr(long sensorptr);
 public static native void finishfromSensorptr(long sensorptr);
 public static native void setInsulinType(int index,int type);
 public static native int getInsulinType(int index);
-public static native int getSiSubtype(long dataptr);
-public static native void setSiSubtype(long dataptr,int type);
 
-public static native byte[] getSIResetBytes( );
 public static native String getbackJson(int pos);
 public static native int makeHomeSender( );
 public static native int makeHomeReceiver( );
@@ -943,57 +872,26 @@ public static native boolean shouldExclude(long msec);
 public static native void setAllValues(boolean val);
 public static native boolean getAllValues( );
 
-public static native void setResetSibionics2(long dataptr,boolean val);
-public static native boolean getResetSibionics2(long dataptr);
 public static native long str2sensorptr(String sensor);
-public static native void setSensorptrResetSibionics2(long sensorptr,boolean val);
-public static native boolean getSensorptrResetSibionics2(long sensorptr);
-public static native int getSensorptrSiSubtype(long sensorptr);
-public static native void setSensorptrSiSubtype(long sensorptr,int type);
 public static native int getSensorptrLibreVersion(long sensorptr);
-public static native boolean siSensorptrTransmitterScan(long sensorptr,String scancode);
 public static native String sensorptr2str(long sensorptr);
 public static native void watchBluetooth(String name,boolean sensor,boolean watch);
 public static native long getnumlasttime( );
-public static native byte[] accuAskValues(long dataptr);
-public static native long accuProcessData(long dataptr,byte[] value,long mmsec);
-public static native void accuSetStartTime(long dataptr,byte[] value);
 public static native void updateUsedSensors();
-public static native byte[] careSenseTimeCMD();
 
-public static native int GlucoseMeterGetLastPos(int meterIndex);
-public static native boolean GlucoseMeterSetLastPos(int meterIndex,int newpos);
-public static native int GlucoseMeterGetIndex(String deviceName,String address);
 
-public static native boolean GlucoseMeterRemove(String deviceName,String address);
 
-public static native boolean GlucoseMeterRemoveIndex(int index);
 
-public static native boolean GlucoseMeterSave(int meterIndex,byte[] value);
-public static native boolean GlucoseMeterProcessContext(int meterIndex,byte[] value);
-public static native boolean GlucoseMeterSaveTime(int meterIndex,byte[] value);
 
-public static native int[] getActiveGlucoseMeters( );
-public static native String GlucoseMeterDeviceName(int meterIndex);
-public static native String GlucoseMeterDeviceAddress(int meterIndex);
-public static native boolean GlucoseMeterSetDeviceAddress(int meterIndex,String address);
 
-public static native byte[] getGlucoseMeterNewCMD(int meterIndex);
 
 //public static native void calibrateLast();
 
-public static native boolean recordCharacteristicChanged(byte[] value);
 
 
 
-public static native long GlucoseMeterGetLastTime(int meterIndex);
-public static native void GlucoseMeterSetLastTime(int meterIndex,long lasttime);
-public static native boolean GlucoseMeterSetActive(int meterIndex,boolean active);
 
-public static native boolean GlucoseMeterGetActive(int meterIndex);
-public static native int GlucoseMeterCount();
 
-public static native int GlucoseMeterHasIndex(String deviceName,String address);
 
 public static native void setDisconnectSensor(boolean val);
 public static native boolean getDisconnectSensor( );
@@ -1015,46 +913,21 @@ public static native void setTurnPort(int pos,int port);
 
 public static native int TurnServerNR();
 
-public static native long airProcessData(long dataptr,byte[] value,long[] msecptr);
-public static native void airSetNumberNew(long dataptr,int nr);
 
-public static native int airGetLast(long dataptr);
-public static native boolean airSaveSensorInfo(long dataptr,byte[] value);
-public static native boolean airSaveSensorInfo2(long dataptr,byte[] value);
-public static native void airSaveStartSensor(long dataptr, float eapp,float vref,int elapsedSecs);
-public static native byte[] airGetPin(long dataptr);
 
 public static native void switchSync();
 
-public static native boolean aidexXSaveKey(long dataptr,byte[] value);
-public static native byte[] aidexXstartCommand( boolean haskey,long dataptr, byte[] value);
-public static native long aidexXscanBytes(long dataptr,byte[] value,long[] time);
-public static native byte[] aidexXprocessHistoryData(long dataptr,boolean bondednow,byte[] value);
-public static native long aidexXprocessCurrentData(long dataptr,byte[] value,long[] time);
-public static native boolean aidexHasKey(long dataptr);
-public static native void aidexXunpair(long dataptr);
 
 public static native int getManualWarmupMinutes(long sensorptr);
 public static native void setManualWarmupMinutes(long sensorptr,int min);
 
 public static native int getMinimalWarmup(long dataptr);
 
-public static native GS3Data gs3Glucose(long dataptr, byte[] value,long mmsec);
-public static native void gs3SetDeviceInfo(long dataptr, String manufacturer, String software);
-public static native boolean gs3IsV3(long dataptr);
-public static native String gs3nfc(byte[] scan);
-public static native String md5sum(String input);
-public static native void saveGS3id(long id);
-public static native long getGS3id();
-public static native byte[] gs3Glucose(long dataptr, byte[] value,long mmsec,long[] res);
 public static native int getmaxmgdL(int sensorgen);
 public static native int getminmgdL(int sensorgen);
 public static native int getSerialLength(long dataptr);
 public static native boolean hasHistory(long sensorptr);
 
-public static native boolean hasAidexX();
-public static native byte[] aidexXaskKey(long dataptr);
-public static native String aidexXaddSensorByDeviceName(String serial);
 
 public static native int sensorIndex(String Sensor);
 public static native boolean lossSignalAlreadyHeard();
@@ -1065,7 +938,6 @@ public static native boolean useAgain(long sensorptr);
 
 public static native boolean activeSensor(long sensorptr);
 
-public static native void aidexXclear(long dataptr);
 
 public static native void setaskedWatchFace(boolean val);
 public static native boolean getaskedWatchFace();
@@ -1096,9 +968,7 @@ public static native void setradius(int val);
 public static native int getradius( );
 //s/^[	 ]*extern.*JNIEXPORT[         ]*\([a-zA-Z]*\)[ ]*JNICALL[      ]*fromjava(\([^)]*\)) *(JNIEnv[^,]*,[^,)]*[,)]\([^){]*\)[^a-zA-Z0-9]*$/public static native \1 \2(\3);/g
 
-public static native void isChinese(long dataptr);
 
-public static native void testLibre3( );
 
 public static native void setalarmSoundType(int val);
 public static native int getalarmSoundType( );

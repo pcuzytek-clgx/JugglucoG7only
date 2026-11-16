@@ -428,25 +428,8 @@ public final class GarminLibre3 {
     }
 
     static List<Integer> backfillSeed(String serial,String address) {
-        long dataptr=0L;
-        try {
-            dataptr=Natives.getdataptr(serial);
-            if(dataptr==0L) return null;
-            long sensorptr=Natives.getsensorptr(dataptr);
-            if(sensorptr==0L) return null;
-            int from=Natives.getlastLifeCountReceived(sensorptr);
-            int start=(int)(Natives.getSensorStartmsec(dataptr)/1000L);
-            if(from<0 || from>65535 || start<=0) return null;
-            String[] parts=address.split(":");
-            if(parts.length!=6) return null;
-            int first=0,last=0;
-            for(int i=0;i<6;i++) {
-                int b=Integer.parseInt(parts[i],16);
-                if(b<0 || b>255) return null;
-                if(i<4) first|=b<<((3-i)*8); else last|=b<<((7-i)*8);
-            }
-            return Arrays.asList(LIBRE3_BACKFILL_SEED,first,last,from,start);
-        } finally { if(dataptr!=0L) Natives.freedataptr(dataptr); }
+        // Libre 3 support was removed from this fork; there is no native life count to backfill from.
+        return null;
     }
 
     public static synchronized boolean switchSensor(final Libre3GattCallback sensor) {
