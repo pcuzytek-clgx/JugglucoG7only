@@ -37,7 +37,6 @@ typedef std::pair<std::string_view,std::string_view> errortype;
 struct geo_t;
 struct jugglucotext;
 extern const jugglucotext engtext;
-extern jugglucotext artext;
 
 struct JCurve {
 protected:
@@ -80,7 +79,7 @@ inline int userunit2mgL(const float unit) const {
 const jugglucotext *usedtext=&engtext;
 
 bool isRTL() const {
-    return usedtext==&artext;
+    return false;
     }
 
 

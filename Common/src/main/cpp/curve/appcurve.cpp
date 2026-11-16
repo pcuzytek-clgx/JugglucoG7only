@@ -27,9 +27,8 @@ extern bool isRTL();
 extern bool hasnetwork();
 
 struct jugglucotext;
-extern jugglucotext artext;
 bool isRTL() {
-    return usedtext==&artext;
+    return false;
 }
 bool bluetoothEnabled();
 #include "numdisplay.hpp"

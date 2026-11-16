@@ -170,10 +170,6 @@ bool hebrew() ;
 #else
 #define fontpath "/home/jka/Android/Sdk/platforms/android-29/data/fonts/"
 #endif
-extern jugglucotext zhtext; 
-extern jugglucotext jatext; 
-extern jugglucotext artext; 
-extern jugglucotext kotext; 
 
 
 #ifdef JUGGLUCO_APP
@@ -370,7 +366,6 @@ static int getHangulMenu(NVGcontext* avg) {
 
 bool usedScript[SCR_COUNT]{};
 
-extern const jugglucotext hitext;
 
 
 static bool didinitScriptFonts=false;
@@ -409,89 +404,7 @@ thevg=avg;
 #endif
 const FontUse fontuse{.vg=avg,.whitefont=whitefont,.blackfont=blackfont,.scriptEnabled=usedScript};
 
-if(usedtext==&kotext) {
-     enableScript(fontuse,SCR_HANGUL);
-#ifdef JUGGLUCO_APP
-    menufont=nvgCreateFontMem(avg, "regular", (unsigned char *)fontfile, sizeof(fontfile), 0);
-    int fallback2 =getHangulMenu(avg);
-    nvgAddFallbackFontId(avg,menufont, getMenuFont(avg));
-    nvgAddFallbackFontId(avg, menufont,fallback2);
-#endif
-     chfontset=HANGUL;
-      }
-else
-if(usedtext==&hitext) {
-     enableScript(fontuse,SCR_DEVANAGARI);
-#ifdef JUGGLUCO_APP
-    menufont=nvgCreateFontMem(avg, "regular", (unsigned char *)fontfile, sizeof(fontfile), 0);
-    int fallback2 =getHindiMenu(avg);
-
-    nvgAddFallbackFontId(avg,menufont, getMenuFont(avg));
-    nvgAddFallbackFontId(avg, menufont,fallback2);
-#endif
-     chfontset=HINDI;
-      }
-else
-if(usedtext==&artext) {
-
-//    nvgAddFallbackFontId(avg, blackfont,getArabicBold(avg)); 
-
-
- //   nvgAddFallbackFontId(avg, whitefont,getArabicRegular(avg));
-     enableScript(fontuse, SCR_ARABIC);
-
-#ifdef JUGGLUCO_APP
-    menufont=nvgCreateFontMem(avg, "regular", (unsigned char *)fontfile, sizeof(fontfile), 0);
-    int fallback2 =getArabicMenu(avg);
-    nvgAddFallbackFontId(avg,menufont, getMenuFont(avg));
-    nvgAddFallbackFontId(avg, menufont,fallback2);
-#endif
-
-   chfontset=ARABIC;
-
-
-}
-else
-if(usedtext==&zhtext||usedtext==&jatext) {
-     enableScript(fontuse, SCR_CJK);
-#ifdef JUGGLUCO_APP
-    if(-1==(menufont = nvgCreateFont(avg, "regular",
-
-#ifdef JUGGLUCO_APP
-    fontpath "NotoSerifCJK-Regular.ttc"
-#else
-"/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc"
-#endif
-
-
-    ))) {
-      CURVELOGAR("menufont NotoSerifCJK-Regular failed");
-       if(-1==(menufont = nvgCreateFont(avg, "regular",
-
-#ifdef JUGGLUCO_APP
-       fontpath "NotoSansCJK-Regular.ttc"
-#else
-"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
-#endif
-       ))) {
-         CURVELOGAR("menufont NotoSansCJK-Regular failed");
-         if(-1==(menufont = nvgCreateFont(avg, "regular",
-#ifdef JUGGLUCO_APP
-         fontpath "DroidSansFallback.ttf"
-#else
-        "/usr/share/fonts-droid-fallback/truetype/DroidSansFallback.ttf"
-#endif
-         )))  {
-               CURVELOGAR("font DroidSansFallback failed");
-               }
-         }
-
-      }
-#endif
-//TODO free font ???
-    chfontset=CJK;
-    }
-else  {
+{
 
 #ifdef USE_HEBREW
      enableScript(fontuse, SCR_HEBREW);
@@ -2495,22 +2408,6 @@ void     JCurve::setlocale(NVGcontext* avg,const char *localestrbuf,const size_t
                 }
             return;
 #endif
-        case mklanguagenum("AR"):
-        case mklanguagenum("ar"):
-            if(chfontset!=ARABIC) {
-                initfont(avg);
-                }
-            return; 
-        case mklanguagenum("ZH"):
-        case mklanguagenum("zh"):
-        case mklanguagenum("JA"):
-        case mklanguagenum("ja"):
-        case mklanguagenum("KO"):
-        case mklanguagenum("ko"):
-            if(chfontset!=CJK) {
-                initfont(avg);
-                }
-            return;
         };
     if(chfontset!=REST) {
         initfont(avg);
