@@ -47,10 +47,6 @@ public    void handlealarm() {
             Log.stack(LOG_ID,"reconnect Libre3 watch",th);
             }
         }
-    final var view=Floating.floatview;
-    if(view!=null) {
-        view.postInvalidate();
-        }
     final boolean haslossalarm=hasalarmloss();
     long wastime = SuperGattCallback.lastfoundL;
     if(wastime==0L) {

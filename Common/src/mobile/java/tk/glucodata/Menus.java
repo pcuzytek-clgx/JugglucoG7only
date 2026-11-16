@@ -341,10 +341,6 @@ static private void showNow(MainActivity act) {
 
 			);
  
-        CheckBox glucosefloatview=view.findViewById(R.id.glucosefloat);glucosefloatview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Floating.setfloatglucose(act,isChecked);
-	}); 
-	glucosefloatview.setChecked(Natives.getfloatglucose());
 
 
 

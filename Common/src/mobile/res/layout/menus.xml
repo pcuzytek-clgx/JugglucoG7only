@@ -97,18 +97,6 @@
         android:layout_rowWeight="1"
         android:text="@string/statistics" />
 
-
-    <CheckBox
-        android:id="@+id/glucosefloat"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_row="2"
-
-        android:layout_column="2"
-        android:layout_columnWeight="1"
-        android:layout_rowWeight="1"
-        android:text="@string/floatname" />
-
     <Space
         android:layout_width="0dp"
         android:layout_column="3"

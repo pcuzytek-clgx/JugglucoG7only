@@ -115,7 +115,6 @@ const jugglucotext engtext {
 #endif //INJUGGLUCO
 		"Statistics",
 #ifdef INJUGGLUCO
-		"Float"
 		},
 	.menustr2= {"Stream"},
 #endif //INJUGGLUCO

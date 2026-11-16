@@ -33,8 +33,6 @@ import static tk.glucodata.Applic.explicit;
 import static tk.glucodata.Applic.isRelease;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.useZXing;
-import static tk.glucodata.Floating.setfloatglucose;
-import static tk.glucodata.Floating.shoulduseadb;
 import static tk.glucodata.GlucoseCurve.STEPBACK;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.Log.showbytes;
@@ -971,8 +969,6 @@ if(!isWearable) {
         Natives.setpaused(curve);
         curve.onResume();
         }
-    if(Natives.gethidefloatinJuggluco())
-        Floating.removeFloating();
     boolean showsdialog=false;
     for(var el:shownummessage) {
         showindialog(el,false);
@@ -1223,8 +1219,6 @@ protected void onStop() {
     active=false;
     if(!Applic.Nativesloaded)
         return;
-    if(Natives.getfloatglucose( )&&Natives.gethidefloatinJuggluco())
-        Floating.makefloat();
     Natives.setpaused(null);
     if(curve != null)
         curve.onPause();
@@ -1501,7 +1495,6 @@ static  final int REQUEST_BARCODE_SIB2=0x11;
 public static final int REQUEST_RINGTONE=0x60;
 public static final int REQUEST_MASK=0xFFFFFF00;
 public static final int IGNORE_BATTERY_OPTIMIZATION_SETTINGS=0x100;
-static final int OVERLAY_PERMISSION_REQUEST_CODE=0x40;
 public static final int REQUEST_SAVE_LOG=0x300;
 public static final int REQUEST_SAVE_LOGCAT=0x301;
 public static final int REQUEST_WEBPAGES=0x302;
@@ -1546,14 +1539,6 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     Log.format("Main.onActivityResult requestCode%x resultCode=%d\n",requestCode,resultCode);
     switch(requestCode) {
-        case OVERLAY_PERMISSION_REQUEST_CODE: {
-            {if(doLog) {Log.i(LOG_ID, "OVERLAY_PERMISSION_REQUEST_CODE ");};};
-            if(Floating.cannotoverlay()  ) {
-                shoulduseadb(this);
-                return ;
-                }
-            setfloatglucose(this, true);
-            };break;
         case REQUEST_NOTIFICATION: {
             Log.i(LOG_ID,"Notification");    
             Natives.setaskedNotify(true);

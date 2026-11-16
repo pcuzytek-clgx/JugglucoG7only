@@ -1923,42 +1923,6 @@ in Libreview at the specified time.</p>
 </p>
 ]]>
 </string>
-<string name="floatingconfig" >
-<![CDATA[
-<p><a href="https://www.juggluco.nl/Jugglucohelp/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/floatingconfig.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/floatingconfig.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/floatingconfig.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/floatingconfig.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/fr/floatingconfig.html">fr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/floatingconfig.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/floatingconfig.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/floatingconfig.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/floatingconfig.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/floatingconfig.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/floatingconfig.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/floatingconfig.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/floatingconfig.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/floatingconfig.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/floatingconfig.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/floatingconfig.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/floatingconfig.html?lang=en">en</a>&emsp;&emsp;</p><h1 class="western">Floating glucose</h1>
-<p>Here you can set the font size and foreground and background color
-of the floating glucose. 
-</p>
-<p><b>Touchable</b>: when set you can move the floating glucose with
-your finger and make it small by long pressing it (without moving). When
-touchable is unset, touch input goes to the window beneath the
-floating glucose, so you can use the app under the floating glucose.
-You can also make the floating glucose untouchable by <b>double
-tapping</b> it.</p>
-<p><b>Transparent:</b> background invisible.</p>
-<p><b>Above</b>: keep the floating glucose visible even when Juggluco is in the foreground.</p>
-<p><b>Time</b>: timestamp of the glucose value.</p>
-<p><b>Active</b>: turn it on.</p>
-<p>You can turn on and off Floating glucose with left middle
-menu-&gt;Float. 
-</p>
-<p>You can switch to Juggluco by tapping the <b>arrow side</b> of the
-floating glucose. Double tapping the glucose value side results in
-the floating glucose becoming untouchable. <b>Long pressing</b> the
-glucose value results in the display of only a small glucose value so
-you can interact with what is underneath, tapping the small display
-enlarges it again. Moving while touching the glucose value side,
-<b>moves</b> the floating glucose.</p>
-<p>To display over other apps Juggluco needs a special permission. On
-WearOS and also Android Automotive you need to use adb to give this
-permission:</p>
-<p style="margin-bottom: 0in"><b>adb shell pm grant tk.glucodata android.permission.SYSTEM_ALERT_WINDOW</b></p>
-<p style="background: transparent">On some watches (for example
-TicWatch Pro), you can also allow it with: Android/WearOS
-settings-&gt;Apps &amp; notifications-&gt; App
-info-&gt;Juggluco-&gt;Advanced-&gt;Display over other apps.</p>
-]]>
-</string>
 <string name="getaccountidhelp" >
 <![CDATA[
 <p><a href="https://www.juggluco.nl/Jugglucohelp/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/getaccountidhelp.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/getaccountidhelp.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/getaccountidhelp.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/getaccountidhelp.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/fr/getaccountidhelp.html">fr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/getaccountidhelp.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/getaccountidhelp.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/getaccountidhelp.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/getaccountidhelp.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/getaccountidhelp.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/getaccountidhelp.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/getaccountidhelp.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/getaccountidhelp.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/getaccountidhelp.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/getaccountidhelp.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/getaccountidhelp.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/getaccountidhelp.html?lang=en">en</a>&emsp;&emsp;</p><h1 class="western">Get Account ID</h1>

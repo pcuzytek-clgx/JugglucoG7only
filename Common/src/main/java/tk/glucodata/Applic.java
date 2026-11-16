@@ -889,17 +889,10 @@ if(isWearable) {
     Specific.setclose(!Natives.getdontuseclose());
     }
 
-    Floating.init(); 
    final var initversion=Natives.getinitVersion();
     if(initversion<39) {
           if(initversion<29) {
              if(initversion<22) {
-                if(initversion<14) {
-                   if(Notify.arrowNotify!=null)
-                      Natives.setfloatingFontsize((int) Notify.glucosesize);
-                   Natives.setfloatingbackground(WHITE);
-                    Natives.setfloatingforeground(BLACK);
-                   }
                 }
              sethour24(DateFormat.is24HourFormat(app));
              }

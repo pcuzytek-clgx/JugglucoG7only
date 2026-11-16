@@ -208,18 +208,9 @@
  <string name="xdripbroadcast">Transm. jak z xDrip</string>
  <string name="sensorpermission">Uprawnienie do dostępu do czujników potrzebne do wyświetlania tętna.</string>
  <string name="sensorpermissionmessage">Ustaw je w Ustawieniach urządzenia, Aplikacje, Uprawnienia, Juggluco</string>
- <string name="floatglucose">Pływ. gluk.</string>
- <string name="floatglucoseshort">@string/floatglucose</string>
 
- <string name="fontsize">Rozmiar czcionki</string>
- <string name="fontsizeshort">@string/fontsize</string>
- <string name="fonttoolarge">Zbyt duży rozmiar czcionki: maks =</string>
- <string name="foreground">Pierwszy plan</string>
- <string name="background">Tło</string>
  <string name="backgroundshort">Tło-</string>
 
- <string name="transparent">Przezroczysta</string>
- <string name="touchable">Dotykowa</string>
 
  <string name="overlaypermission">Wymaga uprawnienia</string>
  <string name="deletereminder">Usunąć przypomnienie?</string>
@@ -278,7 +269,6 @@
  <string name="mirror">Klonowanie</string>
  <string name="list">Lista</string>
  <string name="statistics">Statystyka</string>
- <string name="floatname">Pływ. wart.</string>
  <string name="last_scan">Ostatni skan</string>
  <string name="day_back">Dzień wstecz</string>
  <string name="day_later">Dzień później</string>
@@ -312,7 +302,6 @@
    <string name="clampnow">Zawsze teraz</string>
     <string name="sendfrom">"Wysyłaj od: "</string>
  <string name="changestartbutton">Zmień początek</string>
- <string name="floatjuggluco">Wyżej</string>
  <string name="uploader">Przesył do NS</string>
  <string name="upload">Prześlij</string>
  <string name="sibionics">Sibionics</string>

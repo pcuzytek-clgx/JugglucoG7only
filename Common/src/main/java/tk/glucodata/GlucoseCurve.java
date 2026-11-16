@@ -694,7 +694,6 @@ static private boolean startv1=true;
                 switch(item&0xF) {
                    case 0: (new Backup()).mkbackupview(( MainActivity)getContext());break;
                 case 1: Stats.mkstats((MainActivity) getContext());break;
-                case 2:  Floating.setfloatglucose((MainActivity) getContext(),!Natives.getfloatglucose()) ;break;
                 };
                 };break;
             case 2: {

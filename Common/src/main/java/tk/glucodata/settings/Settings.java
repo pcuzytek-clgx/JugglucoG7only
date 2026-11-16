@@ -115,7 +115,6 @@ import tk.glucodata.BooleanSupplier;
 import tk.glucodata.BuildConfig;
 import tk.glucodata.CheckDirectionBox;
 import tk.glucodata.CheckDirectionRadio;
-import tk.glucodata.Floating;
 import tk.glucodata.GlucoseCurve;
 import tk.glucodata.HealthConnection;
 import tk.glucodata.LabelAdapter;
@@ -1369,13 +1368,6 @@ private    void mksettings(MainActivity context) {
         var uppad=(int)(tk.glucodata.GlucoseCurve.metrics.density*9.0);
       alarmbut.setPadding(uppad,alarmbut.getPaddingTop(),uppad,alarmbut.getPaddingBottom());
 
-      var floatconfig=getbutton(context,R.string.floatglucoseshort);
-
-        CheckDirectionBox floatglucose=new CheckDirectionBox(context);
-      floatconfig.setOnClickListener(v-> {
-         tk.glucodata.FloatingConfig.show(context,thelayout[0]);
-         });
-        floatglucose.setText("   " );
      View[] talkrow;
         if(doLog) {
                 Button logview=getbutton(context,R.string.logging);
@@ -1387,15 +1379,13 @@ private    void mksettings(MainActivity context) {
             }
 
 
-        floatglucose.setChecked(Natives.getfloatglucose());
-        floatglucose.setOnCheckedChangeListener( (buttonView,  isChecked) -> Floating.setfloatglucose(context,isChecked) ) ;
         View[] camornum=new View[] {alarmbut,numalarm};
         if(BuildConfig.minSDK>=26) {
-            views = new View[][]{new View[]{displayview}, hasnfc ? (new View[]{globalscan, nfcsound}) : null,new View[]{floatconfig, floatglucose},new View[]{complications},talkrow, new View[]{exchanges },new View[]{calibration},   camornum, new View[]{close}, new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
+            views = new View[][]{new View[]{displayview}, hasnfc ? (new View[]{globalscan, nfcsound}) : null,new View[]{complications},talkrow, new View[]{exchanges },new View[]{calibration},   camornum, new View[]{close}, new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
             ;
         }
         else{
-            views = new View[][]{new View[]{displayview},    hasnfc ? (new View[]{globalscan, nfcsound}) : null, new View[]{floatconfig, floatglucose},talkrow,  new View[]{exchanges },new View[]{calibration},     camornum,new View[]{close},  new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
+            views = new View[][]{new View[]{displayview},    hasnfc ? (new View[]{globalscan, nfcsound}) : null, talkrow,  new View[]{exchanges },new View[]{calibration},     camornum,new View[]{close},  new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
             ;
         }
         }
@@ -1420,7 +1410,6 @@ private    void mksettings(MainActivity context) {
         glucosenotify.setText(R.string.glucosestatusbar);
         glucosenotify.setChecked(Natives.getshowalways()) ;
         glucosenotify.setOnCheckedChangeListener( (buttonView,  isChecked) -> Notify.glucosestatus(isChecked) );
-      var floatconfig=getbutton(context,R.string.floatglucose);
       View[] numdis;
       var googlescan=getcheckbox(context, R.string.googlescan, Natives.getGoogleScan());
        googlescan.setOnCheckedChangeListener( (buttonView,  isChecked) -> Natives.setGoogleScan(isChecked) );
@@ -1434,16 +1423,14 @@ private    void mksettings(MainActivity context) {
           else {
                 numdis= new View[]{googlescan,displayview};
                 }
-        floatconfig.setOnClickListener(v-> tk.glucodata.FloatingConfig.show(context,thelayout[0]));
 
-        View[] rowglu=new View[]{floatconfig,calibration,glucosenotify};
-//        View[] rowglu=new View[]{floatconfig,glucosenotify};
+        View[] rowglu=new View[]{calibration,glucosenotify};
         views=new View[][]{hasnfc?new View[]{nfcsound, globalscan,camera}:null,rowglu,new View[]{exchanges,numalarm,alarmbut},numdis, row9};
 
         if(advhelp!=null) {
             portraitViews=new View[][]{
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
-                new View[]{floatconfig,calibration},new View[]{glucosenotify},
+                new View[]{calibration,glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
                 new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2]}:null,
                 new View[]{help,advanced},new View[]{intro,close}};
@@ -1451,7 +1438,7 @@ private    void mksettings(MainActivity context) {
         else {
             portraitViews=new View[][]{
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
-                new View[]{floatconfig,calibration},new View[]{glucosenotify},
+                new View[]{calibration,glucosenotify},
                 new View[]{exchanges,numalarm},new View[]{alarmbut},
                 new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2]}:null,
                 new View[]{help,intro},new View[]{close}};

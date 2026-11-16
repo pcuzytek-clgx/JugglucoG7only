@@ -324,11 +324,8 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
         var sglucose=new notGlucose(timmsec, String.format(Applic.usedlocale,Notify.pureglucoseformat, gl),  rate,sensorgen);
         previousglucose=sglucose;
         previousglucosevalue=gl;
-        final var fview=Floating.floatview;
 //        MainActivity.showmessage=null;
         boolean[] alarmspeak={false};
-        if(fview!=null) 
-            fview.postInvalidate();
 
         try {
 

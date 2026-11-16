@@ -71,8 +71,6 @@ static PowerManager.WakeLock wakeLock =null;
        started=true;
        Applic app=(Applic) getApplicationContext();
        app.initproc();
-       if(Natives.getfloatglucose()&&!Natives.gethidefloatinJuggluco()) 
-                Floating.makefloat();
         try {
           if(intent==null) {
              if(!Applic.possiblybluetooth(this)) {

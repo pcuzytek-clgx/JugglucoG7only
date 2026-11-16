@@ -624,21 +624,9 @@ public static native void setglucodataRecepters( String[] jnames);
 public static native void setinitVersion(int val);
 public static native int getinitVersion( );
 
-public static native void setfloatglucose(boolean val);
-public static native boolean getfloatglucose( );
-public static native void setfloatingFontsize(int val);
-public static native int getfloatingFontsize( );
-public static native void setfloatingbackground(int val);
-public static native int getfloatingbackground( );
-public static native void setfloatingforeground(int val);
-public static native int getfloatingforeground( );
 
         
-public static native void setfloatingTouchable(boolean val);
-public static native boolean getfloatingTouchable( );
 
-public static native void setfloatingPos(int val);
-public static native int getfloatingPos( );
 public static native void finishSensor(long dataptr);
 
 public static native long manualLibreAccountIDnumber( );
@@ -731,10 +719,6 @@ public static native String serverError();
 public static native String nightError();
 public static native void setcurrentRelative(boolean val);
 public static native boolean getcurrentRelative( );
-public static native void setfloattime(boolean val);
-public static native boolean getfloattime( );
-public static native void sethidefloatinJuggluco(boolean val);
-public static native boolean gethidefloatinJuggluco( );
 public static native boolean getHostDeactivated(int pos);
 public static native void setHostDeactivated(int pos,boolean val);
 

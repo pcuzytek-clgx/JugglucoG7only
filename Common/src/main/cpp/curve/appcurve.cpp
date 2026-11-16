@@ -626,7 +626,6 @@ int64_t JCurve::doehier(int menu,int item,bool right) {
                         return -1LL;
                     ;break;
 #endif
-                case 2:break;
                 default:
                     nrmenu=0;
                     break;
@@ -2279,13 +2278,12 @@ int getmenulen(const int menu) {
         return alarmongoing?mainmenulen:mainmenulen-1;
         }
     if(menu==1)
-        return 3;
+        return 2;
     if(menu==2)
         return displaymenulen;
     return len;    
     }
 void setfloatptr() {
-    menuopt0b[2]=&settings->data()->floatglucose;
     }
 
 //void setnewamount() { }

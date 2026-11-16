@@ -113,7 +113,6 @@ jugglucotext pltext {
 #endif //INJUGGLUCO
 		"Statystyka",
 #ifdef INJUGGLUCO
-		"Pływ. wart."
 		},
 	.menustr2= {"Strumień"},
 #endif //INJUGGLUCO

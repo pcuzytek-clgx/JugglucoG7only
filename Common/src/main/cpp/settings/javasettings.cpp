@@ -1297,55 +1297,18 @@ extern "C" JNIEXPORT jint  JNICALL   fromjava(getinitVersion)(JNIEnv *env, jclas
     return settings->data()->initVersion;
     }
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatglucose)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->floatglucose=val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getfloatglucose)(JNIEnv *env, jclass cl) {
-    return settings->data()->floatglucose;
-    }
-
-
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingFontsize)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingFontsize=val;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingFontsize)(JNIEnv *env, jclass cl) {
-    return settings->data()->floatingFontsize;
-    }
-
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingbackground)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingbackground=val;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingbackground)(JNIEnv *env, jclass cl) {
-    return settings->data()->floatingbackground;
-    }
 
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingforeground)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingforeground=val;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingforeground)(JNIEnv *env, jclass cl) {
-    return (settings->data()->floatingforeground|0xFF000000);
-    }
 
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingTouchable)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->floatingNotTouchable=!val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getfloatingTouchable)(JNIEnv *env, jclass cl) {
-    return !settings->data()->floatingNotTouchable;
-    }
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingPos)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingPos=val;
-    }
+
+
+
 
 extern void    makenightswitch();
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingPos)(JNIEnv *env, jclass cl) {
-    makenightswitch(); //Something after everything
-    return settings->data()->floatingPos;
-    }
 
 
 
@@ -1657,18 +1620,6 @@ extern "C" JNIEXPORT jfloat  JNICALL   fromjava(getIOBvalue)(JNIEnv *env, jclass
 #endif
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloattime)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->floattime=val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getfloattime)(JNIEnv *env, jclass cl) {
-    return settings->data()->floattime;
-    }
-extern "C" JNIEXPORT void  JNICALL   fromjava(sethidefloatinJuggluco)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->hidefloatinJuggluco=val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(gethidefloatinJuggluco)(JNIEnv *env, jclass cl) {
-    return settings->data()->hidefloatinJuggluco;
-    }
 
 extern "C" JNIEXPORT jfloat  JNICALL   fromjava(getthreshold)(JNIEnv *env, jclass cl) {
     return settings->data()->threshold;
