@@ -1413,14 +1413,7 @@ private    void mksettings(MainActivity context) {
             Calibration.show(context,thelayout[0]);
         });
     if(isWearable) {
-        Button talk;
-        if(!tk.glucodata.Applic.DontTalk) {
-                talk=getbutton(context,R.string.talk);
-                talk.setOnClickListener(v ->{tk.glucodata.Talker.config(context);});
-                getMargins(talk).bottomMargin= (int)(tk.glucodata.GlucoseCurve.metrics.density*4.0);
-
-                }
-        else talk=null;
+        Button talk=null;
         Button complications;
         if(BuildConfig.minSDK>=26) {
             complications = getbutton(context, R.string.complications);

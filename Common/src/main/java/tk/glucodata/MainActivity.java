@@ -26,15 +26,12 @@ import static android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTIN
 import static android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM;
 import static android.view.View.GONE;
 import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
-import static tk.glucodata.Applic.DontTalk;
 import static tk.glucodata.Applic.RunOnUiThread;
 import static tk.glucodata.Applic.TargetSDK;
 import static tk.glucodata.Applic.app;
 import static tk.glucodata.Applic.explicit;
 import static tk.glucodata.Applic.isRelease;
 import static tk.glucodata.Applic.isWearable;
-import static tk.glucodata.Applic.talkbackoff;
-import static tk.glucodata.Applic.talkbackon;
 import static tk.glucodata.Applic.useZXing;
 import static tk.glucodata.Floating.setfloatglucose;
 import static tk.glucodata.Floating.shoulduseadb;
@@ -303,10 +300,6 @@ if(!isWearable) {
     if(!lang.equals(Applic.curlang)) {
         Natives.setlocale(lang,Build.VERSION.SDK_INT);
         Applic.curlang=lang;
-        if(!DontTalk) {
-            if(Talker.istalking())    
-                SuperGattCallback.newtalker(this);
-              }
         }
    }
 static int openglversion=0;
@@ -1024,16 +1017,10 @@ if(!isWearable) {
         var am = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
         List list;
         if(am.isEnabled()&&am.isTouchExplorationEnabled()&&(list=am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN))!=null&&!list.isEmpty()) {
-                if(!DontTalk) {
-                    talkbackon(this);
-                    }
                 if(!isWearable&&!Menus.on)
                     Menus.show(this);
             }
         else {
-            if(!DontTalk) {
-                talkbackoff();
-                }
             }
         }
      else {

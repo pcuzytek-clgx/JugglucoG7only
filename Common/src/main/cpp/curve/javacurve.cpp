@@ -142,7 +142,7 @@ JavaVM *vmptr;
 static jmethodID summaryready=nullptr;
 
 static jmethodID showsensorinfo=nullptr;
-jmethodID jdoglucose=nullptr, jupdateDevices=nullptr, jbluetoothEnabled=nullptr,jspeak=nullptr, jresetWearOS=nullptr, jbluePermission=nullptr;
+jmethodID jdoglucose=nullptr, jupdateDevices=nullptr, jbluetoothEnabled=nullptr, jresetWearOS=nullptr, jbluePermission=nullptr;
 //jmethodID jchangedProfile;
 jclass JNIApplic,JNIString;
 #ifndef WEAROS
@@ -233,9 +233,6 @@ if(cl) {
  }
  if(!(jbluetoothEnabled=env->GetStaticMethodID(JNIApplic,"bluetoothEnabled","()Z"))) {
  LOGAR(R"(jbluetoothEnabled=env->GetStaticMethodID(JNIApplic,"bluetoothEnabled","()Z") failed)" "");
- }
- if(!(jspeak=env->GetStaticMethodID(JNIApplic,"speak","(Ljava/lang/String;)V"))) {
- LOGAR(R"(jspeak=env->GetStaticMethodID(JNIApplic,"speak","(Ljava/lang/String;)V") failed)" "");
  }
  if(!(jresetWearOS=env->GetStaticMethodID(JNIApplic,"resetWearOS","()V"))) {
  LOGAR(R"(jresetWearOS=env->GetStaticMethodID(JNIApplic,"resetWearOS","()V") failed)" "");
@@ -772,13 +769,6 @@ bool rmInitLayout() {
  return true;
  }
 #endif
-void speak(const char *message) {
- if(message)
- getenv()->CallStaticVoidMethod(JNIApplic,jspeak,getenv()->NewStringUTF(message));
- else {
- LOGAR("speak(null)");
- }
- }
 extern void toGarmin(int base);
 void toGarmin(int base) {
 #ifndef WEAROS
@@ -803,6 +793,9 @@ void toCalendar(const char *message) {
  } */
 
 
+#ifdef DONTTALK
+void speak(const char *) {}
+#endif
 #ifndef DONTTALK
 extern bool speakout;
 extern "C" JNIEXPORT void JNICALL fromjava(settouchtalk)(JNIEnv *env, jclass thiz,jboolean val) {

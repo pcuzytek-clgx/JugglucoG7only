@@ -1712,9 +1712,6 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(saveVoice)(JNIEnv *env, jclass cl,
     settings->data()->voicespeakerGet()=voice;
     settings->data()->voiceactiveset(active);
     }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getVoiceTalker)(JNIEnv *env, jclass cl) {
-    return settings->data()->voicespeakerGet();
-    }
 extern "C" JNIEXPORT jint  JNICALL   fromjava(getVoiceSeparation)(JNIEnv *env, jclass cl) {
     return settings->data()->voicesepget();
     }

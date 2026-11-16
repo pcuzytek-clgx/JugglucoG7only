@@ -277,15 +277,9 @@
     <string name="notify">Notify</string>
  <string name="separate">Separate</string>
     <string name="librecurrent">Immediate</string>
-    <string name="speed">Speed</string>
- <string name="pitch">Pitch</string>
- <string name="talker">Voice</string>
- <string name="secondsbetween">Seconds between</string>
- <string name="test">Test</string>
  <string name="streamhistory">Bluetooth History</string>
  <string name="libreisviewed">Spy views</string>
  <string name="novalue">No value</string>
- <string name="talk">Talk</string>
  <string name="watches">Watch</string>
  <string name="menus">Menus</string>
  <string name="system_ui">System UI</string>
@@ -303,10 +297,6 @@
  <string name="day_later">Day later</string>
  <string name="week_back">Week back</string>
  <string name="week_later">Week later</string>
- <string name="talk_touch">Talk touch</string>
- <string name="speakmessages">Speak messages</string>
- <string name="speakalarms">Speak alarms</string>
- <string name="speakglucose">Speak glucose</string>
     <string name="notfound">Not found</string>
  <string name="no_ringtone_picker_found">No Ringtone Picker found</string>
  <string name="can_t_play">"Can't play "</string>

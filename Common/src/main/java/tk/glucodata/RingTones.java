@@ -51,7 +51,6 @@ import static android.view.View.VISIBLE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Applic.isWearable;
-import static tk.glucodata.Applic.talkbackrunning;
 import static tk.glucodata.Natives.getalarmdisturb;
 import static tk.glucodata.help.help;
 import static tk.glucodata.help.helplight;
@@ -106,10 +105,7 @@ void setringer(int ki,String uristr) {
 	}
 static public void EnableControls(View view,boolean enable){
     if(view!=null) {
-        if(talkbackrunning)
-            view.setVisibility(enable?VISIBLE:GONE);
-        else
-            subEnableControls(view,enable);
+        subEnableControls(view,enable);
         }
 	}
 

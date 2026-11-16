@@ -692,7 +692,6 @@ public static native boolean getUSEALARM( );
 public static native void setgadgetbridge(boolean val);
 public static native boolean getgadgetbridge( );
 public static native void saveVoice(float speed,float pitch,int voicesep,int voice,boolean active);
-public static native int getVoiceTalker( );
 public static native int getVoiceSeparation( );
 public static native float getVoiceSpeed( );
 public static native float getVoicePitch( );
@@ -715,17 +714,10 @@ public static native void setRTL(boolean val);
 public static native boolean getRTL( );
 public static native boolean makepercentages( );
 public static native void makenumbers();
-public static native void settouchtalk(boolean val);
-public static native boolean gettouchtalk( );
 public static native void settonow();
 public static native boolean showlastscan( );
-public static native long saylastglucose();
-public static native void setspeakmessages(boolean val);
 
-public static native boolean speakmessages( );
-public static native void setspeakalarms(boolean val);
 
-public static native boolean speakalarms( );
 public static native int getLibreCountry();
 public static native void setLibreCountry(int val);
 public static native void setinterval(int val);

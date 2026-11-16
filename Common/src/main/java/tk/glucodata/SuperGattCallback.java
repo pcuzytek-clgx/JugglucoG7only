@@ -44,7 +44,6 @@ import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
 import static android.bluetooth.BluetoothGattDescriptor.ENABLE_INDICATION_VALUE;
 import static android.bluetooth.BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE;
 import static java.util.Objects.isNull;
-import static tk.glucodata.Applic.DontTalk;
 import static tk.glucodata.Applic.app;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.mgdLmult;
@@ -270,29 +269,6 @@ static float previousglucosevalue=0.0f;
 
 static public void initAlarmTalk() {
     if(glucosealarms==null) glucosealarms=new tk.glucodata.GlucoseAlarms(Applic.app);
-    if(!DontTalk) {
-        Talker.getvalues();
-        if(Talker.shouldtalk())
-            newtalker(null);
-        }
-    }
-static Talker talker;
-static boolean dotalk=false;
-static void newtalker(Context context) {
-    if(!DontTalk) {
-        if (talker != null)
-            talker.destruct();
-        talker = new Talker(context);
-    }
-    }
-static void endtalk() {
-    if(!DontTalk) {
-        dotalk = false;
-        if (talker != null) {
-            talker.destruct();
-            talker = null;
-        } 
-        }
     }
 static private int veryhigh(long tim,notGlucose sglucose,float gl,float rate,int alarm,boolean[] alarmspeak) {
              final boolean alarmtime = tim > nextalarm[6];
@@ -300,9 +276,6 @@ static private int veryhigh(long tim,notGlucose sglucose,float gl,float rate,int
              if(alarmtime) {
                     nextalarm[8]=nextalarm[6] = nextalarm[1] = tim + Natives.readalarmsuspension(6) * 60;
                     alarm |= 8;
-                    if(!DontTalk) {
-                        if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-                    }
                    }
               return alarm;
              }
@@ -312,9 +285,6 @@ static private int high(long tim,notGlucose    sglucose,float gl,float rate,int 
         if (alarmtime) {
             nextalarm[8] = nextalarm[1] = tim + Natives.readalarmsuspension(1) * 60;
             alarm |= 8;
-            if(!DontTalk) {
-                if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-            }
         }
         return alarm;
        }
@@ -326,9 +296,6 @@ static private int verylow(long tim,notGlucose    sglucose,float gl,float rate,i
             nextalarm[7] =nextalarm[5] =nextalarm[0]= tim + Natives.readalarmsuspension(5) * 60;
             {if(doLog) {Log.i(LOG_ID,"next alarm at "+ nextalarm[5] +" "+bluediag.datestr( nextalarm[5]*1000L ));};};
             alarm |= 8;
-            if(!DontTalk) {
-                if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-            }
         }
        return alarm;
       }
@@ -339,9 +306,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
             nextalarm[7] =nextalarm[0] = tim + Natives.readalarmsuspension(0) * 60;
             {if(doLog) {Log.i(LOG_ID,"next alarm at "+ nextalarm[0] +" "+bluediag.datestr( nextalarm[0]*1000L ));};};
             alarm |= 8;
-            if(!DontTalk) {
-                if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-            }
         }
        return alarm;
       }
@@ -386,9 +350,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
                  if(alarmtime) {
                         nextalarm[8]= tim + Natives.readalarmsuspension(8) * 60;
                         alarm |= 8;
-                        if(!DontTalk) {
-                            if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-                        }
                        }
                     break;
                     }
@@ -423,9 +384,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
                  if(alarmtime) {
                         nextalarm[7]= tim + Natives.readalarmsuspension(7) * 60;
                         alarm |= 8;
-                        if(!DontTalk) {
-                            if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-                        }
                        }
                     break;
                     }
@@ -441,11 +399,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
         {if(doLog) {Log.v(LOG_ID, SerialNumber + " "+tim+" glucose=" + gl + " " + rate);};};
         Applic.updatescreen();
 
-        if(!DontTalk) {
-            if(dotalk&&!alarmspeak[0])  {
-                talker.selspeak(sglucose.value);
-                }
-            }
         if(isWearable) {
          tk.glucodata.glucosecomplication.GlucoseValue.updateall();
          }

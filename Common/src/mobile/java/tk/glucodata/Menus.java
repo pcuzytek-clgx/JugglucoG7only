@@ -377,9 +377,7 @@ static private void showNow(MainActivity act) {
 		}
 
 			);
-        var talkview=view.findViewById(R.id.talk);talkview.setOnClickListener(v ->{
-		removeContentView(view);
-		tk.glucodata.Talker.config(act);}); 
+ 
         CheckBox glucosefloatview=view.findViewById(R.id.glucosefloat);glucosefloatview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
 		Floating.setfloatglucose(act,isChecked);
 	}); 

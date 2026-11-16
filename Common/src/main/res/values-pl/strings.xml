@@ -277,15 +277,9 @@
  <string name="separate">Oddzielne</string>
     <string name="librecurrent">Natychmiast</string>
     <string name="USE_ALARM">Alarm to alarm</string>
-    <string name="speed">Prędkość</string>
- <string name="pitch">Ton</string>
- <string name="talker">Głos</string>
- <string name="secondsbetween">Sekund(y) pomiędzy</string>
- <string name="test">Test</string>
  <string name="streamhistory">Historia Bluetooth</string>
  <string name="libreisviewed">Podgl. ekr.</string>
  <string name="novalue">Brak wartości</string>
- <string name="talk">Na głos</string>
  <string name="watches">Zegarek</string>
  <string name="menus">Całe menu</string>
  <string name="system_ui">Integr. z sys.</string>
@@ -303,10 +297,6 @@
  <string name="day_later">Dzień później</string>
  <string name="week_back">Tydzień wstecz</string>
  <string name="week_later">Tydzień później</string>
- <string name="talk_touch">Czytaj na głos przy dotknięciu</string>
- <string name="speakmessages">Mów powiadomienia na głos</string>
- <string name="speakalarms">Mów alarmy na głos</string>
- <string name="speakglucose">Mów wartość glikemii na głos</string>
     <string name="notfound">Nie znaleziono</string>
  <string name="no_ringtone_picker_found">Nie znaleziono aplikacji do wybierania dzwonków</string>
  <string name="can_t_play">"Nie mogę odtworzyć"</string>

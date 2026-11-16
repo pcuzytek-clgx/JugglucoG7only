@@ -84,12 +84,12 @@ static bool getLevelLeft() {
     return settings->data()->levelleft;
 #endif
     }
+extern std::vector<shownglucose_t> shownglucose;
+std::vector<shownglucose_t> shownglucose;
 #ifdef DONTTALK
 extern const bool speakout;
 const bool speakout=false;
 #else
-extern std::vector<shownglucose_t> shownglucose;
-std::vector<shownglucose_t> shownglucose;
 extern bool speakout;
 bool speakout=false;
 #endif

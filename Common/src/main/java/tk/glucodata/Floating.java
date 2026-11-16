@@ -26,7 +26,6 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 import static java.lang.Float.isNaN;
 import static java.util.Collections.swap;
-import static tk.glucodata.Applic.DontTalk;
 import static tk.glucodata.Applic.backgroundcolor;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.startMain;
@@ -623,21 +622,6 @@ public boolean onTouchEvent(MotionEvent event) {
                 downstart=0;
                   } 
             else {
-                if(!DontTalk)  {
-                    if(!startedMain) {
-                        long time=Natives.saylastglucose();
-                        if(time>=0) {
-                            var talker=SuperGattCallback.talker;
-                            if(talker==null) {
-                                SuperGattCallback.newtalker(null);
-                                talker=SuperGattCallback.talker;
-                                }
-                            talker.speak(time==0L?getContext().getString(R.string.novalue):getContext().getString(R.string.nonewvalue) + timef.format(time));
-                            }
-                        }
-                    else
-                        startedMain=false;
-                    }
 
                 }
             }

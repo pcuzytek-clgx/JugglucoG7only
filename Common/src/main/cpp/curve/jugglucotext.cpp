@@ -118,7 +118,6 @@ const jugglucotext engtext {
 #endif //INJUGGLUCO
 		"Statistics",
 #ifdef INJUGGLUCO
-		"Talk",
 		"Float"
 		},
 	.menustr2= {"Stream",

@@ -93,9 +93,7 @@
 #define PERCENTILES 1
 
 #define USE_RUSSIAN 1 
-#ifndef JUGGLUCO_APP
-#define DONTTALK  
-#endif
+#define DONTTALK
 #define LOGALL
 #ifndef NOLOG
 //#define DOTESTS

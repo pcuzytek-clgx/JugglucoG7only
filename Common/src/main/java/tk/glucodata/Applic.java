@@ -104,8 +104,6 @@ public static boolean hour24=true;
 static public final int TargetSDK=BuildConfig.targetSDK;
 static public final boolean isWearable= BuildConfig.isWear==1;
 static public final boolean DynamicTheme=!isWearable;
-//static final boolean DontTalk=isWearable;
-static public final boolean DontTalk=false;
 static public final boolean useZXing= BuildConfig.noZXing==0;
 static public final boolean isRelease= BuildConfig.isRelease==1;
 //static public final boolean isRelease= !BuildConfig.DEBUG;
@@ -160,10 +158,6 @@ static public    void argToaster(Context context,String message,int duration) {
    // Toast.makeText(context,message, duration).show();
 
     FullToasts.argToaster(context, message, duration);
-    if(!DontTalk) {
-        if(initproccalled&&Natives.speakmessages()) 
-            speak(message);
-        }
     }
 
 
@@ -171,10 +165,6 @@ static public    void argToaster(Context context,String message,int duration) {
 
 public static void argToasterWait(Context context, String message) {
     FullToasts.argToasterWait(context, message);
-    if(!DontTalk) {
-        if(initproccalled&&Natives.speakmessages()) 
-            speak(message);
-        }
     }
 
 
@@ -253,10 +243,6 @@ private static void setlanguage() {
         {if(doLog) {Log.i(LOG_ID,"Applic.setlangauge="+lang+" cur="+curlang);};};
         if(!lang.equals(curlang)) {
             curlang=lang;
-            if(!DontTalk) {
-                if(Talker.istalking())    
-                        SuperGattCallback.newtalker(null);
-                }
             }
         else  {
             return;
@@ -935,35 +921,6 @@ if(isWearable) {
    setjavahour24(Natives.gethour24());
         }
 
-static public  boolean    talkbackrunning=false;
-static    void        talkbackon(Context cont) {
-    if(!DontTalk) {
-        SuperGattCallback.newtalker(cont);
-        talkbackrunning=true;
-
-        Natives.settouchtalk(true);
-        Natives.setspeakmessages(true);
-        Natives.setspeakalarms(true);
-        }
-
-    }
-
-static    void        talkbackoff() {
-    if(!DontTalk) {
-        talkbackrunning=false;
-        }
-    }
-@Keep
-static public void speak(String message) {
-    if(!DontTalk) {
-        var talker=SuperGattCallback.talker;
-        if(talker==null) {
-            SuperGattCallback.newtalker(null);
-            talker=SuperGattCallback.talker;
-            }
-        talker.speak(message);
-        }
-    }
 static public boolean getHeartRate() {
     return initproccalled&&Natives.getheartrate();
     }

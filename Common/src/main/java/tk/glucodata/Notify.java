@@ -29,7 +29,6 @@ import static android.graphics.Color.WHITE;
 import static android.media.AudioAttributes.USAGE_NOTIFICATION;
 import static android.media.AudioAttributes.USAGE_ASSISTANCE_SONIFICATION;
 import static java.lang.String.format;
-import static tk.glucodata.Applic.DontTalk;
 import static tk.glucodata.Applic.TargetSDK;
 import static tk.glucodata.Applic.app;
 import static tk.glucodata.Applic.isWearable;
@@ -40,7 +39,6 @@ import static tk.glucodata.Natives.getalarmdisturb;
 import static tk.glucodata.Natives.getisalarm;
 import static tk.glucodata.Natives.setisalarm;
 import static tk.glucodata.ScanNfcV.vibrates;
-import static tk.glucodata.Talker.notifyfocus;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -452,20 +450,10 @@ static void stopGlucoseAlarm() {
                 stopalarm();
          }
     private synchronized void playringhier(Ringtone ring,int duration,boolean sound,boolean flash,boolean vibrate,boolean disturb,int kind) {
-        notifyfocus=true;
         doTurnFocuson();
         stopalarm();
 //        final int[] curfilter={-1};
         final boolean glucosealarm=kind<2||kind>4;
-        if(!DontTalk) {
-              if(glucosealarm&&Natives.speakalarms()) {
-                 final var  glu=SuperGattCallback.previousglucose;
-                 if(glu!=null) {
-                           SuperGattCallback.talker.speak(glu.value, getAlarmAttributes());
-//                            Applic.scheduler.schedule( () -> SuperGattCallback.talker.speak(glu.value, getUSEALARM()?ScanNfcV.audioattributes:notification_audio), 50, TimeUnit.MILLISECONDS);
-                            }
-                        }
-                }
         final boolean[] doplaysound={true};
         if(sound) {
             if(disturb) {
@@ -493,7 +481,6 @@ static void stopGlucoseAlarm() {
             vibratealarm(kind);
         }
         runstopalarm= () -> {
-            notifyfocus=false;
             lastalarm=-1;
             if(getisalarm()) {
                 {if(doLog) {Log.d(LOG_ID,"runstopalarm  isalarm");};};
@@ -517,22 +504,7 @@ static void stopGlucoseAlarm() {
                 if(vibrate) {
                     stopvibratealarm();
                     }
-                if(!DontTalk) {
-                    if(glucosealarm&&Natives.speakalarms()) {
-                        final var  glu=SuperGattCallback.previousglucose;
-                        if(glu!=null) {
-                            Applic.scheduler.schedule(
-                            () -> SuperGattCallback.talker.speak(glu.value,getAlarmAttributes()), 300, TimeUnit.MILLISECONDS);
-                            }
-                         else
-                                doTurnFocusoff();
-                        }
-                    else
-                        doTurnFocusoff();
-                  //overwriteglucose();
-                    }
-                else
-                    doTurnFocusoff();
+                doTurnFocusoff();
 
                 if(glucosealarm) overwriteglucose(kind);
                 setisalarm(false);

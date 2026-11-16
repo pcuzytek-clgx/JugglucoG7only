@@ -636,7 +636,7 @@ int64_t JCurve::doehier(int menu,int item,bool right) {
                         return -1LL;
                     ;break;
 #endif
-                case 6:break;
+                case 5:break;
                 default:
                     nrmenu=0;
                     break;
@@ -734,7 +734,6 @@ void lognum(const Num *num) {
         LOGGER("%s %.1f\n",item,num->value);
         }
 #endif    
-#ifndef DONTTALK
 static int verbosedate(struct tm *stm,char *buf,int maxbuf=256) {
     const auto wdaynr= stm->tm_wday;
     const char *dayname=usedtext->speakdaylabel[wdaynr];
@@ -749,6 +748,7 @@ static int verbosedate(time_t tim,char *buf,int maxbuf=256) {
     struct tm *stm=localtime_r(&tim,&tmbuf);
    return verbosedate(stm,buf, maxbuf);
     }
+#ifndef DONTTALK
 static void speakdate(time_t tim) {
     constexpr const int maxbuf=256;
     char buf[maxbuf];
@@ -2306,12 +2306,14 @@ int getmenulen(const int menu) {
         constexpr const int mainmenulen=6;
         return alarmongoing?mainmenulen:mainmenulen-1;
         }
+    if(menu==1)
+        return 6;
     if(menu==2)
         return displaymenulen;
     return len;    
     }
 void setfloatptr() {
-    menuopt0b[6]=&settings->data()->floatglucose;
+    menuopt0b[5]=&settings->data()->floatglucose;
     }
 
 //void setnewamount() { }

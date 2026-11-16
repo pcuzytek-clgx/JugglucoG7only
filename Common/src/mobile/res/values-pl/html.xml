@@ -738,36 +738,6 @@ i zawartość węglowodanów do definicji składnika.</p>
 <p style="margin-bottom: 0in">Jeśli ta aplikacja nie odbiera wartości z urządzenia &bdquo;klonu&rdquo;, należy wyłączyć tę opcję.</p>
 ]]>
 </string>
-<string name="talkhelp" >
-<![CDATA[
-<p><a href="https://www.juggluco.nl/Jugglucohelp/pl/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/talkhelp.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/talkhelp.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/talkhelp.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/talkhelp.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/fr/talkhelp.html">fr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/talkhelp.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/talkhelp.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/talkhelp.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/talkhelp.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/talkhelp.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/talkhelp.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/talkhelp.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/talkhelp.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/talkhelp.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/talkhelp.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/talkhelp.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/talkhelp.html?lang=en">en</a>&emsp;&emsp;</p><h1>Na głos</h1>
-<h2 class="western">M&oacute;w wartość glikemii na głos</h2>
-<p>Wypowiada na głos wartości glukozy, gdy się pojawią.</p>
-<p><b>Sekund(y) pomiędzy</b>: Określa, ile sekund Juggluco ma czekać przed wypowiedzeniem następnej wartości glukozy. Wartości glukozy są zawsze podawane natychmiast po ich otrzymaniu. Po określeniu dużej wartości, Juggluco pominie wartości glukozy, kt&oacute;re dotrą przed upływem tego czasu.</p>
-<p><b>Głos</b>: Wybiera głos z listy możliwych głos&oacute;w.</p>
-<p><b>Szybkość</b>: wyższa liczba oznacza szybsze wypowiadanie na głos.</p>
-<p><b>Ton</b>: wyższa liczba oznacza wyższą wysokość dźwięku.</p>
-<p><b>Test</b>: wypowiada na głos ostatnią wartość stężenia glukozy.</p>
-<p>W niekt&oacute;rych telefonach ustawienia systemu Android dotyczące zamiany tekstu na mowę muszą zostać zmienione, aby funkcja ta działała. Czasami trzeba zainstalować dane języka lub zmienić konfigurację. W telefonach Samsung należy ustawić &quot;<i>Rozpoznawanie i synteza mowy od Google</i><i></i>&quot; zamiast <i>&quot;Mechanizm syntezatora mowy Samsung</i>&quot;, aby m&oacute;c wybierać spośr&oacute;d r&oacute;żnych głos&oacute;w. Opcje te można znaleźć, wyszukując <i>Syntezator mowy</i> w ustawieniach Androida lub przechodząc do opcji <i>Język i wprowadzanie (-&gt;Zaawansowane)-&gt;Syntezator mowy</i>. Tutaj można wybrać <i>&quot;Preferowany mechanizm Google</i>&quot; i zainstalować dane głosowe. W innych telefonach opcja ta znajduje się w sekcji <i>Ustawienia systemowe-&gt;Dostępność-&gt;Ulepszenia widoczności-&gt;Syntezator mowy</i>.</p>
-<h2 class="western">Czytaj na głos przy dotknięciu</h2>
-<p>Gdy włączona jest opcja <em>Czytaj na głos przy dotknięciu</em>, dotknięcie określonych miejsc powoduje odczytanie ich na głos:</p>
-<ul>
-	<li><p>Dotknięcie bieżącej wartości glukozy;</p>
-	<li><p>Dotknięcie punkt&oacute;w wykres&oacute;w i punkt&oacute;w skanowania;</p>
-	<li><p>Dotknięcie wartości;</p>
-	<li><p>Data tego punktu wykresu jest odczytywana po dotknięciu lewego i prawego g&oacute;rnego rogu;</p>
-	<li><p>Długie naciśnięcie elementu menu;</p>
-	<li><p>Długie naciśnięcie wartości na liście wartości (lewe środkowe menu-&gt;lista).</p>
-</ul>
-<h2 class="western">M&oacute;w powiadomienia na głos</h2>
-<p>Odczytuje komunikaty tekstowe, kt&oacute;re są tymczasowo widoczne na ekranie, oraz wynik skanowania (komunikaty o błędach i wartość glukozy).</p>
-<h2 class="western">M&oacute;w alarmy na głos</h2>
-<p>Podaje poziom glukozy podczas alarm&oacute;w niskiego i wysokiego poziomu glukozy. Jest on odczytywany zar&oacute;wno na początku alarmu, jak i w momencie jego zatrzymania.</p>
-<p><br/> <br/></p>
-<p><br/> <br/></p>
-<p><br/> <br/></p>
-]]>
-</string>
 <string name="nightnumhelp" >
 <![CDATA[
 <p><a href="https://www.juggluco.nl/Jugglucohelp/pl/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/nightnumhelp.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/nightnumhelp.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/nightnumhelp.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/nightnumhelp.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/nightnumhelp.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/nightnumhelp.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/nightnumhelp.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/nightnumhelp.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/nightnumhelp.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/nightnumhelp.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/nightnumhelp.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/nightnumhelp.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/nightnumhelp.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/nightnumhelp.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/nightnumhelp.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nightnumhelp.html?lang=en">en</a>&emsp;&emsp;</p><p>Ustaw &bdquo;<i>Przekaż wartości</i>&quot;, aby wartości były dostępne za pośrednictwem serwera Nightscout w Juggluco. Przed włączeniem opcji <i>&quot;Przekaż wartości</i>&quot; należy dla każdej etykiety określić, w jaki spos&oacute;b wartości wpisane pod daną etykietą mają być przekazywane. Same etykiety można tworzyć, modyfikować i usuwać w Lewym menu -&gt; Ustawienia -&gt; <a href="https://www.juggluco.nl/Jugglucohelp/pl/labelhelp.html">Etykiety wart. liczb.</a>&quot;.</p>
