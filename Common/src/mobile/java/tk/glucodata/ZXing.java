@@ -28,7 +28,6 @@ import static tk.glucodata.Applic.useZXing;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.MainActivity.REQUEST_BARCODE;
 import static tk.glucodata.PhotoScan.connectSensor;
-import static tk.glucodata.watchdrip.tostring;
 
 import static com.google.zxing.integration.android.IntentIntegrator.DATA_MATRIX;
 import static com.google.zxing.integration.android.IntentIntegrator.QR_CODE;

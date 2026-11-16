@@ -1247,12 +1247,6 @@ void activateresult(boolean res) {
         Natives.wakeuploader();
         if(!isWearable) {
             wakelibreview(20);
-            if(Natives.getlibrelinkused()) {
-                final var     starttime= Natives.laststarttime();
-                if(starttime!=0L) {
-                    XInfuus.sendSensorActivateBroadcast(app, Natives.lastsensorname(), starttime);
-                    }
-                }
             }
         else {
             if(Natives.stopWifi()) {

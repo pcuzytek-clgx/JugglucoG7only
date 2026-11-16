@@ -709,14 +709,8 @@ Doesn't seem to be usefull. When there are muliple sensor it is not the case tha
        return false;
        }
    }
-#include "EverSense.hpp"
 extern "C" JNIEXPORT void JNICALL   fromjava(dexEndBackfill)(JNIEnv *env, jclass cl,jlong dataptr) {
       backup->wakebackup(wakestream);
-#ifdef     OLDEVERSENSE
-	if(!settings->data()->everSenseBroadcast.nr)
-         return;
-     sendEverSenseold(reinterpret_cast<const streamdata *>(dataptr)->hist,1);
-#endif
       }
 #endif
 

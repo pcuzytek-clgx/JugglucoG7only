@@ -145,11 +145,8 @@ static jmethodID showsensorinfo=nullptr;
 jmethodID jdoglucose=nullptr, jupdateDevices=nullptr, jbluetoothEnabled=nullptr,jspeak=nullptr, jresetWearOS=nullptr, jbluePermission=nullptr;
 //jmethodID jchangedProfile;
 jclass JNIApplic,JNIString;
-#ifdef OLDEVERSENSE
 #ifndef WEAROS
-jclass EverSense;
-jmethodID sendGlucoseBroadcast=nullptr,jtoGarmin=nullptr, jGarmindeletelast=nullptr,jswitchbluetooth=nullptr;
-#endif
+jmethodID jtoGarmin=nullptr, jGarmindeletelast=nullptr,jswitchbluetooth=nullptr;
 #endif
 #ifdef WEAROS
 jmethodID jsetinittext=nullptr;
@@ -279,25 +276,6 @@ else {
 }
 
 
-#ifdef OLDEVERSENSE
-#ifndef WEAROS
-{
-const static jclass cl=env->FindClass("tk/glucodata/EverSense");
-if(cl) {
-
- EverSense = (jclass)env->NewGlobalRef(cl);
- env->DeleteLocalRef(cl);
-// broadcastglucose(int mgdl, float rate, long timmsec)
- if(!(sendGlucoseBroadcast=env->GetStaticMethodID(EverSense,"broadcastglucose","(IFJ)V"))) {
- LOGAR(R"(GetStaticMethodID(EverSense,"broadcastglucose","(IFJ)V") failed)" "");
- }
- }
-else {
- LOGAR(R"(FindClass("tk/glucodata/EverSense") failed)" "");
- }
- }
-#endif
-#endif
  /*
 const static jclass clappl=env->FindClass("tk/glucodata/Applic");
 jclass Applic=nullptr;

@@ -25,7 +25,6 @@ package tk.glucodata;
 
 import android.os.Build;
 
-import com.eveningoutpost.dexdrip.services.broadcastservice.models.GraphLine;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -732,10 +731,7 @@ public static native long[] getlastGlucose( );
 public static native long[] libre3EmulatorHistory(long fromSeconds,long throughSeconds);
 public static native long[] libre3EmulatorStream(long fromSeconds,long throughSeconds);
 public static native long[] libre3EmulatorLatest();
-public static native void setwatchdrip(boolean val);
-public static native boolean getwatchdrip( );
 
-public static native boolean mkWearIntgraph(long start, long end, GraphLine low, GraphLine within, GraphLine high);
 public static native void isGalaxyWatch(boolean val);
 
 public static native long novopentype(String serial);

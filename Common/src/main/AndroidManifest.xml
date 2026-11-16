@@ -53,9 +53,6 @@
 
     <queries> <intent> <action android:name="android.nfc.action.TECH_DISCOVERED" /> </intent> </queries>
 
-    <queries> <intent> <action android:name="com.eveningoutpost.dexdrip.BgEstimate" /> </intent> </queries>
-
-    <queries> <intent> <action android:name="glucodata.Minute" /> </intent> </queries>
 
     <uses-permission-sdk-23 android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 

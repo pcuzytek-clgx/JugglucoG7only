@@ -75,7 +75,6 @@
 //#define SIHISTORY 1
 //#endif
 #ifndef WEAROS
-#define OLDEVERSENSE 1
 #ifdef JUGGLUCO_APP
 #define DOESSEARCH 1
 #endif

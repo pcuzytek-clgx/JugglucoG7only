@@ -81,7 +81,6 @@ import java.util.concurrent.TimeUnit;
 
 import tk.glucodata.nums.AllData;
 import tk.glucodata.nums.numio;
-import tk.glucodata.settings.Broadcasts;
 //import static tk.glucodata.MessageSender.messagesender;
 
 public class Applic extends Application {
@@ -958,9 +957,6 @@ if(isWearable) {
           if(initversion<29) {
              if(initversion<22) {
                 if(initversion<14) {
-                   if(initversion<13) {
-                      Broadcasts.updateall();
-                      }
                    if(Notify.arrowNotify!=null)
                       Natives.setfloatingFontsize((int) Notify.glucosesize);
                    Natives.setfloatingbackground(WHITE);
@@ -973,10 +969,6 @@ if(isWearable) {
           }
 
    setjavahour24(Natives.gethour24());
-    XInfuus.setlibrenames();
-   EverSense.setreceivers();
-    JugglucoSend.setreceivers();
-    SendLikexDrip.setreceivers();
         }
 
 static public  boolean    talkbackrunning=false;

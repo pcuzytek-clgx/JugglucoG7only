@@ -78,12 +78,6 @@ static public void show(MainActivity context) {
             Natives.setSeparate(isChecked);
             });
 
-           var watchdrip=getcheckbox(context,"Watchdrip", SuperGattCallback.doWearInt);
-        watchdrip.setOnCheckedChangeListener(
-            (buttonView,  isChecked) ->  {
-                Natives.setwatchdrip(isChecked);
-                tk.glucodata.watchdrip.set(isChecked);
-                });
        var gadget=getcheckbox(context,"GadgetBridge", SuperGattCallback.doGadgetbridge);
         gadget.setOnCheckedChangeListener(
             (buttonView,  isChecked) ->  {
@@ -116,10 +110,10 @@ static public void show(MainActivity context) {
                 Gadgetbridge.sendglucose(""+glucose,mgdl,glucose,trend, System.currentTimeMillis());
                 });
 
-        mibandrow=new View[]{watchdrip,gadget,test};
+        mibandrow=new View[]{gadget,test};
         }
     else  {
-        mibandrow=new View[]{watchdrip,gadget};
+        mibandrow=new View[]{gadget};
         }
     var usexdripserver=Natives.getusexdripwebserver();
     var server=getcheckbox(context,R.string.webserver,usexdripserver);

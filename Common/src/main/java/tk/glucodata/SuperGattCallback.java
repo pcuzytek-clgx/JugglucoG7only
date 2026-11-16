@@ -58,7 +58,6 @@ import androidx.annotation.NonNull;
 
 public abstract class SuperGattCallback extends BluetoothGattCallback {
 volatile protected    boolean stop=false;
-public static boolean doWearInt=false;
 public static boolean doGadgetbridge=false;
     private static final String LOG_ID="SuperGattCallback";
     static final private int  use_priority=CONNECTION_PRIORITY_HIGH;
@@ -452,8 +451,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
          }
 
 
-        if(Natives.getJugglucobroadcast())
-            JugglucoSend.broadcastglucose(SerialNumber,mgdl,gl,rate,alarm,timmsec);
         if(!isWearable) {
             app.numdata.sendglucose(SerialNumber, tim, gl, thresholdchange(rate), alarm|0x10);
             GlucoseWidget.update();
@@ -461,16 +458,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
         if(tim>nexttime) {
             nexttime=tim+mininterval;
             if(!isWearable) {
-                if(Natives.getlibrelinkused()) XInfuus.sendGlucoseBroadcast(SerialNumber, mgdl, rate, timmsec);
-                if(Natives.geteverSensebroadcast()) EverSense.broadcastglucose(mgdl, rate, timmsec);
-                //SendNSClient.broadcastglucose(mgdl, rate, timmsec);
-                }
-            if(Natives.getxbroadcast())
-                SendLikexDrip.broadcastglucose(mgdl,rate,timmsec,sensorstartmsec,sensorgen);
-            if(!isWearable) {
-                if(doWearInt)
-                    tk.glucodata.WearInt.sendglucose(mgdl, rate, alarm, timmsec);
-
                 if(doGadgetbridge)
                     Gadgetbridge.sendglucose(sglucose.value,mgdl,gl,rate,timmsec);
                 } 

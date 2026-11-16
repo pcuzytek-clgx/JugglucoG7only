@@ -1718,7 +1718,6 @@ template <typename  TI,typename TE> void    JCurve::textbox(NVGcontext* avg,cons
     }
 
 
-#include "EverSense.hpp"
 extern    bool hasnotiset();
 void     processglucosevalue(int sendindex,int newstart) {
     if(settings) {
@@ -1730,11 +1729,7 @@ void     processglucosevalue(int sendindex,int newstart) {
                hist->backstream(newstart);
                if(newstart<=hist->previousstream) {
                    hist->previousstream=newstart;
-                   sendEverSenseold(hist,5/hist->getminstreaminterval());
                    return;
-                   }
-               if(hist->previousstream==-1) {
-                   sendEverSenseold(hist,5/hist->getminstreaminterval());
                    }
                 hist->previousstream=newstart;
                 }

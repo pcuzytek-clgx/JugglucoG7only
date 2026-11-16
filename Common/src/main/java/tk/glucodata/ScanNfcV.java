@@ -111,9 +111,6 @@ public static void startvibration(Vibrator vibrator) {
             }
     }
 static private void newsensor(MainActivity act,String text,String name) {
-    if(!isWearable) {
-        XInfuus.sendSensorActivateBroadcast(act, name, Natives.laststarttime());
-        }
 
   /*  var metrics= act.getResources().getDisplayMetrics();
     int width= metrics.widthPixels;

@@ -302,35 +302,15 @@ static RemoteGlucose arrowNotify;
     //        channel.setShowBadge(false);
     void lowglucose(notGlucose strgl,float gl,float rate,boolean alarm) {
         arrowglucosealarm(0,gl, format(usedlocale,glucoseformat, gl)+Applic.getContext().getString(isWearable?R.string.lowglucoseshort:R.string.lowglucose), strgl,GLUCOSEALARM,alarm);
-        if(!isWearable) {
-            if(alarm)  {
-                tk.glucodata.WearInt.alarm("LOW "+strgl.value);
-                }
-            }
     }
     void highglucose(notGlucose strgl,float gl,float rate,boolean alarm) {
         arrowglucosealarm(1,gl,format(usedlocale,glucoseformat, gl)+Applic.getContext().getString(isWearable?R.string.highglucoseshort:R.string.highglucose), strgl,GLUCOSEALARM,alarm);
-        if(!isWearable) {
-            if(alarm)  {
-                tk.glucodata.WearInt.alarm("HIGH "+strgl.value);
-                }
-            }
         }
     void veryhighglucose(notGlucose strgl,float gl,float rate,boolean alarm) {
         arrowglucosealarm(6,gl,format(usedlocale,glucoseformat, gl)+Applic.getContext().getString(isWearable?R.string.veryhighglucoseshort:R.string.veryhighglucose), strgl,GLUCOSEALARM,alarm);
-        if(!isWearable) {
-            if(alarm)  {
-                tk.glucodata.WearInt.alarm("HIGH "+strgl.value);
-                }
-            }
         }
     void verylowglucose(notGlucose strgl,float gl,float rate,boolean alarm) {
         arrowglucosealarm(5,gl, format(usedlocale,glucoseformat, gl)+Applic.getContext().getString(isWearable?R.string.verylowglucoseshort:R.string.verylowglucose), strgl,GLUCOSEALARM,alarm);
-        if(!isWearable) {
-            if(alarm)  {
-                tk.glucodata.WearInt.alarm("LOW "+strgl.value);
-                }
-            }
     }
 
     void prehighglucose(notGlucose strgl,float gl,float rate,boolean alarm) {

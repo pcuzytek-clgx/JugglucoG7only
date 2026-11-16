@@ -28,16 +28,6 @@
 </queries>
 
     <queries>
-        <intent>
-            <action android:name="com.librelink.app.ThirdPartyIntegration.GLUCOSE_READING" />
-        </intent>
-    </queries>
-    <queries>
-        <intent>
-            <action android:name="com.librelink.app.ThirdPartyIntegration.SENSOR_ACTIVATE" />
-        </intent>
-    </queries>
-    <queries>
         <package android:name="com.garmin.android.apps.connectmobile" />
     </queries>
 
