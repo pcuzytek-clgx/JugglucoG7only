@@ -22,7 +22,6 @@
 package tk.glucodata;
 
 import static android.graphics.Typeface.BOLD;
-import static android.graphics.Typeface.SANS_SERIF;
 import static java.lang.String.format;
 
 
@@ -34,7 +33,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
-import android.os.Build;
 import tk.glucodata.Log;
 
 public class StatusIcon {
@@ -59,17 +57,10 @@ StatusIcon() {
 	//{if(doLog) {Log.i(LOG_ID," mapwidth="+mapwidth+" mapheight="+mapheight+"color="+ format("%x",iconPaint.getColor()));};};
 //   iconPaint.setTypeface(Typeface.defaultFromStyle(BOLD));
 //      Typeface normaltype=Typeface.create("Arial",Typeface.NORMAL);
-    Typeface basistype=
-    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)?
- Applic.app.getResources().getFont(R.font.opensans): SANS_SERIF;
+    Typeface basistype=Applic.app.getResources().getFont(R.font.opensans);
 //      ontFace=Typeface.createFromAsset(getAssets(),"font/comic.TTF"); Typeface face = Typeface.create(fontFace, Typeface.BOLD);
 Typeface     normaltype;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        normaltype= Typeface.create(basistype,1000, false);
-    }
-    else {
-        normaltype= Typeface.create(basistype,Typeface.BOLD);
-       }
+    normaltype= Typeface.create(basistype,1000, false);
 //var     normaltype= Typeface.create(basistype,Typeface.BOLD);
    iconPaint.setTypeface(normaltype);
 

@@ -52,7 +52,6 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.os.Build;
 import android.provider.Settings;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
@@ -254,7 +253,7 @@ public static void rewritefloating(MainActivity context) {
 
         final int floatingheight=(int)(density*nrdens),floatingwidth=floatingheight*2;
         floatPaint.setTextSize(floatingheight);
-        final var type = (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)?WindowManager.LayoutParams.TYPE_SYSTEM_ALERT: WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        final var type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         final var flags = FLAG_NOT_FOCUSABLE;
         var params= new WindowManager.LayoutParams( floatingwidth,(int)(floatingheight),(int) floatingx, (int)floatingy, type, flags, PixelFormat.TRANSLUCENT);
         windowMana.addView(floatview, params);
@@ -265,7 +264,7 @@ private void untouchable() {
    if(asking)
       return;
    asking=true;
-        final var type = (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)?WindowManager.LayoutParams.TYPE_SYSTEM_ALERT: WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        final var type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         final var flags = FLAG_NOT_FOCUSABLE;
         final int x=isWearable?0:(int) floatingx;
         final int y=isWearable?0:(int)floatingy;
@@ -351,12 +350,12 @@ private static WindowManager.LayoutParams makeparams(int screenwidth, int screen
         floatingy=ypos;
       {if(doLog) {Log.i(LOG_ID,"Floating glucose: x="+xpos+" y="+ypos);};};
 
-        var type = (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)?WindowManager.LayoutParams.TYPE_SYSTEM_ALERT: WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        var type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         var flags = FLAG_NOT_FOCUSABLE|(Natives.getfloatingTouchable()?0:WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         return     new WindowManager.LayoutParams( floatingwidth,(int)(floatingheight),(int) xpos, (int)ypos, type, flags, PixelFormat.TRANSLUCENT);
     }
 static boolean cannotoverlay()  {
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(Applic.app)) {
+        if(!Settings.canDrawOverlays(Applic.app)) {
             return true;
         }
 

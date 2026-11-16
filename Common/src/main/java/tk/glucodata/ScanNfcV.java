@@ -46,7 +46,6 @@ import java.util.Arrays;
 
 import tk.glucodata.settings.Settings;
 
-import static android.content.Context.VIBRATOR_SERVICE;
 import static android.view.View.GONE;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Applic.isWearable;
@@ -69,46 +68,26 @@ public class ScanNfcV   {
     @SuppressWarnings("deprecation")
 public static void failure(Vibrator vibrator) {
     final long[] vibrationPatternFailure = {0, 500}; // [ms]
-        if(android.os.Build.VERSION.SDK_INT < 26)
-        vibrator.vibrate(vibrationPatternFailure, -1);
-    else
         vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternFailure, -1));
     }
 
 
 
 
-static     AudioAttributes audioattributes;
-static {
-        if(android.os.Build.VERSION.SDK_INT >= 21)
-         audioattributes=new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM) .build();
-    };
-static    VibrationAttributes vibrationattributes=android.os.Build.VERSION.SDK_INT <33?null:new VibrationAttributes.Builder().setUsage(VibrationAttributes.USAGE_ALARM) .build();
+static     AudioAttributes audioattributes=new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM) .build();
+static    VibrationAttributes vibrationattributes=new VibrationAttributes.Builder().setUsage(VibrationAttributes.USAGE_ALARM) .build();
 static void vibrates(Vibrator vibrator,final long[] vibrationPatternstart ,final int[]  amplitude) {
-    if( android.os.Build.VERSION.SDK_INT <33) {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternstart,amplitude, 1),audioattributes);
-        }
-    else {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternstart,amplitude, 1),vibrationattributes);
-        }
+    vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternstart,amplitude, 1),vibrationattributes);
     }
     @SuppressWarnings("deprecation")
 public static Vibrator getvibrator(Context context) {
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-        return ((VibratorManager)context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE)).getDefaultVibrator();
-    }
-    else
-        return (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+    return ((VibratorManager)context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE)).getDefaultVibrator();
 
     }
 public static void startvibration(Vibrator vibrator) {
-        if(android.os.Build.VERSION.SDK_INT < 26)
-            vibrator.vibrate( new long[]  {0, 100, 10,50,50} , 1);
-        else {
         final long[] vibrationPatternstart = {0, 70, 50,50,50,50,50};
         final int[] amplitude={0,  255,150,0,255,50,0};
         vibrates(vibrator,vibrationPatternstart,amplitude); 
-            }
     }
 static private void newsensor(MainActivity act,String text,String name) {
 

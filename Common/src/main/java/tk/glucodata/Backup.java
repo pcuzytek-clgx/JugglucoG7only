@@ -28,9 +28,7 @@ import android.content.res.TypedArray;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -237,20 +235,11 @@ public class Backup {
         }
       @SuppressWarnings("deprecation")
       public static int agetColor(Context context, int id) {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getColor(id);
-         } else {
-            //noinspection deprecation
-            return context.getResources().getColor(id);
-         }
+         return context.getColor(id);
       }
       @SuppressWarnings("deprecation")
       public static void setColorFilter(@NonNull Drawable drawable, @ColorInt int color) {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            drawable.setColorFilter(new BlendModeColorFilter(color, BlendMode.SRC_ATOP));
-         } else {
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-         }
+         drawable.setColorFilter(new BlendModeColorFilter(color, BlendMode.SRC_ATOP));
       }
    private void deleteconfirmation(MainActivity act) {
            AlertDialog.Builder builder = new AlertDialog.Builder(act);
@@ -1310,7 +1299,7 @@ ViewGroup.LayoutParams params;
          closerun.run();
          });
 
-      if(!isWearable&&android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+      if(!isWearable) {
          battery.setText(R.string.dozemode);
          battery.setOnClickListener(v-> {
             Battery.batteryscreen(act,lay);

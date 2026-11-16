@@ -99,6 +99,12 @@ add_link_options(-g  )
 #target_link_options(g PRIVATE "-Wl,-z,max-page-size=16384")
 target_link_options(g PRIVATE "-Wl,-z,max-page-size=16384" "-Wl,-z,common-page-size=16384")
 
+# G7-only fork targets Pixel 10 Pro (Tensor G5: Cortex-X4/A725/A520 = Armv9.2-A).
+if(ANDROID_ABI STREQUAL "arm64-v8a")
+    target_compile_options(g PRIVATE -march=armv9.2-a -flto=thin -ffunction-sections -fdata-sections)
+    target_link_options(g PRIVATE -flto=thin -Wl,--gc-sections -Wl,--icf=safe)
+endif()
+
 
 #target_link_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wl,-z,max-page-size=16384")
 

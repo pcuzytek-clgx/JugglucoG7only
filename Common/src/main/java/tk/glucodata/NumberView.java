@@ -27,7 +27,6 @@ import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
@@ -169,8 +168,8 @@ void configurationChanged(MainActivity activity) {
             pick=null;
             }
         else {
-            int hour=Build.VERSION.SDK_INT<23?pick.getCurrentHour():pick.getHour();
-            int minute=Build.VERSION.SDK_INT<23?pick.getCurrentMinute():pick.getMinute();
+            int hour=pick.getHour();
+            int minute=pick.getMinute();
             TimePicker fresh=newTimePicker(activity);
             fresh.setIs24HourView(Applic.hour24);
             fresh.setCurrentHour(hour);
@@ -201,7 +200,7 @@ void closenumview() {
     if (newnumview != null) {
         removeContentView(newnumview);
         newnumview=null;
-        if(!isWearable && android.os.Build.VERSION.SDK_INT>=28) ActivityHealth.numberEditorClosed();
+        if(!isWearable) ActivityHealth.numberEditorClosed();
         }
     editfocus.clearedittext(valueedit);
     spinner=null;
@@ -933,13 +932,8 @@ final  boolean buttonsunder=false;
         ok.setOnClickListener(vi -> {
         activity.doonback();
             int hour,min;
-            if(Build.VERSION.SDK_INT < 23) {
-                 hour=pick.getCurrentHour();
-                 min=pick.getCurrentMinute(); }
-            else {
-                 hour=pick.getHour();
-                 min=pick.getMinute();
-                }
+            hour=pick.getHour();
+            min=pick.getMinute();
         settime.accept(hour,min);
 
         });
@@ -1218,7 +1212,7 @@ Layout getkeyboard(Context context,View anchor,int keyboardMode) {
     tmp[0]=but;
     but.setText("0");
     tmp[1]=but=new Button(context);
-    but.setText(Build.VERSION.SDK_INT>=22?"\u232B":"\u2190");
+    but.setText("\u232B");
 
     but.setContentDescription("Backspace");
     but.setOnClickListener(v->{

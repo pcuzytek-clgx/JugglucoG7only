@@ -42,7 +42,6 @@ import static tk.glucodata.GlucoseCurve.STEPBACK;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.Log.showbytes;
 import static tk.glucodata.Natives.getInvertColors;
-import static tk.glucodata.Natives.hasNeedScan;
 import static tk.glucodata.Natives.setShownintro;
 import static tk.glucodata.help.hidekeyboard;
 import static tk.glucodata.settings.Settings.removeContentView;
@@ -77,7 +76,6 @@ import android.app.AlarmManager;
 //import androidx.appcompat.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ConfigurationInfo;
@@ -213,32 +211,30 @@ private void permissionFinished(int requestCode) {
 
 static private  int askedNotify=5;
 boolean askNotify() {
-     if(Build.VERSION.SDK_INT >=33)  {
-        var perm= Manifest.permission.POST_NOTIFICATIONS;
-        if(ContextCompat.checkSelfPermission(this, perm)!= PackageManager.PERMISSION_GRANTED)  {
-            queuePermissionRequest(NOTIFICATION_PERMISSION_REQUEST_CODE, () -> {
-                if(ContextCompat.checkSelfPermission(this, perm)==PackageManager.PERMISSION_GRANTED) {
-                    askedNotify=-1;
-                    Log.i(LOG_ID,"askNotify explicit");
-                    explicit(this);
-                    permissionFinished(NOTIFICATION_PERMISSION_REQUEST_CODE);
-                    return;
-                    }
-                askedNotify=-1;
-                {if(doLog) {Log.i(LOG_ID,"askNotify");};};
-                var permar=new String[]{perm};
-                if(shouldShowRequestPermissionRationale(perm) ) {
-                     help.help(R.string.notificationpermission,this,l-> {
-                        requestPermissions(permar, NOTIFICATION_PERMISSION_REQUEST_CODE);
-                        });
-                    }
-                else   {
-                    requestPermissions(permar, NOTIFICATION_PERMISSION_REQUEST_CODE);
-                    }
-                });
-            return false;
-            }
-        }
+     var perm= Manifest.permission.POST_NOTIFICATIONS;
+     if(ContextCompat.checkSelfPermission(this, perm)!= PackageManager.PERMISSION_GRANTED)  {
+         queuePermissionRequest(NOTIFICATION_PERMISSION_REQUEST_CODE, () -> {
+             if(ContextCompat.checkSelfPermission(this, perm)==PackageManager.PERMISSION_GRANTED) {
+                 askedNotify=-1;
+                 Log.i(LOG_ID,"askNotify explicit");
+                 explicit(this);
+                 permissionFinished(NOTIFICATION_PERMISSION_REQUEST_CODE);
+                 return;
+                 }
+             askedNotify=-1;
+             {if(doLog) {Log.i(LOG_ID,"askNotify");};};
+             var permar=new String[]{perm};
+             if(shouldShowRequestPermissionRationale(perm) ) {
+                  help.help(R.string.notificationpermission,this,l-> {
+                     requestPermissions(permar, NOTIFICATION_PERMISSION_REQUEST_CODE);
+                     });
+                 }
+             else   {
+                 requestPermissions(permar, NOTIFICATION_PERMISSION_REQUEST_CODE);
+                 }
+             });
+         return false;
+         }
     askedNotify=-1;
     Log.i(LOG_ID,"askNotify explicit");
     explicit(this);
@@ -261,38 +257,34 @@ private void startdisplay() {
     curve = new GlucoseCurve(this);
    {if(doLog) {Log.i(LOG_ID,"After curve = new GlucoseCurve(this);");};};
    if(!isWearable) {
-      if(Build.VERSION.SDK_INT >= 30) {
-             setOnApplyWindowInsetsListener(curve,(v, windowInsets) -> {
-             int oldScreenWidth=screenwidth;
-             int oldScreenHeight=screenheight;
-             setsizes(this);
-             Insets  insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-             boolean geometryChanged=oldScreenWidth!=screenwidth||oldScreenHeight!=screenheight||
-                     systembarLeft!=insets.left||systembarTop!=insets.top||
-                     systembarRight!=insets.right||systembarBottom!=insets.bottom;
-             {if(doLog) {Log.i(LOG_ID, "systemBars: left="+insets.left+ " right="+insets.right+ " bottom="+insets.bottom+ " top="+insets.top);};};
-             Natives.systembar(insets.left, insets.top, insets.right, insets.bottom);
+      setOnApplyWindowInsetsListener(curve,(v, windowInsets) -> {
+      int oldScreenWidth=screenwidth;
+      int oldScreenHeight=screenheight;
+      setsizes(this);
+      Insets  insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+      boolean geometryChanged=oldScreenWidth!=screenwidth||oldScreenHeight!=screenheight||
+              systembarLeft!=insets.left||systembarTop!=insets.top||
+              systembarRight!=insets.right||systembarBottom!=insets.bottom;
+      {if(doLog) {Log.i(LOG_ID, "systemBars: left="+insets.left+ " right="+insets.right+ " bottom="+insets.bottom+ " top="+insets.top);};};
+      Natives.systembar(insets.left, insets.top, insets.right, insets.bottom);
 
-            systembarLeft=insets.left;
-            systembarTop=insets.top;
-            systembarRight=insets.right;
-            systembarBottom=insets.bottom;
-            if(rtl) {
-                systembarStart=systembarRight;
-                systembarEnd=systembarLeft;
-                }
-            else {
-                systembarStart=systembarLeft;
-                systembarEnd=systembarRight;
-                }
-             requestRender();
-             if(geometryChanged)
-                curve.requestOverlayLayout();
-             return windowInsets;
-          });
-          }
-    else {
-        }
+     systembarLeft=insets.left;
+     systembarTop=insets.top;
+     systembarRight=insets.right;
+     systembarBottom=insets.bottom;
+     if(rtl) {
+         systembarStart=systembarRight;
+         systembarEnd=systembarLeft;
+         }
+     else {
+         systembarStart=systembarLeft;
+         systembarEnd=systembarRight;
+         }
+      requestRender();
+      if(geometryChanged)
+         curve.requestOverlayLayout();
+      return windowInsets;
+   });
 
       lightBars(!getInvertColors( ));
       }
@@ -343,23 +335,21 @@ boolean glversion() {
 static MainActivity thisone=null;
 static void alarmsExact(Context context) {
     if(TargetSDK>30) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            AlarmManager manager= (AlarmManager) context.getSystemService(ALARM_SERVICE);
-                if(manager.canScheduleExactAlarms()){
-                   {if(doLog) {Log.d(LOG_ID, "canScheduleExactAlarms");};};
-                   }
-                else {
-                   {if(doLog) {Log.d(LOG_ID, "not canScheduleExactAlarms");};};
-                   try {
-                       Intent intent=new Intent();
-                       intent.setAction(ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                       context.startActivity(intent);
-                       } catch(Throwable th) {
-                           Log.stack(LOG_ID,"ACTION_REQUEST_SCHEDULE_EXACT_ALARM",th);
+        AlarmManager manager= (AlarmManager) context.getSystemService(ALARM_SERVICE);
+            if(manager.canScheduleExactAlarms()){
+               {if(doLog) {Log.d(LOG_ID, "canScheduleExactAlarms");};};
+               }
+            else {
+               {if(doLog) {Log.d(LOG_ID, "not canScheduleExactAlarms");};};
+               try {
+                   Intent intent=new Intent();
+                   intent.setAction(ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                   context.startActivity(intent);
+                   } catch(Throwable th) {
+                       Log.stack(LOG_ID,"ACTION_REQUEST_SCHEDULE_EXACT_ALARM",th);
 
-                           }
-                   }
-        }
+                       }
+               }
     }
     }
 /*
@@ -378,13 +368,11 @@ private void supportRTL() {
     // Returns true if the currently applied theme is a light theme
 private void reallightBars(boolean light) {
    Log.i(LOG_ID,"lightBars "+ light);
-   if(Build.VERSION.SDK_INT >= 30) {
-     var win=getWindow();
-     var view= win.getDecorView();
-     WindowInsetsControllerCompat windowInsetsController =WindowCompat.getInsetsController(win, view);
-     windowInsetsController.setAppearanceLightStatusBars(light);
-     windowInsetsController.setAppearanceLightNavigationBars(light);
-     }
+   var win=getWindow();
+   var view= win.getDecorView();
+   WindowInsetsControllerCompat windowInsetsController =WindowCompat.getInsetsController(win, view);
+   windowInsetsController.setAppearanceLightStatusBars(light);
+   windowInsetsController.setAppearanceLightNavigationBars(light);
    }
 
 
@@ -495,7 +483,7 @@ private void requestOrientationOnce(int orientation) {
     }
 }
 private boolean hasAndroid16LargeScreenRestriction() {
-    return Build.VERSION.SDK_INT >= 36 && getApplicationInfo().targetSdkVersion >= 36;
+    return getApplicationInfo().targetSdkVersion >= 36;
     }
 
 private static boolean getIsElongated(Configuration config) {
@@ -520,11 +508,9 @@ private boolean isSystemAutoRotateEnabled() {
      * Auto-rotate option here: SCREEN_ORIENTATION_FULL_USER lets WindowManager
      * apply the real user rotation policy.
      */
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        android.os.UserManager userManager=(android.os.UserManager)getSystemService(Context.USER_SERVICE);
-        if(userManager!=null&&userManager.isManagedProfile())
-            return true;
-        }
+    android.os.UserManager userManager=(android.os.UserManager)getSystemService(Context.USER_SERVICE);
+    if(userManager!=null&&userManager.isManagedProfile())
+        return true;
     return Settings.System.getInt(getContentResolver(),Settings.System.ACCELEROMETER_ROTATION,1) != 0;
     }
 private boolean observingAutoRotate = false;
@@ -694,7 +680,7 @@ if(!isWearable) {
         wanted=ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
         }
     else {
-        canRotate=Build.VERSION.SDK_INT < 36||!largeScreen;
+        canRotate=!largeScreen;
         if(!largeScreen) {
             wanted=getMenuLandscapeOrientation(config);
             }
@@ -727,11 +713,7 @@ if(!isWearable) {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(android.os.Build.VERSION.SDK_INT >= 21) {
-             Log.i(LOG_ID,"sdk 21 or larger") ;
-            }
-        else
-            Log.i(LOG_ID,"smaller than sdk 21") ;
+        Log.i(LOG_ID,"sdk 21 or larger") ;
 
         if(isWearable) {
            Specific.splash(this);
@@ -754,10 +736,8 @@ if(!isWearable) {
 
         updateRtl(getResources().getConfiguration());
         if(!isWearable) {
-            if(Build.VERSION.SDK_INT >= 30)  {
         //        WindowCompat.enableEdgeToEdge(getWindow());
                EdgeToEdge.enable(this);
-               }
            }
       thisone=this;
       if(Applic.stopprogram >0){
@@ -775,9 +755,7 @@ if(!isWearable) {
 
       {if(doLog) {Log.i(LOG_ID,"onCreate start target="+ TargetSDK);};};
       if(TargetSDK>30) {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            alarmsExact(this);
-            }
+         alarmsExact(this);
          }
       showSystemUI();
       if(!glversion())
@@ -835,32 +813,30 @@ void handleIntent(Intent intent) {
         help.help(R.string.healthpermission,this);
         return;
         }
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-      if("android.intent.action.VIEW_PERMISSION_USAGE".intern()==action) {
-          if (extras != null) {
-              final String groupname;
-              groupname = extras.getString(EXTRA_PERMISSION_GROUP_NAME);
-              switch (groupname) {
-                  case "android.permission-group.HEALTH" ->
-                          help.help(R.string.healthpermission, this);
-                  case "android.permission-group.NOTIFICATIONS" ->
-                          help.help(R.string.notificationpermission, this);
-                  case "android.permission-group.NEARBY_DEVICES" ->
-                          help.help(R.string.nearbypermission, this);
-                  case "android.permission-group.CAMERA" ->
-                          help.help(R.string.camerapermission, this);
-                  default -> {if(doLog) {Log.i(LOG_ID, "EXTRA_PERMISSION_GROUP_NAME=" + groupname);};}
+    if("android.intent.action.VIEW_PERMISSION_USAGE".intern()==action) {
+        if (extras != null) {
+            final String groupname;
+            groupname = extras.getString(EXTRA_PERMISSION_GROUP_NAME);
+            switch (groupname) {
+                case "android.permission-group.HEALTH" ->
+                        help.help(R.string.healthpermission, this);
+                case "android.permission-group.NOTIFICATIONS" ->
+                        help.help(R.string.notificationpermission, this);
+                case "android.permission-group.NEARBY_DEVICES" ->
+                        help.help(R.string.nearbypermission, this);
+                case "android.permission-group.CAMERA" ->
+                        help.help(R.string.camerapermission, this);
+                default -> {if(doLog) {Log.i(LOG_ID, "EXTRA_PERMISSION_GROUP_NAME=" + groupname);};}
+            }
+            ;
+            }
+         else {
+             if(intent.hasCategory("android.intent.category.HEALTH_PERMISSIONS")) {
+                        help.help(R.string.healthpermission, this);
+                      }
               }
-              ;
-              }
-           else {
-               if(intent.hasCategory("android.intent.category.HEALTH_PERMISSIONS")) {
-                          help.help(R.string.healthpermission, this);
-                        }
-                }
-              }
-            return;
-          }
+            }
+          return;
 
 //       else hideSystem=true;
    }
@@ -955,7 +931,7 @@ static boolean tocalendarapp=false;
     protected void onResume() {
     if(doLog) {Log.i(LOG_ID,"onResume");};;
     super.onResume();
-    if(!isWearable && Build.VERSION.SDK_INT>=28) ActivityHealth.onResume(this);
+    if(!isWearable) ActivityHealth.onResume(this);
     if(curve!=null) {
         if(!curve.waitnfc) {
             {if(doLog) {Log.d(LOG_ID,"onResume setnfc");};};
@@ -1032,7 +1008,7 @@ if(!isWearable) {
             }
         if(!showsdialog) {
             if(tryHealth>0) {
-                if(Natives.gethealthConnect()&& Build.VERSION.SDK_INT >= 28) {
+                if(Natives.gethealthConnect()) {
                         --tryHealth;
                         HealthConnection.Companion.init(this);
                     } 
@@ -1060,9 +1036,7 @@ if(!isWearable) {
                         if(tryHealth>0) {
                             Log.i(LOG_ID,"onStart tryHealth="+tryHealth);
                             if(tryHealth--==4) {
-                                    if(android.os.Build.VERSION.SDK_INT >= 33)  {
-                                            Above33.checkAndRestoreWatchFace(this);
-                                            }
+                                    Above33.checkAndRestoreWatchFace(this);
                                       tryHealth=0;
                                      }
                            }
@@ -1240,7 +1214,7 @@ void activateresult(boolean res) {
                 }
             }
         super.onPause();
-    if(!isWearable && Build.VERSION.SDK_INT>=28) ActivityHealth.onPause();
+    if(!isWearable) ActivityHealth.onPause();
         if(!Applic.Nativesloaded)
             return;
         if(isWearable) {
@@ -1411,17 +1385,11 @@ public void requestRender() {
 
 private void netinitstep() {
     if(!started) {
-        if (Build.VERSION.SDK_INT < 26||Build.VERSION.SDK_INT>30||hasNeedScan()) {
-            useBluetooth(Natives.getusebluetooth()&&finepermission());
-            }
-        else
-            useBluetooth(Natives.getusebluetooth());
+        useBluetooth(Natives.getusebluetooth()&&finepermission());
         started=true;
         if(!isWearable) {
             if(Natives.gethealthConnect()) {
-                 if(Build.VERSION.SDK_INT >= 28) {
-                    HealthConnection.Companion.init(this);
-                    }
+                 HealthConnection.Companion.init(this);
                 }
             }
         }
@@ -1432,38 +1400,19 @@ private boolean gaverational=false;
 boolean finepermission() {
     MainActivity act=this;
     {if(doLog) {Log.i(LOG_ID,"finepermission");};};
-    if(Build.VERSION.SDK_INT >= 23) {
-        var noperm=Applic.refreshBluetoothPermissions(act);
-        if(noperm.length==0) {
-              if((Build.VERSION.SDK_INT==29||Build.VERSION.SDK_INT==30)&&ContextCompat.checkSelfPermission(this, location_background_permission[0])!= PackageManager.PERMISSION_GRANTED) {
-                    queuePermissionRequest(BACKGROUND_LOCATION_REQUEST_CODE, ()->
-                            help.help(R.string.locationpermission,act,l-> {
-                                requestPermissions(location_background_permission, BACKGROUND_LOCATION_REQUEST_CODE);
-                                if(help.whelplayout!=null&&help.whelplayout.get()!=null) {
-                                    removeContentView(help.whelplayout.get()); //setContentView makes view inaccessable
-                                    help.whelplayout=null;
-                                    }
-                                }));
-                    return false;
-                    }
-               else {
-                   return systemlocation() ;
-                   }
-           }
-        queuePermissionRequest(BLUETOOTH_PERMISSION_REQUEST_CODE, () -> {
+    var noperm=Applic.refreshBluetoothPermissions(act);
+    if(noperm.length==0)
+        return true;
+    queuePermissionRequest(BLUETOOTH_PERMISSION_REQUEST_CODE, () -> {
                 boolean giveRational=false;
-                if(Build.VERSION.SDK_INT==29||Build.VERSION.SDK_INT==30)
-                    giveRational=true;
-                else {
-                    for(var scanpermission:noperm) {
-                        if(shouldShowRequestPermissionRationale(scanpermission)) {
-                            giveRational=true;
-                            }
-                       }
-                      }
+                for(var scanpermission:noperm) {
+                    if(shouldShowRequestPermissionRationale(scanpermission)) {
+                        giveRational=true;
+                        }
+                   }
                 if(giveRational) {
                         gaverational=true;
-                        help.help(Build.VERSION.SDK_INT>30?R.string.nearbypermission:R.string.locationpermission,act,l-> {
+                        help.help(R.string.nearbypermission,act,l-> {
                                 Log.i(LOG_ID,"request permission "+noperm);
                                 requestPermissions(noperm, BLUETOOTH_PERMISSION_REQUEST_CODE);
                                 if(help.whelplayout!=null&&help.whelplayout.get()!=null) {
@@ -1478,30 +1427,21 @@ boolean finepermission() {
                     });
 
 
-            return false;
-        }
-    else
-        return true;
+    return false;
     }
 
 static public final int SENSOR_PERMISSION_REQUEST_CODE=0x23457;
 static final int FLASH_PERMISSION_REQUEST_CODE=0x11224;
 
 static final int BLUETOOTH_PERMISSION_REQUEST_CODE=0x942365;
-static final int BACKGROUND_LOCATION_REQUEST_CODE=0x942366;
 private static final int NOTIFICATION_PERMISSION_REQUEST_CODE=0x8878;
 
 static public final int REQ_SET_PUSHED_WATCH_FACE_ACTIVE = 1001;
 
-private static final String[] location_background_permission=new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION};
 //private final int STORAGE_PERMISSION_REQUEST_CODE=0x445533;
 private void hasLocationContinue() {
-      if(Natives.getusebluetooth())  {
-         if(Build.VERSION.SDK_INT <26||Build.VERSION.SDK_INT>30 ||hasNeedScan()) 
-            useBluetooth(true);
-         else
-             SensorBluetooth.goscan();
-         }
+      if(Natives.getusebluetooth())
+         useBluetooth(true);
    }
 @Override
 public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -1516,7 +1456,7 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
                         return;
                         }
                 
-                if(isWearable&&android.os.Build.VERSION.SDK_INT >= 33) {
+                if(isWearable) {
                         Specific.WatchFaceActivation.onRequestPermissionsResult( this, granted);
                         };
                 break;
@@ -1536,25 +1476,13 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
                 }
 
              };break;
-        case BACKGROUND_LOCATION_REQUEST_CODE:
-                if(systemlocation()) {
-                   hasLocationContinue();
-                   return;
-                   }
-               break;
         case BLUETOOTH_PERMISSION_REQUEST_CODE:
             {if(doLog) {Log.i(LOG_ID,"onRequestPermissionsResult(BLUETOOTH_PERMISSION_REQUEST_CODE) "+granted);};};
             // Permission callbacks are a deliberate refresh boundary. Re-read the
             // permission state once here; BLE operations use only the cached result.
             BleMirror.permissionsChanged();
             if(granted) {
-              if((Build.VERSION.SDK_INT==29||Build.VERSION.SDK_INT==30)&&ContextCompat.checkSelfPermission(this, location_background_permission[0])!= PackageManager.PERMISSION_GRANTED) {
-                        queuePermissionRequest(BACKGROUND_LOCATION_REQUEST_CODE, ()->requestPermissions(location_background_permission, BACKGROUND_LOCATION_REQUEST_CODE));
-                    }
-               else {
-                    if(systemlocation())
-                       hasLocationContinue();
-                    }
+                hasLocationContinue();
             } else {
                 {if(doLog) {Log.i(LOG_ID,"denied");};};
                 //setbluetoothmain(false);
@@ -1562,23 +1490,10 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
 
                 if(!gaverational) {
                     bluediag.returntoblue=false;
-                    if(Build.VERSION.SDK_INT>30) {
-                        help.basehelp(R.string.nearbypermission,
-                            this, l -> {
-                                useBluetooth(false);
-                            });
-                          }
-                     else {
-                        if(Build.VERSION.SDK_INT <26 ||hasNeedScan() )  {
-                            help.basehelp(R.string.locationpermission,
-                                    this, l -> {
-                                        useBluetooth(false);
-                                    });
-                            }
-                        else {
-                                help.help(R.string.locationpermission, this);
-                           }
-                    }
+                    help.basehelp(R.string.nearbypermission,
+                        this, l -> {
+                            useBluetooth(false);
+                        });
                     }
                 }
             if(bluediag.returntoblue) {
@@ -1880,17 +1795,6 @@ boolean backinapp()  {
         return doonback();
         }
        }
-/*
-    @Override
-    public    void onBackPressed()   {
-        {if(doLog) {Log.d(LOG_ID, "onBackPressed");};};
-        if(!backinapp())  {
-            {if(doLog) {Log.d(LOG_ID, "moveTaskToBack");};};
-    //        moveTaskToBack(true);
-            super.onBackPressed();
-            }
-    }
-    */
 void tonotaccesssettings() {
     {if(doLog) {Log.i(LOG_ID,"tonotaccesssettings()");};};
     try {
@@ -1903,27 +1807,25 @@ void tonotaccesssettings() {
         }
 }
     public void asknotificationAccess() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        try {
-             var context = this;
-          NotificationManager n = (NotificationManager) context.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-          if(n != null && !n.isNotificationPolicyAccessGranted()) {
-            if(isWearable)
-                tonotaccesssettings();
-            else {
-                {if(doLog) {Log.i(LOG_ID,"disturbe");};};
-                help.basehelp(R.string.disturbhelp, this, l ->  tonotaccesssettings());
-                }
-            return;
-            }
+    try {
+         var context = this;
+      NotificationManager n = (NotificationManager) context.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+      if(n != null && !n.isNotificationPolicyAccessGranted()) {
+        if(isWearable)
+            tonotaccesssettings();
         else {
-            {if(doLog) {Log.i(LOG_ID,"don't ask disturbe");};};
-            Natives.setaskedNotify(true);
+            {if(doLog) {Log.i(LOG_ID,"disturbe");};};
+            help.basehelp(R.string.disturbhelp, this, l ->  tonotaccesssettings());
             }
-        } catch (Throwable th) {
-        Log.stack("ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS", th);
+        return;
         }
+    else {
+        {if(doLog) {Log.i(LOG_ID,"don't ask disturbe");};};
+        Natives.setaskedNotify(true);
         }
+    } catch (Throwable th) {
+    Log.stack("ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS", th);
+    }
     }
 AlertDialog shownglucosealert=null;
 void  cancelglucosedialog() {
@@ -1959,9 +1861,7 @@ void showindialog(String message,boolean cancel) {
        dialog.setCanceledOnTouchOutside(false);
         dialog.setOnShowListener(a ->  {
             final var colres= android.R.color.holo_orange_light; //Very infrequently button not shown. Maybe this helps.
-        final var col=
-           (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)?getResources().getColor(colres, getTheme()):
-                getResources().getColor(colres);
+        final var col=getResources().getColor(colres, getTheme());
          var negbut=dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
         negbut.setTextColor(col);
         }    
@@ -1975,33 +1875,6 @@ void showindialog(String message,boolean cancel) {
 call fineres=null;
 public void setfineres(call proc) {
     fineres=proc;
-    }
-
-private static int getLocationMode(Context context) {
-       return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
-   }
-public static boolean isLocationEnabled(Context context) {
-       return getLocationMode(context) != Settings.Secure.LOCATION_MODE_OFF;
-   }
-
-boolean systemlocation() {
-    if(Build.VERSION.SDK_INT > 30||Build.VERSION.SDK_INT < 23||!(hasNeedScan()||Build.VERSION.SDK_INT<26))  {
-        return true;
-    }
-    {if(doLog) {Log.i(LOG_ID,"systemlocation()");};};
-   try {
-       if(!isLocationEnabled(this)) {
-            {if(doLog) {Log.i(LOG_ID,"Location not Enabled");};};
-            RunOnUiThread(()-> needsLocation());
-            return false;
-         }
-      else
-         {if(doLog) {Log.i(LOG_ID,"Location Enabled");};};
-      }catch (Throwable th) {
-         Log.stack(LOG_ID,"Settings.Secure.LOCATION_MODE",th);
-         return false;
-         }
-    return true;
     }
 
     /*
@@ -2030,32 +1903,6 @@ catch (Throwable th) {
     return true;
 }
 */
-private static void needsLocation() {
-     MainActivity main=thisone;
-    if(main!=null) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(main);
-        builder.setTitle("Location").
-         setMessage("System Location needs to be turned on to find Bluetooth devices").
-           setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            enableLocationSettings();
-            }
-   }).setOnCancelListener(l->enableLocationSettings()).show().setCanceledOnTouchOutside(false);
-         }
-     else {
-      Applic.Toaster("Turn on Location in System settings"); 
-       }
-   }
-
-private static void enableLocationSettings() {
-      MainActivity main=thisone;
-      if(thisone!=null) {
-            {if(doLog) {Log.i(LOG_ID,"ACTION_LOCATION_SOURCE_SETTINGS");};};
-             Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-             main.startActivity(settingsIntent);
-             }
-    }
 /* Doesn't work on a lot of phones and watches
 private boolean systemlocation() { 
      if(Build.VERSION.SDK_INT > 30||Build.VERSION.SDK_INT < 23||!(hasSibionics()||Build.VERSION.SDK_INT<26))  {
@@ -2150,10 +1997,8 @@ public  void setbluetoothmain(boolean on) {
     {if(doLog) {Log.i(LOG_ID,"setbluetoothmain "+on);};};
     if(on) {
          Natives.setusebluetooth(on);
-         if(Build.VERSION.SDK_INT < 26||Build.VERSION.SDK_INT>30||hasNeedScan()) {
-            if(!finepermission()) {
-                return;
-                }
+         if(!finepermission()) {
+            return;
             }
         }
     Applic.setbluetooth(this, on) ;
@@ -2313,14 +2158,8 @@ public boolean canForceMenuLandscape(Configuration config) {
 public  Point getWindowSize() {
     final MainActivity act=this;
     Point size;
-    if (Build.VERSION.SDK_INT >= 30) {
-        Rect bounds = act.getWindowManager().getCurrentWindowMetrics().getBounds();
-        size=new Point(bounds.width(), bounds.height());
-        }
-    else {
-            size = new Point();
-            act.getWindowManager().getDefaultDisplay().getRealSize(size);
-            }
+    Rect bounds = act.getWindowManager().getCurrentWindowMetrics().getBounds();
+    size=new Point(bounds.width(), bounds.height());
     GlucoseCurve.setgeo(size.x,size.y);
     return size;
    }

@@ -108,8 +108,6 @@ static void deviceAdded(MainActivity act) {
            if(res) {
                 act.finepermission(); 
                 }
-              else
-                act.systemlocation();
             }
         else {
             Natives.updateUsedSensors();

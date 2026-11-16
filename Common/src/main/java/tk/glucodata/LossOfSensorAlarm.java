@@ -27,7 +27,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import static android.app.AlarmManager.RTC_WAKEUP;
 import static android.app.PendingIntent.getBroadcast;
@@ -54,11 +53,7 @@ static void mkintents(Context context) {
     if(onalarm==null) {
         final int alarmrequest = 4;
         final int alarmflags;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            alarmflags = PendingIntent.FLAG_IMMUTABLE;
-            }
-        else
-             alarmflags = 0;
+        alarmflags = PendingIntent.FLAG_IMMUTABLE;
         Intent alarmintent = new Intent(context, LossOfSensorAlarm.class);
         onalarm = getBroadcast(context, alarmrequest, alarmintent, alarmflags);
         }
@@ -73,15 +68,11 @@ static    void setalarm(Context context, long alarmtime) {
         AlarmManager manager= (AlarmManager) context.getSystemService(ALARM_SERVICE);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(isWearable) {
-                 manager.setAlarmClock(new AlarmManager.AlarmClockInfo(alarmtime, onalarm), onalarm);
-                 }
-            else 
-                manager.setExactAndAllowWhileIdle(type,alarmtime,onalarm);
-           }
-        else
-            manager.setExact(type,alarmtime,onalarm);
+        if(isWearable) {
+             manager.setAlarmClock(new AlarmManager.AlarmClockInfo(alarmtime, onalarm), onalarm);
+             }
+        else 
+            manager.setExactAndAllowWhileIdle(type,alarmtime,onalarm);
        }
        catch(Throwable e) {
            Log.stack(LOG_ID,"setalarm", e);

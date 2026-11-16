@@ -1168,12 +1168,8 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
          * SCREEN_ORIENTATION_FULL_USER defer to WindowManager.  Use the same
          * rule here, otherwise the Work Profile incorrectly hides Rotate text. */
         final boolean managedProfile;
-        if(android.os.Build.VERSION.SDK_INT>=android.os.Build.VERSION_CODES.N) {
-            var userManager=(android.os.UserManager)context.getSystemService(android.content.Context.USER_SERVICE);
-            managedProfile=userManager!=null&&userManager.isManagedProfile();
-            }
-        else
-            managedProfile=false;
+        var userManager=(android.os.UserManager)context.getSystemService(android.content.Context.USER_SERVICE);
+        managedProfile=userManager!=null&&userManager.isManagedProfile();
 
         /* These controls are local to displaysettings(): whether they have an
          * effect is a property of the current display/orientation policy, not
@@ -1189,8 +1185,7 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
                     context.getContentResolver(),
                     android.provider.Settings.System.ACCELEROMETER_ROTATION,1)!=0;
             final boolean effectiveAutoRotate=Natives.getRotate()&&systemAutoRotate;
-            final boolean android16LargeRestriction=android.os.Build.VERSION.SDK_INT>=36
-                    &&context.getApplicationInfo().targetSdkVersion>=36;
+            final boolean android16LargeRestriction=context.getApplicationInfo().targetSdkVersion>=36;
 
             final boolean orientationHasEffect;
             if(nearlySquare)
@@ -1663,23 +1658,21 @@ static private void exchanges(MainActivity context, View parent) {
         */
         var clarity = getbutton(context, "Dexcom Clarity");
         clarity.setOnClickListener(v -> tk.glucodata.Clarity.show(context,thelayout[0]));
-        final var healthconnect = (isWearable || Build.VERSION.SDK_INT < 28) ? null : getcheckbox(context, "Health Connect", Natives.gethealthConnect());
+        final var healthconnect = isWearable ? null : getcheckbox(context, "Health Connect", Natives.gethealthConnect());
         final var activities = getbutton(context, R.string.activity_import);
         activities.setOnClickListener(v -> tk.glucodata.ActivitySettings.show(context, thelayout[0]));
-        if(isWearable || Build.VERSION.SDK_INT<28 || !tk.glucodata.ActivityHealth.available()) activities.setVisibility(View.GONE);
-        if (Build.VERSION.SDK_INT >= 28) {
-            healthconnect.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                        Natives.sethealthConnect(isChecked);
-                        if (isChecked) {
-                            MainActivity.tryHealth = 5;
-                            HealthConnection.Companion.init(context);
-                        } else {
-                            MainActivity.tryHealth = 0;
-                            HealthConnection.Companion.stop();
-                        }
+        if(isWearable) activities.setVisibility(View.GONE);
+        healthconnect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    Natives.sethealthConnect(isChecked);
+                    if (isChecked) {
+                        MainActivity.tryHealth = 5;
+                        HealthConnection.Companion.init(context);
+                    } else {
+                        MainActivity.tryHealth = 0;
+                        HealthConnection.Companion.stop();
                     }
-            );
-        }
+                }
+        );
         var webserver = getbutton(context, R.string.webserver);
         webserver.setOnClickListener(v -> tk.glucodata.Nightscout.show(context, thelayout[0]));
         var help = getbutton(context, R.string.helpname);
@@ -1695,10 +1688,10 @@ static private void exchanges(MainActivity context, View parent) {
         lay = new Layout(context, (l, w, h) -> {
             int[] ret = {w, h};
             return ret;
-        }, Build.VERSION.SDK_INT >= 28 ?new View[]{healthconnect,activities,clarity}:new View[]{clarity}, new View[]{webserver,exportview,mirrorview} ,                /*new View[]{emulator},*/new View[]{help, ok})
+        }, new View[]{healthconnect,activities,clarity}, new View[]{webserver,exportview,mirrorview} ,                /*new View[]{emulator},*/new View[]{help, ok})
             .portraitLayout(
                 new View[]{webserver,clarity},
-                (Build.VERSION.SDK_INT >= 28)?new View[]{healthconnect,activities}:null,
+                new View[]{healthconnect,activities},
                 new View[]{exportview,mirrorview},/*new View[]{emulator},*/new View[]{help},new View[]{ok});
 
     final   int pad=(int)(tk.glucodata.GlucoseCurve.metrics.density*10.0);

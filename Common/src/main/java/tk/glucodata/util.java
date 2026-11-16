@@ -38,7 +38,6 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
 import android.text.method.LinkMovementMethod;
 import android.widget.Button;
 
@@ -100,10 +99,7 @@ public static Button getbutton(Context act, int res) {
 	}
 	@SuppressWarnings("deprecation")
 static void sethtml(TextView view, String text) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        view.setText(fromHtml(text,TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
-    }
-    else view.setText(fromHtml(text));
+    view.setText(fromHtml(text,TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
     view.setTextIsSelectable(true);
     view.setTextColor(util.getColorFromTheme(view.getContext(), android.R.attr.textColorPrimary));
 
@@ -117,12 +113,7 @@ static void sethtml(TextView view,int res) {
 	sethtml(view,view.getContext().getString(res));
 	}
 static  Locale getReslocale() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            return Applic.app.getResources().getConfiguration().getLocales().get(0);
-        } else{
-            //noinspection deprecation
-            return Applic.app.getResources().getConfiguration().locale;
-        }
+        return Applic.app.getResources().getConfiguration().getLocales().get(0);
     }
 static public Locale getlocale() {
 	final var locales= AppCompatDelegate.getApplicationLocales();

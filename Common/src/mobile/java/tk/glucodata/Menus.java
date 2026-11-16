@@ -26,7 +26,6 @@ package tk.glucodata;
 
 import android.view.LayoutInflater;
 import android.content.res.Configuration;
-import android.os.Build;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsCompat;
@@ -230,17 +229,11 @@ static private void showNow(MainActivity act) {
         view.setBackgroundColor( Applic.backgroundcolor);
 
     if(!isWearable) {
-        /* MainActivity enables edge-to-edge only on Android 11/API 30+.
-         * On older Android versions the decor/content area already excludes
-         * visible status/navigation bars. Padding with systemBars() there
-         * would therefore count the navigation bar a second time. */
-        if(Build.VERSION.SDK_INT >= 30) {
-            setOnApplyWindowInsetsListener(view,(v,windowInsets) -> {
-                Insets bars=windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-                v.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
-                return windowInsets;
-                });
-            }
+        setOnApplyWindowInsetsListener(view,(v,windowInsets) -> {
+            Insets bars=windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
+            return windowInsets;
+            });
         view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) { }
@@ -516,18 +509,12 @@ static private void showNow(MainActivity act) {
    
 	  // view.setPadding(0,MainActivity.systembarTop,0,0);
     if(!isWearable) {
-        if(Build.VERSION.SDK_INT >= 30) {
-            /* Edge-to-edge: the overlay occupies the whole window, so keep
-             * its controls out of the system bars explicitly. */
-            WindowInsetsCompat wi=ViewCompat.getRootWindowInsets(act.getWindow().getDecorView());
-            if(wi!=null) {
-                Insets bars=wi.getInsets(WindowInsetsCompat.Type.systemBars());
-                view.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
-                }
-            }
-        else {
-            /* Pre edge-to-edge: Android has already inset the content view. */
-            view.setPadding(0,0,0,0);
+        /* Edge-to-edge: the overlay occupies the whole window, so keep
+         * its controls out of the system bars explicitly. */
+        WindowInsetsCompat wi=ViewCompat.getRootWindowInsets(act.getWindow().getDecorView());
+        if(wi!=null) {
+            Insets bars=wi.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
             }
         }
     else

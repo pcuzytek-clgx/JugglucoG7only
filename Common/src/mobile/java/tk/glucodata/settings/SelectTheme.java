@@ -192,9 +192,7 @@ private static class ReselectSpinner extends Spinner {
             ));
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            tv.setForeground(null);
-        }
+        tv.setForeground(null);
 
         return tv;
     }
@@ -259,9 +257,7 @@ private static class ReselectSpinner extends Spinner {
         tv.setVisibility(View.VISIBLE);
         tv.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            tv.setForeground(null);
-        }
+        tv.setForeground(null);
     }
 
     private static boolean isShapeEditorAvailable() {
@@ -599,43 +595,41 @@ private static class ReselectSpinner extends Spinner {
         rectButton.setTextColor(compoundText);
         ovalButton.setTextColor(compoundText);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            rectButton.setButtonTintList(compoundTint);
-            ovalButton.setButtonTintList(compoundTint);
+        rectButton.setButtonTintList(compoundTint);
+        ovalButton.setButtonTintList(compoundTint);
 
-            ColorStateList seekActivatedTint = new ColorStateList(
-                    new int[][] {
-                            new int[] {-android.R.attr.state_enabled},
-                            new int[] {}
-                    },
-                    new int[] {disabledControl, activated}
-            );
-            ColorStateList seekNormalTint = new ColorStateList(
-                    new int[][] {
-                            new int[] {-android.R.attr.state_enabled},
-                            new int[] {}
-                    },
-                    new int[] {disabledControl, normal}
-            );
+        ColorStateList seekActivatedTint = new ColorStateList(
+                new int[][] {
+                        new int[] {-android.R.attr.state_enabled},
+                        new int[] {}
+                },
+                new int[] {disabledControl, activated}
+        );
+        ColorStateList seekNormalTint = new ColorStateList(
+                new int[][] {
+                        new int[] {-android.R.attr.state_enabled},
+                        new int[] {}
+                },
+                new int[] {disabledControl, normal}
+        );
 
-            seekBar.setProgressTintList(seekActivatedTint);
-            seekBar.setProgressBackgroundTintList(seekNormalTint);
-            seekBar.setThumbTintList(seekActivatedTint);
-            seekBar.setSecondaryProgressTintList(seekNormalTint);
+        seekBar.setProgressTintList(seekActivatedTint);
+        seekBar.setProgressBackgroundTintList(seekNormalTint);
+        seekBar.setThumbTintList(seekActivatedTint);
+        seekBar.setSecondaryProgressTintList(seekNormalTint);
 
-            // Do not tint the native spinner shell with textColor. When AndroidDefault
-            // is the active app theme, that can leave the closed/unselected spinner
-            // looking dark while the preview text is dark too. Replace the shell with
-            // a deterministic preview-colored background instead.
-            styleSpinnerShell(themeContext, lightSpinner);
-            styleSpinnerShell(themeContext, darkSpinner);
+        // Do not tint the native spinner shell with textColor. When AndroidDefault
+        // is the active app theme, that can leave the closed/unselected spinner
+        // looking dark while the preview text is dark too. Replace the shell with
+        // a deterministic preview-colored background instead.
+        styleSpinnerShell(themeContext, lightSpinner);
+        styleSpinnerShell(themeContext, darkSpinner);
 
-            // The popup background must be styled for the spinner group, not for the
-            // currently selected preview theme. Otherwise a light-theme spinner opened
-            // while AndroidDefault is active can still get a dark popup surface.
-            styleSpinnerPopup(themeContext, lightSpinner, AppTheme.LIGHT);
-            styleSpinnerPopup(themeContext, darkSpinner, AppTheme.DARK);
-        }
+        // The popup background must be styled for the spinner group, not for the
+        // currently selected preview theme. Otherwise a light-theme spinner opened
+        // while AndroidDefault is active can still get a dark popup surface.
+        styleSpinnerPopup(themeContext, lightSpinner, AppTheme.LIGHT);
+        styleSpinnerPopup(themeContext, darkSpinner, AppTheme.DARK);
     }
 /*
     private static void styleSpinnerShell(Context themeContext, Spinner spinner) {
@@ -697,9 +691,7 @@ private static void styleSpinnerShell(Context themeContext, Spinner spinner) {
                 popupTheme.isDark() ? Color.BLACK : Color.WHITE
         );
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            spinner.setPopupBackgroundDrawable(new ColorDrawable(popupBg));
-        }
+        spinner.setPopupBackgroundDrawable(new ColorDrawable(popupBg));
     }
 
     private static void stylePreviewButton(Context themeContext, String pkg, Button button) {

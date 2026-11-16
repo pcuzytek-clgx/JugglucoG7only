@@ -35,7 +35,7 @@ if(false) {
     GMSWEAR = '20.0.1'
     GMSBASE = '18.11.1'
     MINSDK = 36
-    TARGETSDK = 36
+    TARGETSDK = 37
     CPPSTD = "-std=gnu++26"
 }
 

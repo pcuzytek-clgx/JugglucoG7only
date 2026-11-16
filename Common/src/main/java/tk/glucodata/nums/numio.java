@@ -179,9 +179,7 @@ if(true) {
 
    if(doLog) {
           var build=new StringBuilder();
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-             build.append("\nVERSION.BASE_OS: "+ Build.VERSION.BASE_OS);
-             }
+          build.append("\nVERSION.BASE_OS: "+ Build.VERSION.BASE_OS);
           build.append("\nVERSION.RELEASE: "+ RELEASE+"\n"+
           "VERSION.SDK_INT: "+ Build.VERSION.SDK_INT+"\n"+
           "BRAND: "+ Build.BRAND+"\n"+
@@ -193,13 +191,11 @@ if(true) {
           "PRODUCT: "+ Build.PRODUCT+"\n"+
           "MODEL: "+ Build.MODEL);
 
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-             build.append("\nSUPPORTED_ABIS: ");
-             for(var ap: Build.SUPPORTED_ABIS) {
-                build.append(ap);
-                build.append(", ");
-                }
-          }
+          build.append("\nSUPPORTED_ABIS: ");
+          for(var ap: Build.SUPPORTED_ABIS) {
+             build.append(ap);
+             build.append(", ");
+             }
           build.append('\n');
           Natives.log(build.toString());
            final String version= BuildConfig.VERSION_CODE+" "+ BuildConfig.VERSION_NAME +" "+ tk.glucodata.BuildTime.TIME+"\n";

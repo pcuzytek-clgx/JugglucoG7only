@@ -27,7 +27,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.SystemClock;
 
 import java.util.UUID;
@@ -86,12 +85,12 @@ final class GattRecoveryAlarm {
                         TimeUnit.MILLISECONDS);
             } else {
                 alarmManager = (AlarmManager) Applic.app.getSystemService(Context.ALARM_SERVICE);
-                if (alarmManager == null || Build.VERSION.SDK_INT < 21) {
+                if (alarmManager == null) {
                     Log.e(LOG_ID, serial + " alarm-clock scheduling unavailable");
                     cancelLocked();
                     return false;
                 }
-                if (Build.VERSION.SDK_INT >= 31 && !alarmManager.canScheduleExactAlarms()) {
+                if (!alarmManager.canScheduleExactAlarms()) {
                     Log.e(LOG_ID, serial + " exact-alarm access unavailable; recovery wakeup not scheduled");
                     cancelLocked();
                     return false;
@@ -105,9 +104,7 @@ final class GattRecoveryAlarm {
                 final Intent intent = new Intent(Applic.app, ConnectReceiver.class)
                         .setAction(intentAction);
                 int flags = PendingIntent.FLAG_CANCEL_CURRENT;
-                if (Build.VERSION.SDK_INT >= 23) {
-                    flags |= PendingIntent.FLAG_IMMUTABLE;
-                }
+                flags |= PendingIntent.FLAG_IMMUTABLE;
                 pendingIntent = PendingIntent.getBroadcast(Applic.app, 0, intent, flags);
                 // No show intent: exposing the operation there would allow other
                 // apps to trigger this internal deadline via getNextAlarmClock().

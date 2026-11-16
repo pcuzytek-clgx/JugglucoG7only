@@ -24,7 +24,6 @@ package tk.glucodata;
 import static android.app.Notification.FLAG_ONGOING_EVENT;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static android.content.Context.VIBRATOR_SERVICE;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
 import static android.media.AudioAttributes.USAGE_NOTIFICATION;
@@ -40,10 +39,8 @@ import static tk.glucodata.Natives.getUSEALARM;
 import static tk.glucodata.Natives.getalarmdisturb;
 import static tk.glucodata.Natives.getisalarm;
 import static tk.glucodata.Natives.setisalarm;
-import static tk.glucodata.R.id.arrowandvalue;
 import static tk.glucodata.ScanNfcV.vibrates;
 import static tk.glucodata.Talker.notifyfocus;
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -106,7 +103,6 @@ static void mkunitstr(Context cont,int unit) {
         }
 
     }
-@SuppressLint("NewApi")
 Ringtone setring(String uristr, int res) {
     if(uristr==null||uristr.length()==0) {
         uristr= "android.resource://" + Applic.app.getPackageName() + "/" + res;
@@ -120,7 +116,7 @@ Ringtone setring(String uristr, int res) {
         ring = RingtoneManager.getRingtone(Applic.app, uri);
         }
     try {
-        if(Build.VERSION.SDK_INT >=23) ring.setLooping(true);
+        ring.setLooping(true);
         } 
     catch(Throwable e) {
            Log.stack(LOG_ID,"setring",e);
@@ -162,54 +158,39 @@ private static AudioAttributes getAlarmAttributes() {
 static AudioFocusRequest audiofocusrequest;
 
 static public void makenotification_audio() {
-    if(android.os.Build.VERSION.SDK_INT >= 21) {
-        var type=isWearable? USAGE_ASSISTANCE_SONIFICATION: AudioAttributes.USAGE_NOTIFICATION;
-        notification_audio=new AudioAttributes.Builder().setUsage(type).build();
-        media_audio=new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build();
-        if(android.os.Build.VERSION.SDK_INT >= 26) {
-                audiofocusrequest = new AudioFocusRequest.Builder( AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes( notification_audio ).build();
-                Log.i(LOG_ID, "audiofocusrequest  has value");
-                }
-         else {
-                audiofocusrequest =null;
-                Log.i(LOG_ID, "audiofocusrequest=null");
-                }
-        }
-    else {
-                notification_audio=null;
-        }
+    var type=isWearable? USAGE_ASSISTANCE_SONIFICATION: AudioAttributes.USAGE_NOTIFICATION;
+    notification_audio=new AudioAttributes.Builder().setUsage(type).build();
+    media_audio=new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build();
+    audiofocusrequest = new AudioFocusRequest.Builder( AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes( notification_audio ).build();
+    Log.i(LOG_ID, "audiofocusrequest  has value");
     }
 
 
-static  AudioManager audioManager = (android.os.Build.VERSION.SDK_INT <26)?null:(AudioManager) Applic.getContext().getSystemService(Context.AUDIO_SERVICE);
+static  AudioManager audioManager = (AudioManager) Applic.getContext().getSystemService(Context.AUDIO_SERVICE);
 static private boolean turnfocusoff=false;
         static void doTurnFocusoff() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                final var wasturnoff=turnfocusoff;
-                turnfocusoff=false;
-                if(wasturnoff) {
-                    audioManager.abandonAudioFocusRequest(audiofocusrequest);
-                }
+            final var wasturnoff=turnfocusoff;
+            turnfocusoff=false;
+            if(wasturnoff) {
+                audioManager.abandonAudioFocusRequest(audiofocusrequest);
             }
         }
 
         static void doTurnFocuson() {
-            if(android.os.Build.VERSION.SDK_INT >= 26) {
-                if(!turnfocusoff) {
-                    switch(audioManager.requestAudioFocus(audiofocusrequest)) {
-                        case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
-                            Log.i(LOG_ID,"REQUEST_FAILED");
-                            break;
+            if(!turnfocusoff) {
+                switch(audioManager.requestAudioFocus(audiofocusrequest)) {
+                    case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
+                        Log.i(LOG_ID,"REQUEST_FAILED");
+                        break;
 
-                        case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
-                            turnfocusoff=true;
-                            Log.i(LOG_ID,"REQUEST_GRANTED");
-                            break;
-                        case AudioManager.AUDIOFOCUS_REQUEST_DELAYED:
-                            Log.i(LOG_ID,"REQUEST_DELAYED");
-                            break;
-                    };
-                }
+                    case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
+                        turnfocusoff=true;
+                        Log.i(LOG_ID,"REQUEST_GRANTED");
+                        break;
+                    case AudioManager.AUDIOFOCUS_REQUEST_DELAYED:
+                        Log.i(LOG_ID,"REQUEST_DELAYED");
+                        break;
+                };
             }
         }
 
@@ -221,15 +202,13 @@ public static Ringtone getring(int kind) {
 Ringtone mkring(String uristr,int kind) {
     {if(doLog) {Log.i(LOG_ID,"ringtone "+kind+" "+uristr);};};
     var ring=setring(uristr,defaults[kind]);
-    if(android.os.Build.VERSION.SDK_INT >= 21)  {
-          try {
-            ring.setAudioAttributes(kind!=2?getAlarmAttributes():notification_audio);
-        }
-        catch(Throwable e) {
-            Log.stack(LOG_ID,"mkring",e);
-            }
+    try {
+      ring.setAudioAttributes(kind!=2?getAlarmAttributes():notification_audio);
+  }
+  catch(Throwable e) {
+      Log.stack(LOG_ID,"mkring",e);
+      }
 
-        }
     return ring;
     }
 static public Ringtone mkrings(String uristr,int kind) {
@@ -271,31 +250,29 @@ static RemoteGlucose arrowNotify;
 
 
     private void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String description = context.getString(R.string.numalarm_description);
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(NUMALARM, NUMALARM, importance);
-            channel.setSound(null, null);
-            channel.setDescription(description);
-            // allowbubbel(channel);
-            notificationManager.createNotificationChannel(channel);
+        String description = context.getString(R.string.numalarm_description);
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel(NUMALARM, NUMALARM, importance);
+        channel.setSound(null, null);
+        channel.setDescription(description);
+        // allowbubbel(channel);
+        notificationManager.createNotificationChannel(channel);
 
-            description = context.getString(R.string.alarm_description);
-            importance = NotificationManager.IMPORTANCE_HIGH;
-            channel = new NotificationChannel(GLUCOSEALARM,GLUCOSEALARM, importance);
-            channel.setSound(null, null);
-            channel.setDescription(description);
-            // allowbubbel(channel);
-            notificationManager.createNotificationChannel(channel);
+        description = context.getString(R.string.alarm_description);
+        importance = NotificationManager.IMPORTANCE_HIGH;
+        channel = new NotificationChannel(GLUCOSEALARM,GLUCOSEALARM, importance);
+        channel.setSound(null, null);
+        channel.setDescription(description);
+        // allowbubbel(channel);
+        notificationManager.createNotificationChannel(channel);
 
-            description = context.getString(R.string.notification_description);
-            importance = NotificationManager.IMPORTANCE_HIGH;
-            channel = new NotificationChannel(GLUCOSENOTIFICATION, GLUCOSENOTIFICATION, importance);
-            //allowbubbel(channel);
-            channel.setSound(null, null);
-            channel.setDescription(description);
-            notificationManager.createNotificationChannel(channel);
-        }
+        description = context.getString(R.string.notification_description);
+        importance = NotificationManager.IMPORTANCE_HIGH;
+        channel = new NotificationChannel(GLUCOSENOTIFICATION, GLUCOSENOTIFICATION, importance);
+        //allowbubbel(channel);
+        channel.setSound(null, null);
+        channel.setDescription(description);
+        notificationManager.createNotificationChannel(channel);
 
     }
 
@@ -440,30 +417,18 @@ private static void showoldglucose() {
     Vibrator vibrator = null;
 private    void vibratealarm(int kind) {
         var context= Applic.app;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            vibrator =  ((VibratorManager)(context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE))).getDefaultVibrator();
-        }
-        else
-            vibrator=(Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-        if(android.os.Build.VERSION.SDK_INT < 26) {
-            if(kind!=0)
-                vibrator.vibrate( new long[]  {0, 100, 10,  50, 50 } , 1);
-            else
-                vibrator.vibrate(new long[]   {0, 1000, 500,100,500,500,500,100,100},1);
+        vibrator =  ((VibratorManager)(context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE))).getDefaultVibrator();
+        if(kind!=0) {
+            final long[] vibrationPatternstart = {0, 70, 50,50,50,50,50,200,30};
+            final int[] amplitude=               {0, 255,150,0,255,50,0,255,50};
+            vibrates(vibrator,vibrationPatternstart,amplitude);
         }
         else {
-            if(kind!=0) {
-                final long[] vibrationPatternstart = {0, 70, 50,50,50,50,50,200,30};
-                final int[] amplitude=               {0, 255,150,0,255,50,0,255,50};
-                vibrates(vibrator,vibrationPatternstart,amplitude);
-            }
-            else {
-                final long[] vibrationPatternstart = {0, 1000, 500,100,500,500,500,100,100};
-                final int[]                amplitude={0, 0xff, 128,255,0  ,255,0, 255,  50};
-                vibrates(vibrator,vibrationPatternstart,amplitude);
-            }
-
+            final long[] vibrationPatternstart = {0, 1000, 500,100,500,500,500,100,100};
+            final int[]                amplitude={0, 0xff, 128,255,0  ,255,0, 255,  50};
+            vibrates(vibrator,vibrationPatternstart,amplitude);
         }
+
         {if(doLog) {Log.i(LOG_ID,"vibratealarm "+kind);};};
         }
     void stopvibratealarm() {
@@ -504,15 +469,13 @@ static void stopGlucoseAlarm() {
         final boolean[] doplaysound={true};
         if(sound) {
             if(disturb) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    int filt=notificationManager.getCurrentInterruptionFilter();
-                    {if(doLog) {Log.i(LOG_ID,"getCurrentInterruptionFilter()="+filt);};};
+                int filt=notificationManager.getCurrentInterruptionFilter();
+                {if(doLog) {Log.i(LOG_ID,"getCurrentInterruptionFilter()="+filt);};};
 
-                    if(filt!=NotificationManager.INTERRUPTION_FILTER_ALL) {
-                            if(notificationManager.isNotificationPolicyAccessGranted()) {
-                            //    curfilter[0]=filt;
-                                notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
-                            }
+                if(filt!=NotificationManager.INTERRUPTION_FILTER_ALL) {
+                        if(notificationManager.isNotificationPolicyAccessGranted()) {
+                        //    curfilter[0]=filt;
+                            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
                         }
                     }
                 }
@@ -724,7 +687,7 @@ void overwriteglucose(int kind) {
     final static int forcecloserequest=10;
     final static int stopalarmrequest=8;
 //    static final String closename= "ForceClose";
-    final static int penmutable= android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M? PendingIntent.FLAG_IMMUTABLE:0;
+    final static int penmutable= PendingIntent.FLAG_IMMUTABLE;
 
 private final boolean makeicon=!isWearable&&tk.glucodata.BuildConfig.minSDK>=23;
 private final StatusIcon icons=makeicon?new StatusIcon():null;
@@ -778,19 +741,13 @@ private void  makeseparatenotification(float glvalue,String message,notGlucose g
 
            setIcon(GluNotBuilder,glvalue,glucose.sensorgen2);
             GluNotBuilder.setShowWhen(true).setContentTitle(message);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //                final int timeout= Build.VERSION.SDK_INT >= 30? 60*1500:60*3000;  
                 final int timeout= 800*60;//Build.VERSION.SDK_INT >= 30? 60*1500:60*3000;  
                 GluNotBuilder.setTimeoutAfter(timeout);
-                }
             GluNotBuilder.setAutoCancel(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                GluNotBuilder.setVisibility(VISIBILITY_PUBLIC);
-                }
+            GluNotBuilder.setVisibility(VISIBILITY_PUBLIC);
             GluNotBuilder.setPriority(Notification.PRIORITY_HIGH);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
-                } 
+            GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
             Notification notif= GluNotBuilder.build();
             notif.when= glucose.time;
             notificationManager.notify(glucosealarmid,notif);
@@ -811,40 +768,25 @@ static public boolean alertseparate=false;
           setIcon(GluNotBuilder,glvalue,glucose.sensorgen2);
         GluNotBuilder.setContentTitle(message).setOnlyAlertOnce(once);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            GluNotBuilder.setVisibility(VISIBILITY_PUBLIC);
-            }
+        GluNotBuilder.setVisibility(VISIBILITY_PUBLIC);
         final boolean glucosealarm=kind<2||kind>4;
         if(!isWearable) {
-            if(Build.VERSION.SDK_INT  >= 24) {
-                GluNotBuilder.setStyle(new Notification.DecoratedCustomViewStyle());
-                }
+            GluNotBuilder.setStyle(new Notification.DecoratedCustomViewStyle());
             GluNotBuilder.setShowWhen(true);
             RemoteViews remoteViews=arrowNotify.arrowremote(kind,glucose,glucosealarm&&!once);
             if(whiteonblack) {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    GluNotBuilder.setColorized(true);
-                    GluNotBuilder.setColor(BLACK);
-                    }
-                else
-                    remoteViews.setInt(arrowandvalue, "setBackgroundColor", BLACK);
+                GluNotBuilder.setColorized(true);
+                GluNotBuilder.setColor(BLACK);
                 }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                GluNotBuilder.setCustomContentView(remoteViews);
-            } else
-                GluNotBuilder.setContent(remoteViews);
+            GluNotBuilder.setCustomContentView(remoteViews);
             }
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        GluNotBuilder.setTimeoutAfter(glucosetimeout);
-    }
+    GluNotBuilder.setTimeoutAfter(glucosetimeout);
     if(isWearable) {GluNotBuilder.setAutoCancel(true);}
     if(once)
         GluNotBuilder.setPriority(Notification.PRIORITY_DEFAULT);
     else  {
         GluNotBuilder.setPriority(Notification.PRIORITY_HIGH);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
-        }
+        GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
     }
 
      {if(doLog) {Log.i(LOG_ID,(once?"":"not ")+"only once");};};
@@ -876,26 +818,10 @@ static public PendingIntent mkpending() {
     }
 
 private Notification.Builder   mkbuilderintent(String type,PendingIntent notifyPendingIntent) {
-    Notification.Builder  GluNotBuilder;
-     if(true) {
-         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-             GluNotBuilder = new Notification.Builder(Applic.app, type);
-         }
-         else {
-                     GluNotBuilder = new Notification.Builder(Applic.app);
-         }
-        }
-    else {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            GluNotBuilder.setChannelId(type);
-        }
+    Notification.Builder  GluNotBuilder = new Notification.Builder(Applic.app, type);
     GluNotBuilder.setContentIntent(notifyPendingIntent).setOnlyAlertOnce(true);
-    if (Build.VERSION.SDK_INT >= 20) {
-        GluNotBuilder.setLocalOnly(false);
-        }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-        GluNotBuilder.setGroup("aa2");
-        }
+    GluNotBuilder.setLocalOnly(false);
+    GluNotBuilder.setGroup("aa2");
     return GluNotBuilder;
     }
 private Notification.Builder   mkbuilder(String type) {
@@ -960,10 +886,8 @@ void oldnotification(long time) {
 private Notification  makenotification(int draw,String message,String type,boolean once) {
     var GluNotBuilder=mkbuilder(type);
 
-    if(TargetSDK<31||Build.VERSION.SDK_INT < 31) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            GluNotBuilder.setStyle(new Notification.DecoratedCustomViewStyle());
-        }
+    if(TargetSDK<31) {
+        GluNotBuilder.setStyle(new Notification.DecoratedCustomViewStyle());
         }
     {if(doLog) {Log.i(LOG_ID,"makenotification "+message);};};
 
@@ -973,18 +897,10 @@ private Notification  makenotification(int draw,String message,String type,boole
         RemoteViews remoteViews = new RemoteViews(app.getPackageName(), R.layout.text);
         remoteViews.setTextColor(R.id.content, foregroundcolor);
         remoteViews.setTextViewText(R.id.content, message);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            GluNotBuilder.setCustomContentView(remoteViews);
-            } 
-        else
-            GluNotBuilder.setContent(remoteViews);
+        GluNotBuilder.setCustomContentView(remoteViews);
         }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        GluNotBuilder.setVisibility(VISIBILITY_PUBLIC);
-    }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        GluNotBuilder.setTimeoutAfter(glucosetimeout);
-    }
+    GluNotBuilder.setVisibility(VISIBILITY_PUBLIC);
+    GluNotBuilder.setTimeoutAfter(glucosetimeout);
     if(isWearable) {GluNotBuilder.setAutoCancel(true);}
     if(once)
         GluNotBuilder.setPriority(Notification.PRIORITY_DEFAULT);
@@ -992,9 +908,7 @@ private Notification  makenotification(int draw,String message,String type,boole
     //    GluNotBuilder.setPriority(Notification.PRIORITY_HIGH);
         GluNotBuilder.setPriority(Notification.PRIORITY_MAX);
 //        GluNotBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
-        }
+        GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
     }
 
      {if(doLog) {Log.i(LOG_ID,(once?"":"not ")+"only once");};};
@@ -1085,21 +999,15 @@ public static void mkDateformat() {
 Notification.Builder  NumNotBuilder=null;
     @SuppressWarnings("deprecation")
 public void  notifyer(int draw,String message,String type,int notid) {
-     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-         NumNotBuilder = new Notification.Builder(Applic.app, type);
-     }
-     else
-         NumNotBuilder = new Notification.Builder(Applic.app);
+     NumNotBuilder = new Notification.Builder(Applic.app, type);
 
 //    notificationManager.cancel(glucosenotificationid);
 
 
     NumNotBuilder.setAutoCancel(true).setContentIntent(mkpending()).
 setDeleteIntent(DeleteReceiver.getDeleteIntent()) .setContentTitle(message);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            NumNotBuilder.setVisibility(VISIBILITY_PUBLIC);
-            NumNotBuilder.setCategory(Notification.CATEGORY_ALARM);
-        }
+        NumNotBuilder.setVisibility(VISIBILITY_PUBLIC);
+        NumNotBuilder.setCategory(Notification.CATEGORY_ALARM);
     var timemess=            timef.format(System.currentTimeMillis()) + ": " + message;
     showpopupalarm(timemess,false);
     if(!isWearable) {
@@ -1107,21 +1015,14 @@ setDeleteIntent(DeleteReceiver.getDeleteIntent()) .setContentTitle(message);
         NumRemoteViewss.setInt(R.id.text, "setBackgroundColor", WHITE);
         NumRemoteViewss.setTextColor(R.id.text, BLACK);
         NumRemoteViewss.setTextViewText(R.id.text, timemess);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            NumNotBuilder.setCustomContentView(NumRemoteViewss);
-        } else
-            NumNotBuilder.setContent(NumRemoteViewss);
+        NumNotBuilder.setCustomContentView(NumRemoteViewss);
         }
 
     NumNotBuilder.setSmallIcon(draw).setPriority(Notification.PRIORITY_MAX);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NumNotBuilder.setTimeoutAfter(1000L*60*60*2);
-        }
+        NumNotBuilder.setTimeoutAfter(1000L*60*60*2);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
         NumNotBuilder.setGroup("aa1");
-    }
     notificationManager.notify(notid,NumNotBuilder.build());
     }
  public void  amountalarm(String message) {

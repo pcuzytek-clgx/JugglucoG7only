@@ -503,12 +503,10 @@ protected void handleGlucoseResult(long res,long timmsec) {
             charcha[0] = timmsec;
             if(!isWearable) {
                 if(Natives.gethealthConnect( )) {
-                    if(Build.VERSION.SDK_INT >= 28) {
                     if(dohealth(this)) {
                             final long sensorptr = Natives.getsensorptr(dataptr);//TODO: set sensorptr in SuperGattCallback?
                             HealthConnection.Companion.writeAll(sensorptr,SerialNumber);
                             }
-                        }
                     }
                 }
             SensorBluetooth.othersworking(this,timmsec);
@@ -589,9 +587,7 @@ public void searchforDeviceAddress() {
                 tmpgatt.disconnect();
                 tmpgatt.close();
             } catch (Throwable se) {
-                var mess = se.getMessage();
-                mess = mess == null ? "" : mess;
-                String uit = ((Build.VERSION.SDK_INT > 30) ? Applic.getContext().getString(R.string.turn_on_nearby_devices_permission)  : mess) ;
+                String uit = Applic.getContext().getString(R.string.turn_on_nearby_devices_permission);
                 Applic.Toaster(uit);
                 Log.stack(LOG_ID, SerialNumber +" "+ "BluetoothGatt.close()", se);
             }
@@ -647,11 +643,7 @@ public void searchforDeviceAddress() {
                         cb.setGattOptions(newGatt);
                         }
                     else {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            newGatt = device.connectGatt(Applic.app, autoconnect, cb, BluetoothDevice.TRANSPORT_LE);
-                        } else {
-                            newGatt = device.connectGatt(Applic.app, autoconnect, cb);
-                            }
+                        newGatt = device.connectGatt(Applic.app, autoconnect, cb, BluetoothDevice.TRANSPORT_LE);
                         }
                     cb.mBluetoothGatt=newGatt;
                     reconnectWaitingGatt=null;
@@ -660,9 +652,7 @@ public void searchforDeviceAddress() {
                     connectTime= System.currentTimeMillis();
                     }
                 } catch (SecurityException se) {
-                    var mess = se.getMessage();
-                    mess = mess == null ? "" : mess;
-                    String uit = ((Build.VERSION.SDK_INT > 30) ? Applic.getContext().getString(R.string.turn_on_nearby_devices_permission)  : mess) ;
+                    String uit = Applic.getContext().getString(R.string.turn_on_nearby_devices_permission);
                     Applic.Toaster(uit);
 
                     Log.stack(LOG_ID, SerialNumber +" "+ "connectGatt", se);
@@ -691,20 +681,18 @@ private boolean used_priority=false;
     @SuppressLint("MissingPermission")
     void setpriority(BluetoothGatt bluegatt) {
         if(bluegatt!=null) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if(Natives.getpriority()) {
-                   bluegatt.requestConnectionPriority(use_priority);
-                   {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority HIGH");};};
-                   used_priority=true;
-               }
-                else {
-               if(used_priority) {
-                  bluegatt.requestConnectionPriority(CONNECTION_PRIORITY_BALANCED);
-                  {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority LOW");};};
-                  used_priority=false;
-                  }
-               }
-            }
+            if(Natives.getpriority()) {
+               bluegatt.requestConnectionPriority(use_priority);
+               {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority HIGH");};};
+               used_priority=true;
+           }
+            else {
+           if(used_priority) {
+              bluegatt.requestConnectionPriority(CONNECTION_PRIORITY_BALANCED);
+              {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority LOW");};};
+              used_priority=false;
+              }
+           }
             }
         else {
             Log.e(LOG_ID, SerialNumber +" "+"setpriority BluetoothGatt==null");
@@ -713,16 +701,7 @@ private boolean used_priority=false;
 boolean disableNoCheck(BluetoothGatt gatt, BluetoothGattCharacteristic ch) {
         gatt.setCharacteristicNotification(ch, false);
         BluetoothGattDescriptor descriptor = ch.getDescriptor(mCharacteristicConfigDescriptor);
-        if(Build.VERSION.SDK_INT >= 33) {
-              return gatt.writeDescriptor(descriptor,BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)==BluetoothStatusCodes.SUCCESS;
-             }
-         else {
-            if(!descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)) {
-                Log.e(LOG_ID, SerialNumber + " " + "descriptor.setValue())  failed");
-                return false;
-            }
-            return gatt.writeDescriptor(descriptor);
-            }
+        return gatt.writeDescriptor(descriptor,BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)==BluetoothStatusCodes.SUCCESS;
         }
     boolean    disablenotification(BluetoothGatt gatt, BluetoothGattCharacteristic ch) {
         if(isNull(gatt)) {
@@ -775,22 +754,10 @@ static boolean enableGattDescriptornote(String note, BluetoothGatt gatt, Bluetoo
             return false;
             }
 
-        if(Build.VERSION.SDK_INT >= 33) {
-            int res = gatt.writeDescriptor(descriptor, value);
-            if(res != BluetoothStatusCodes.SUCCESS) {
-                Log.e(LOG_ID, note + " writeDescriptor failed " + res);
-                return false;
-                }
-            } 
-        else {
-            if(!descriptor.setValue(value)) {
-                Log.e(LOG_ID, note + " descriptor.setValue failed");
-                return false;
-                }
-            if (!gatt.writeDescriptor(descriptor)) {
-                Log.e(LOG_ID, note + " writeDescriptor failed");
-                return false;
-               }
+        int res = gatt.writeDescriptor(descriptor, value);
+        if(res != BluetoothStatusCodes.SUCCESS) {
+            Log.e(LOG_ID, note + " writeDescriptor failed " + res);
+            return false;
             }
         if(doLog) {
             showbytes(LOG_ID + " " + note + " enableNotification ", value);

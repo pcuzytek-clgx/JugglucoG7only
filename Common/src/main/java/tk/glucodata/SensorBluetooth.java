@@ -48,7 +48,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import androidx.annotation.RequiresApi;
 
 import static android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED;
 import static android.bluetooth.BluetoothDevice.BOND_BONDED;
@@ -214,7 +213,7 @@ private boolean checkdevice(BluetoothDevice device,byte[] advertised) {
         return false;
     } catch (Throwable e) {
         Log.stack(LOG_ID, "checkdevice", e);
-        if (Build.VERSION.SDK_INT > 30 && !Applic.mayscan())
+        if (!Applic.mayscan())
             Applic.Toaster(R.string.turn_on_nearby_devices_permission);
         return true;
     }
@@ -226,9 +225,7 @@ boolean mScanning = false;
 class Scanner21 implements Scanner  {
    final    private ScanSettings mScanSettings;
    private BluetoothLeScanner mBluetoothLeScanner=null;
-     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
      private final ScanCallback mScanCallback = new ScanCallback() {
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
        private synchronized boolean processScanResult(ScanResult scanResult) {
        if(!mScanning) {
             Log.i(LOG_ID,"!mScanning"); 
@@ -244,7 +241,6 @@ class Scanner21 implements Scanner  {
         }
 //    private  boolean resultbusy=false;
 
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onScanResult(int callbackType, ScanResult scanResult) {
             if(doLog) {Log.d(LOG_ID,"onScanResult");};
@@ -277,14 +273,12 @@ class Scanner21 implements Scanner  {
              }
          };
 private static final  boolean alwaysfilter=true;
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     Scanner21() {
         ScanSettings.Builder builder = new ScanSettings.Builder();
         builder.setReportDelay(0);
         mScanSettings = builder.build();
         {if(doLog) {Log.i(LOG_ID,"Scanner21");};};
         }
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public boolean init() {
         {if(doLog) {Log.i(LOG_ID,"Scanner21.init");};};
            return ( (mBluetoothLeScanner = SensorBluetooth.mBluetoothAdapter.getBluetoothLeScanner())!=null);
@@ -293,7 +287,6 @@ private static final  boolean alwaysfilter=true;
 
 private int scanTries=0;
     @SuppressLint("MissingPermission")
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public boolean start()  {
         if(mBluetoothLeScanner!=null) {
            if(doLog) {Log.i(LOG_ID,"Scanner21.start");};
@@ -335,7 +328,7 @@ private int scanTries=0;
                  } 
              catch (Throwable e) {
                 Log.stack(LOG_ID, e);
-                if (Build.VERSION.SDK_INT > 30 && !Applic.mayscan()) Applic.Toaster(R.string.turn_on_nearby_devices_permission);
+                if (!Applic.mayscan()) Applic.Toaster(R.string.turn_on_nearby_devices_permission);
                 return false;
                 }
            return true;
@@ -343,7 +336,6 @@ private int scanTries=0;
         return false;
          }
     @SuppressLint("MissingPermission")
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void stop() {
         if(mBluetoothLeScanner!=null) {
             {if(doLog) {Log.i(LOG_ID,"Scanner21.stop");};};
@@ -357,39 +349,7 @@ private int scanTries=0;
         };
 
         };
-    @SuppressWarnings("deprecation")
-class ArchScanner  implements Scanner {
-   BluetoothAdapter.LeScanCallback mLeScanCallback= new BluetoothAdapter.LeScanCallback () {
-        @Override
-    public  void onLeScan (BluetoothDevice device, int rssi, byte[] scanRecord) {
-        checkdevice(device,scanRecord);
-        }
-    }    ;
-    public boolean init() {
-        {if(doLog) {Log.i(LOG_ID,"ArchScanner.init");};};
-        return true;
-           }
-    @SuppressLint("MissingPermission")
-    public boolean start()  {
-       if(doLog) {Log.d(LOG_ID,"SCAN: starting scan.");};
-       switch(gattcallbacks.size()) {
-             case 0: Log.e(LOG_ID,"nothing to scan for");return false;
-            case 1:
-                final var service=gattcallbacks.get(0).getService();
-                if(service!=null) {
-                      return SensorBluetooth.mBluetoothAdapter.startLeScan(new UUID[] {service},mLeScanCallback);
-                      }
-            }
-        return SensorBluetooth.mBluetoothAdapter.startLeScan(mLeScanCallback);
-          }
-    @SuppressLint("MissingPermission")
-    public void stop() {
-         SensorBluetooth.mBluetoothAdapter.stopLeScan( mLeScanCallback);
-        };
-
-};
-
-Scanner scanner=Build.VERSION.SDK_INT >= 21?new Scanner21():new ArchScanner();
+Scanner scanner=new Scanner21();
 
 final private Runnable mScanTimeoutRunnable = () -> {
     {if(doLog) {Log.i(LOG_ID,"Timeout scanning");};};
@@ -507,7 +467,7 @@ private     boolean scanStarter(long delayMillis) {
       {if(doLog) {Log.i(LOG_ID,"scanStarter("+delayMillis+")");};};
       var main=MainActivity.thisone;
         if(!((main==null&&Applic.mayscan())||(main!=null&&main.finepermission())) ) {
-          Applic.Toaster((Build.VERSION.SDK_INT > 30)?R.string.turn_on_nearby_devices_permission: R.string.turn_on_location_permission );
+          Applic.Toaster(R.string.turn_on_nearby_devices_permission);
          return true;
          }
 
@@ -933,12 +893,6 @@ static private boolean resetDevicePtr(String str,long[] ptrptr) {
     }
 
 
-static public   void goscan() { 
-    if(blueone!=null) {
-        blueone.connectToAllActiveDevices(0);
-        }
-    }
-
     public SensorBluetooth() {
         if(doLog) {Log.v(LOG_ID,"SensorBluetooth");};
         SuperGattCallback.autoconnect=Natives.getAndroid13();
@@ -1103,8 +1057,6 @@ private void addReceivers() {
 private void removeReceivers() {
    removeBluetoothStateReceiver();
    removeBondStateReceiver() ;
-   if(Build.VERSION.SDK_INT <26)
-        removePairingRequestReceiver();
     }
 private BroadcastReceiver bondStateReceiver =null;
 private void addBondStateReceiver() {

@@ -449,18 +449,7 @@ private    int certinbufiter = 0;
 private    int certsize = 0x10000;
 
     static private boolean equalpart(byte[] one, byte[] two, int twofrom) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return Arrays.equals(one, 0, one.length, two, twofrom, twofrom + one.length);
-        } else {
-            final int len = one.length;
-            if ((two.length - twofrom) < len)
-                return false;
-            for (int i = 0; i < len; i++) {
-                if (one[i] != two[i + twofrom])
-                    return false;
-            }
-            return true;
-        }
+        return Arrays.equals(one, 0, one.length, two, twofrom, twofrom + one.length);
     }
 
 private void askcertificate(int pha) {
@@ -848,15 +837,11 @@ private    void getdata(byte[] value) {
                         }
                      } */
                     try {
-                        if(Build.VERSION.SDK_INT >=26) {
-                                var uristr = "android.resource://" + app.getPackageName() + "/" + R.raw.bonded;
-                                Uri uri = Uri.parse(uristr);
-                                Ringtone ring = RingtoneManager.getRingtone(app, uri);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                    ring.setLooping(false);
-                                }
-                                ring.play();
-                                }
+                        var uristr = "android.resource://" + app.getPackageName() + "/" + R.raw.bonded;
+                        Uri uri = Uri.parse(uristr);
+                        Ringtone ring = RingtoneManager.getRingtone(app, uri);
+                        ring.setLooping(false);
+                        ring.play();
                        // Applic.scheduler.schedule(ring::stop, 5, TimeUnit.SECONDS);
                        disablenotification(mBluetoothGatt,charact[1]); charact[1]=null;
                        disablenotification(mBluetoothGatt,charact[3]); charact[3]=null;
@@ -977,11 +962,7 @@ public void close() {
 
 static private PendingIntent mkintents(Context context,String id,int alarmrequest) {
        final int alarmflags;
-       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-               alarmflags = PendingIntent.FLAG_IMMUTABLE;
-               }
-       else
-                alarmflags = 0;
+       alarmflags = PendingIntent.FLAG_IMMUTABLE;
        Intent alarmintent = new Intent(context, ConnectReceiver.class);
        alarmintent.setAction(id);
        return getBroadcast(context, alarmrequest++, alarmintent, alarmflags);

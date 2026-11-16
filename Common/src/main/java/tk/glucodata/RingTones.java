@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.os.Build;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -207,16 +206,14 @@ static private void subEnableControls(View view,boolean enable){
 	CheckDirectionBox disturb=new CheckDirectionBox(context);
 	if(!isWearable) {
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			disturb.setText(R.string.disturb);
-			final boolean dodisturb=getalarmdisturb(kind);
-			disturb.setChecked(dodisturb);
-			disturb.setOnCheckedChangeListener((buttonView,  isChecked) -> {
-				 if (isChecked) {
-					context.asknotificationAccess(); }
-					}
-					);
-			}
+		disturb.setText(R.string.disturb);
+		final boolean dodisturb=getalarmdisturb(kind);
+		disturb.setChecked(dodisturb);
+		disturb.setOnCheckedChangeListener((buttonView,  isChecked) -> {
+			 if (isChecked) {
+				context.asknotificationAccess(); }
+				}
+				);
 		}
 	 EditText waitedit=new EditText(context);
 		waitedit.setMinimumHeight(minheight);
@@ -227,7 +224,7 @@ static private void subEnableControls(View view,boolean enable){
 				hidekeyboard(context);
 				int dur=(str!=null)?Integer.parseInt(str):duration;
 		 		Ringtone ringtone = Notify.mkrings(uri, kind);
-				Notify.playring(ringtone,dur,sound.isChecked(),hasflash&&flashview.isChecked(),vibration.isChecked(),isWearable||Build.VERSION.SDK_INT < Build.VERSION_CODES.M||disturb.isChecked(),kind);
+				Notify.playring(ringtone,dur,sound.isChecked(),hasflash&&flashview.isChecked(),vibration.isChecked(),isWearable||disturb.isChecked(),kind);
 				} catch(Throwable e) {
 				Log.stack(LOG_ID,"play",e);
 					Applic.argToaster(context, context.getString(R.string.can_t_play)+str+ context.getString(R.string.seconds), Toast.LENGTH_SHORT);
@@ -318,7 +315,7 @@ View[] durviews;
       views[start+3]=new View[]{space1,play,Cancel,space2};
       }
    else  {
-      views[start+2]=(Build.VERSION.SDK_INT <Build.VERSION_CODES.M? new View[]{sound}:new View[]{sound,disturb});
+      views[start+2]=new View[]{sound,disturb};
       views[start+3]=new View[]{flashview,vibration};
    }
 	
@@ -396,9 +393,7 @@ View[] durviews;
 				};
 
 			if(!isWearable)  {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					Natives.setalarmdisturb(kind,disturb.isChecked());
-					}
+				Natives.setalarmdisturb(kind,disturb.isChecked());
 				}
 
 			if(parview!=null)

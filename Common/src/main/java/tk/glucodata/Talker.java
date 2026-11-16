@@ -63,7 +63,6 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
-import android.widget.Space;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -81,8 +80,6 @@ static private    long   cursep=50*1000L;
 static private int voicepos=-1;
 static private String playstring=null;
 static private Spinner spinner=null;
-//static final private int minandroid=24; //21
-static final private int minandroid=21; //21
 
 static void getvalues() {
 if(!DontTalk) {
@@ -151,37 +148,35 @@ if(!DontTalk) {
             }
          if(status ==TextToSpeech.SUCCESS) {
             setvalues();
-            if (android.os.Build.VERSION.SDK_INT >= minandroid) {
-                Set<Voice> voices=gine.getVoices();
-                if(voices==null) {
-                    {if(doLog) {Log.i(LOG_ID,"voices==null");};};
-                    }
-                else {
-                    var loc=getlocale();
-   //                    var lang=(context!=null)?context.getString(R.string.language):loc.getLanguage();
-                    var lang=loc.getLanguage();
-                    {if(doLog) {Log.i(LOG_ID,"lang="+lang);};};
+            Set<Voice> voices=gine.getVoices();
+            if(voices==null) {
+                {if(doLog) {Log.i(LOG_ID,"voices==null");};};
+                }
+            else {
+                var loc=getlocale();
+//                    var lang=(context!=null)?context.getString(R.string.language):loc.getLanguage();
+                var lang=loc.getLanguage();
+                {if(doLog) {Log.i(LOG_ID,"lang="+lang);};};
 
-                    voiceChoice.clear();
-                    for(var voice:voices) {
-                        if(lang.equals(voice.getLocale().getLanguage())) {
-                            voiceChoice.add(voice);
-                            }
-                        }
-                    var spin=spinner;
-                    if(spin!=null) {
-                        {if(doLog) {Log.i(LOG_ID,"Talker spinner!=null");};};
-                          Applic.RunOnUiThread(() -> {
-                            spin.setAdapter(new RangeAdapter<Voice>(voiceChoice, Applic.app, voice -> {
-                                    return voice.getName();
-                                    })); 
-                            if(voicepos>=0&&voicepos<voiceChoice.size())
-                                spin.setSelection(voicepos);
-                            });
+                voiceChoice.clear();
+                for(var voice:voices) {
+                    if(lang.equals(voice.getLocale().getLanguage())) {
+                        voiceChoice.add(voice);
                         }
                     }
-                setvoice();
-            }
+                var spin=spinner;
+                if(spin!=null) {
+                    {if(doLog) {Log.i(LOG_ID,"Talker spinner!=null");};};
+                      Applic.RunOnUiThread(() -> {
+                        spin.setAdapter(new RangeAdapter<Voice>(voiceChoice, Applic.app, voice -> {
+                                return voice.getName();
+                                })); 
+                        if(voicepos>=0&&voicepos<voiceChoice.size())
+                            spin.setSelection(voicepos);
+                        });
+                    }
+                }
+            setvoice();
              if(playstring!=null) {
                  speak(playstring);
                  playstring=null;
@@ -223,18 +218,14 @@ if(!DontTalk) {
 
     });
     if(doLog) {Log.i(LOG_ID,"after new TextToSpeech");};
-    if(android.os.Build.VERSION.SDK_INT >= minandroid)
-        engine.setAudioAttributes(talk_audio);
+    engine.setAudioAttributes(talk_audio);
         }
    }
 
 public void speak(String message) {
     if(!DontTalk) {
         try {
-            if(
-                    ((android.os.Build.VERSION.SDK_INT >= 21)?
-                    engine.speak(message, TextToSpeech.QUEUE_FLUSH, null,message):
-                            engine.speak(message, TextToSpeech.QUEUE_FLUSH, null)) ==TextToSpeech.SUCCESS)
+            if(engine.speak(message, TextToSpeech.QUEUE_FLUSH, null,message)==TextToSpeech.SUCCESS)
 
 
             {
@@ -257,18 +248,14 @@ static boolean notifyfocus=false;
 static AudioAttributes talk_audio;
 public void speak(String message, AudioAttributes attr) {
 if(!DontTalk) {
-    if(android.os.Build.VERSION.SDK_INT >= minandroid) {
-        if(attr!=talk_audio) {
-            engine.setAudioAttributes(attr);
-           }
-           }
+    if(attr!=talk_audio) {
+        engine.setAudioAttributes(attr);
+       }
     
 //    engine.speak(message, TextToSpeech.QUEUE_FLUSH, null);
     speak(message);
-    if(android.os.Build.VERSION.SDK_INT >= minandroid) {
-        if(attr!=talk_audio)
-            engine.setAudioAttributes(talk_audio);
-         }
+    if(attr!=talk_audio)
+        engine.setAudioAttributes(talk_audio);
          }
     }
 static long nexttime=0L;
@@ -443,7 +430,7 @@ public static void config(MainActivity context) {
             }
         else
                 Log.i(LOG_ID,"Talker.config spinner==null");  
-        var spin= spinner!=null?spinner:((android.os.Build.VERSION.SDK_INT >= minandroid)? (spinner=getGenSpin(context)):null);
+        var spin= spinner!=null?spinner:(spinner=getGenSpin(context));
 
         int[] spinpos={-1};
         var touchtalk= getcheckbox(context,context.getString(R.string.talk_touch), Natives.gettouchtalk());
@@ -465,26 +452,24 @@ public static void config(MainActivity context) {
         public  void onNothingSelected (AdapterView<?> parent) {
 
         } });
-        if(android.os.Build.VERSION.SDK_INT >= minandroid) { 
-            spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public  void onItemSelected (AdapterView<?> parent, View view, int position, long id) {
-                    {if(doLog) {Log.i(LOG_ID,"onItemSelected "+position);};};
-                    
-                    spinpos[0]=position;
-                    }
-                @Override
-                public  void onNothingSelected (AdapterView<?> parent) {
+        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public  void onItemSelected (AdapterView<?> parent, View view, int position, long id) {
+                {if(doLog) {Log.i(LOG_ID,"onItemSelected "+position);};};
 
-                } });
-            spin.setAdapter(new RangeAdapter<Voice>(voiceChoice, context, voice -> {
-                    return voice.getName();
-                    }));
-            {if(doLog) {Log.i(LOG_ID,"voicepos="+voicepos);};};
-            if(voicepos>=0&&voicepos<voiceChoice.size())
-                spin.setSelection(voicepos);
-            spinpos[0]=-1;
-            }
+                spinpos[0]=position;
+                }
+            @Override
+            public  void onNothingSelected (AdapterView<?> parent) {
+
+            } });
+        spin.setAdapter(new RangeAdapter<Voice>(voiceChoice, context, voice -> {
+                return voice.getName();
+                }));
+        {if(doLog) {Log.i(LOG_ID,"voicepos="+voicepos);};};
+        if(voicepos>=0&&voicepos<voiceChoice.size())
+            spin.setSelection(voicepos);
+        spinpos[0]=-1;
         ViewGroup layout;
     var schedules=getbutton(context,R.string.schedules);
 
@@ -514,14 +499,7 @@ public static void config(MainActivity context) {
            }
         else {
             View[]  firstrow; 
-            if(android.os.Build.VERSION.SDK_INT >= minandroid) { 
-                 firstrow=new View[]{active,seplabel,separation,voicelabel,spin};
-                 }
-            else {
-                var space=new Space(context);
-                space.setMinimumWidth((int)(width*0.4));
-                firstrow=new View[]{active,seplabel,separation,space};
-              }
+            firstrow=new View[]{active,seplabel,separation,voicelabel,spin};
             var secondrow=new View[]{touchtalk, speakmessages, speakalarms };
             var marghor= (int)(width*.05f);
 
@@ -532,7 +510,7 @@ public static void config(MainActivity context) {
             layout= new Layout(context,(l,w,h)-> {
                 return new int[] {w,h};
                 },firstrow,secondrow,new View[]{speedlabel,speeds[1],speeds[0],pro},new View[]{pitchlabel,pitchs[1],pitchs[0],mediasound}, new View[]{cancel,helpview,schedules,test,save}).portraitLayout( new View[]{active},new View[]{seplabel,separation},
-android.os.Build.VERSION.SDK_INT >= minandroid?new View[]{voicelabel,spin}:null, new View[]{touchtalk, speakmessages}, new View[]{speakalarms,mediasound},new View[]{speedlabel,speeds[1],speeds[0]},new View[]{pitchlabel,pitchs[1],pitchs[0]},  new View[]{pro,schedules},new View[]{helpview,test},new View[]{cancel,save}).systembarPadding((left,top,right,bottom)->new int[]{left+(int)(density*5.0),top,right+(int)(density*8.0),bottom});
+new View[]{voicelabel,spin}, new View[]{touchtalk, speakmessages}, new View[]{speakalarms,mediasound},new View[]{speedlabel,speeds[1],speeds[0]},new View[]{pitchlabel,pitchs[1],pitchs[0]},  new View[]{pro,schedules},new View[]{helpview,test},new View[]{cancel,save}).systembarPadding((left,top,right,bottom)->new int[]{left+(int)(density*5.0),top,right+(int)(density*8.0),bottom});
 
             }
 
@@ -557,12 +535,10 @@ android.os.Build.VERSION.SDK_INT >= minandroid?new View[]{voicelabel,spin}:null,
             });
         Runnable getvalues=()-> {
             try {
-                if (android.os.Build.VERSION.SDK_INT >= minandroid) {
-                    int pos=spinpos[0];
-                    if(pos>=0) {
-                        voicepos=pos;
-                        }
-                      }
+                int pos=spinpos[0];
+                if(pos>=0) {
+                    voicepos=pos;
+                    }
                  var str = separation.getText().toString();
                 if(str != null) {
                     cursep = Integer.parseInt(str)*1000L;
@@ -637,56 +613,41 @@ android.os.Build.VERSION.SDK_INT >= minandroid?new View[]{voicelabel,spin}:null,
         }
   }
 static public void maketalk_audio() {
-    if(android.os.Build.VERSION.SDK_INT >= 21) {
-        int type=Natives.getSoundType( );
-        Log.i(LOG_ID,"getSoundType()="+type);
-        if(type==0) {
-            type=isWearable? USAGE_ASSISTANCE_SONIFICATION: AudioAttributes.USAGE_NOTIFICATION;
-            } 
-        talk_audio=new AudioAttributes.Builder().setUsage(type).build();
-        if(android.os.Build.VERSION.SDK_INT >= 26) {
-                talkaudiofocusrequest = new AudioFocusRequest.Builder( AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes( talk_audio ).build();
-                Log.i(LOG_ID, "audiofocusrequest  has value");
-                }
-         else {
-                talkaudiofocusrequest =null;
-                Log.i(LOG_ID, "audiofocusrequest=null");
-                }
-        }
-    else {
-                talk_audio=null;
-        }
+    int type=Natives.getSoundType( );
+    Log.i(LOG_ID,"getSoundType()="+type);
+    if(type==0) {
+        type=isWearable? USAGE_ASSISTANCE_SONIFICATION: AudioAttributes.USAGE_NOTIFICATION;
+        } 
+    talk_audio=new AudioAttributes.Builder().setUsage(type).build();
+    talkaudiofocusrequest = new AudioFocusRequest.Builder( AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes( talk_audio ).build();
+    Log.i(LOG_ID, "audiofocusrequest  has value");
     }
 
 static private AudioFocusRequest talkaudiofocusrequest;
 static private boolean turnfocusoff=false;
         static void doTurnFocusoff() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                final var wasturnoff=turnfocusoff;
-                turnfocusoff=false;
-                if(wasturnoff) {
-                    Notify.audioManager.abandonAudioFocusRequest(talkaudiofocusrequest);
-                }
+            final var wasturnoff=turnfocusoff;
+            turnfocusoff=false;
+            if(wasturnoff) {
+                Notify.audioManager.abandonAudioFocusRequest(talkaudiofocusrequest);
             }
         }
 
         static void doTurnFocuson() {
-            if(android.os.Build.VERSION.SDK_INT >= 26) {
-                if(!turnfocusoff) {
-                    switch(Notify.audioManager.requestAudioFocus(talkaudiofocusrequest)) {
-                        case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
-                            Log.i(LOG_ID,"REQUEST_FAILED");
-                            break;
+            if(!turnfocusoff) {
+                switch(Notify.audioManager.requestAudioFocus(talkaudiofocusrequest)) {
+                    case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
+                        Log.i(LOG_ID,"REQUEST_FAILED");
+                        break;
 
-                        case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
-                            turnfocusoff=true;
-                            Log.i(LOG_ID,"REQUEST_GRANTED");
-                            break;
-                        case AudioManager.AUDIOFOCUS_REQUEST_DELAYED:
-                            Log.i(LOG_ID,"REQUEST_DELAYED");
-                            break;
-                    };
-                }
+                    case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
+                        turnfocusoff=true;
+                        Log.i(LOG_ID,"REQUEST_GRANTED");
+                        break;
+                    case AudioManager.AUDIOFOCUS_REQUEST_DELAYED:
+                        Log.i(LOG_ID,"REQUEST_DELAYED");
+                        break;
+                };
             }
         }
 

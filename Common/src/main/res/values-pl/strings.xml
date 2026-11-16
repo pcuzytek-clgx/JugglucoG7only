@@ -55,6 +55,10 @@
     <string name="dontchangeamounts">Klon wysyła wartości</string>
     <string name="thishost">Ten host:</string>
     <string name="dozemode">Tryb uśpienia?</string>
+    <string name="companion">Companion</string>
+    <string name="companion_done">Sensor powiązany jako urządzenie towarzyszące</string>
+    <string name="companion_nosensor">Brak jeszcze adresu sensora</string>
+    <string name="companion_failed">Powiązanie nie powiodło się: %1$s</string>
     <string name="sync">Synchr.</string>
     <string name="alarms">Alarmy</string>
     <string name="save">Zapisz</string>

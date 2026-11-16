@@ -38,7 +38,6 @@ import static tk.glucodata.util.getbutton;
 import static tk.glucodata.util.getcheckbox;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.View;
@@ -126,12 +125,7 @@ void setSensorptrText(long sensorptr) {
     settext(Natives.sensortextfromSensorptr(sensorptr));
     }
 void settext(String text) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            textview.setText(fromHtml(text,TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
-            }
-        else {
-            textview.setText(fromHtml(text));
-            }
+        textview.setText(fromHtml(text,TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
          }
 Button use;
 Sensors(MainActivity act,boolean givehelp,boolean select) {
@@ -282,8 +276,6 @@ private static void useAgain(MainActivity act,long sensorptr) {
            if(res) {
                 act.finepermission(); 
                 }
-              else
-                act.systemlocation();
             }
        Applic.wakemirrors();
        act.requestRender();

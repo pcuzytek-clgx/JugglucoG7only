@@ -24,7 +24,6 @@ package tk.glucodata;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.PowerManager;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -56,60 +55,58 @@ static void batteryscreen(MainActivity context,View parent ) {
 	if(parent!=null)
 		parent.setVisibility(INVISIBLE);
 if(!isWearable) {
-	if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-		Button Close=getbutton(context,R.string.closename);
-		TextView info=new TextView(context);
+	Button Close=getbutton(context,R.string.closename);
+	TextView info=new TextView(context);
 
-		  final CheckDirectionBox battery = new CheckDirectionBox(context);
+	  final CheckDirectionBox battery = new CheckDirectionBox(context);
 
-		   int pad=(int)(GlucoseCurve.metrics.density*7.0);
-		   info.setPadding(pad,0,pad,0);
+	   int pad=(int)(GlucoseCurve.metrics.density*7.0);
+	   info.setPadding(pad,0,pad,0);
 
-		sethtml(info, R.string.battery);
-
-
-		battery.setText(R.string.dozeupdate);
-		final PowerManager pm = (PowerManager)context.getSystemService(Activity.POWER_SERVICE);
-		boolean isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(context.getPackageName());
-		battery.setChecked(isIgnoringBatteryOptimizations);
-		context.themeLightBars();
-                final var hormarg=(int)(GlucoseCurve.metrics.density*32.0);
-
-                getMargins(battery).setMarginStart(hormarg);
-                getMargins(Close).setMarginEnd(hormarg);
-               final Layout lay=new Layout(context, (l, w, h) -> {
-			return new int[] {w,h}; } , new View[]{info}
-			,isWearable?new View[]{Close}:new View[]{battery,Close}). systembarPadding();
+	sethtml(info, R.string.battery);
 
 
+	battery.setText(R.string.dozeupdate);
+	final PowerManager pm = (PowerManager)context.getSystemService(Activity.POWER_SERVICE);
+	boolean isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(context.getPackageName());
+	battery.setChecked(isIgnoringBatteryOptimizations);
+	context.themeLightBars();
+               final var hormarg=(int)(GlucoseCurve.metrics.density*32.0);
 
-		Runnable closerun=()-> {
-			if(parent!=null)
-				parent.setVisibility(VISIBLE);
-			lay.setVisibility(GONE);
-			removeContentView(lay); 
+               getMargins(battery).setMarginStart(hormarg);
+               getMargins(Close).setMarginEnd(hormarg);
+              final Layout lay=new Layout(context, (l, w, h) -> {
+		return new int[] {w,h}; } , new View[]{info}
+		,isWearable?new View[]{Close}:new View[]{battery,Close}). systembarPadding();
 
-			if(!context.showui)
-   				context.lightBars(!getInvertColors( ));
-			};
-		context.setonback(closerun);
-		battery.setOnClickListener(v-> {
-			context.doonback();
-			try{
-				context.startActivityForResult(new Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-				} catch(Throwable th) {
-					Log.stack(LOG_ID,"ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS",th);
-					}
-			});
-		Close.setOnClickListener(v-> context.doonback());
-	      lay.setBackgroundResource(R.drawable.dialogbackground);
-		ScrollView scroll=new ScrollView(context);
-	  	scroll.setFillViewport(true);
 
-		scroll.addView(lay);
+
+	Runnable closerun=()-> {
+		if(parent!=null)
+			parent.setVisibility(VISIBLE);
+		lay.setVisibility(GONE);
+		removeContentView(lay); 
+
+		if(!context.showui)
+  				context.lightBars(!getInvertColors( ));
+		};
+	context.setonback(closerun);
+	battery.setOnClickListener(v-> {
+		context.doonback();
+		try{
+			context.startActivityForResult(new Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+			} catch(Throwable th) {
+				Log.stack(LOG_ID,"ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS",th);
+				}
+		});
+	Close.setOnClickListener(v-> context.doonback());
+      lay.setBackgroundResource(R.drawable.dialogbackground);
+	ScrollView scroll=new ScrollView(context);
+  	scroll.setFillViewport(true);
+
+	scroll.addView(lay);
 //		context.addMyContentView(scroll, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-		context.addMyContentView(scroll, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-		}
+	context.addMyContentView(scroll, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
 		}
 	}
 

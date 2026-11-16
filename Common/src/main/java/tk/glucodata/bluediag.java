@@ -29,7 +29,6 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Paint;
-import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -521,6 +520,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
     final Button close=getbutton(act,R.string.closename);
     final Button help=isWearable?null:getbutton(act,R.string.helpname);
     final Button background=isWearable?null:getbutton(act,R.string.dozemode);
+    final Button companion=isWearable?null:getbutton(act,R.string.companion);
 
     final Layout content;
     final View showview;
@@ -581,7 +581,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
                 new View[]{scanview},
                 new View[]{spin,address,forget,streaming},
                 new View[]{diagnosticScroll},
-                new View[]{help,usebluetooth,background},
+                new View[]{help,usebluetooth,background,companion},
                 new View[]{priority,android13,rssiview,close})
                 .portraitLayout(
                 new View[]{bluestate},
@@ -595,6 +595,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
                 new View[]{diagnosticScroll},
                 new View[]{help,usebluetooth},
                 new View[]{background,priority},
+                new View[]{companion},
                 new View[]{android13,close});
         content.setPadding(dp(15),dp(9),dp(2),dp(9));
 
@@ -652,7 +653,6 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
     streamhistory.setOnCheckedChangeListener( (buttonView,  isChecked) -> Natives.setStreamHistory(isChecked) );
     alarmclock.setOnCheckedChangeListener( (buttonView,  isChecked) -> Natives.setalarmclock(isChecked) );
 
-     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
     priority.setOnCheckedChangeListener(
                  (buttonView,  isChecked) -> {
              final boolean priorityused = Natives.getpriority();
@@ -661,12 +661,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
                 }
          }
          );
-        }
-    else  {
-        {if(doLog) {Log.i(LOG_ID,"priority.setVisibility(INVISIBLE);");};};
-       priority.setVisibility(INVISIBLE);
-       }
-    boolean hasperm=Build.VERSION.SDK_INT < 23||Applic.noPermissions(act).length==0;
+    boolean hasperm=Applic.noPermissions(act).length==0;
     if(!isWearable)  {
         if(hasperm)   {
             {if(doLog) {Log.i(LOG_ID,"locationpermission.setVisibility(GONE);");};};
@@ -725,13 +720,14 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
         }
     if(!isWearable) {
         help.setOnClickListener(v-> helplight(R.string.sensorhelp,act));
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            background.setOnClickListener(v-> Battery.batteryscreen(act,showview));
-            }
-        else  {
-        {if(doLog) {Log.i(LOG_ID,"background.setVisibility(GONE);");};};
-            background.setVisibility(GONE);
-            }
+        background.setOnClickListener(v-> Battery.batteryscreen(act,showview));
+        companion.setOnClickListener(v-> {
+            if(gatts==null||gatts.isEmpty()) {
+                CompanionLink.associate(act,null);
+                return;
+                }
+            CompanionLink.associate(act,gatts.get(gattselected<gatts.size()?gattselected:0).mActiveDeviceAddress);
+            });
         }
 
 
@@ -860,7 +856,7 @@ private void showall() {
         }
     if(!isWearable) {
         activity.setfineres(()-> {
-        if( Build.VERSION.SDK_INT < 23|| Applic.noPermissions(activity).length==0) {
+        if(Applic.noPermissions(activity).length==0) {
             {if(doLog) {Log.i(LOG_ID,"locationpermissin.setVisibility(GONE);");};};
             locationpermission.setVisibility(GONE);
             }
@@ -871,7 +867,7 @@ private void showall() {
         priority.setChecked(Natives.getpriority());
     streamhistory.setChecked(Natives.getStreamHistory( ));
     if(!isWearable) {
-        if( Build.VERSION.SDK_INT < 23|| Applic.noPermissions(activity).length==0) {
+        if(Applic.noPermissions(activity).length==0) {
             {if(doLog) {Log.i(LOG_ID,"locationpermissin.setVisibility(GONE);");};};
             locationpermission.setVisibility(GONE);
             }
@@ -901,18 +897,16 @@ private void show(MainActivity act,View view) {
     }
 
   private static  void setpriorities(boolean isChecked,ArrayList<SuperGattCallback> gatts) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          Natives.setpriority(isChecked);
-          if(gatts!=null) {
-              final int use_priority = isChecked ? CONNECTION_PRIORITY_HIGH : CONNECTION_PRIORITY_BALANCED;
-              for (SuperGattCallback g : gatts) {
-                  try {
-                      var ga = g.mBluetoothGatt;
-                      if (ga != null)
-                          ga.requestConnectionPriority(use_priority);
-                  } catch (Throwable th) {
-                      Log.stack(LOG_ID, "setpriorities", th);
-                  }
+      Natives.setpriority(isChecked);
+      if(gatts!=null) {
+          final int use_priority = isChecked ? CONNECTION_PRIORITY_HIGH : CONNECTION_PRIORITY_BALANCED;
+          for (SuperGattCallback g : gatts) {
+              try {
+                  var ga = g.mBluetoothGatt;
+                  if (ga != null)
+                      ga.requestConnectionPriority(use_priority);
+              } catch (Throwable th) {
+                  Log.stack(LOG_ID, "setpriorities", th);
               }
           }
       }

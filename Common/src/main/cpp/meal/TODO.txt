@@ -1,3 +1,0 @@
-Add check naast numer of items
-test op ingredient nummbers
-herstel verkeerde mealindex

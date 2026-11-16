@@ -154,12 +154,6 @@ public final class BleMirror {
     private static final int MAX_QUEUED_BYTES=1024*1024;
     private static final long HANDSHAKE_TIMEOUT_MILLIS=30L*1000L;
     private static final long SUBSCRIPTION_TIMEOUT_MILLIS=8L*1000L;
-    // Android 5.0/5.1 can accept BluetoothGatt.writeDescriptor() locally but
-    // then neither transmit the CCCD write nor deliver onDescriptorWrite().
-    // A working CCCD write normally completes in a fraction of a second, so
-    // do not spend eight seconds on this known-dead setup path before trying
-    // the opposite physical GATT role.
-    private static final long LEGACY_SUBSCRIPTION_TIMEOUT_MILLIS=2500L;
     private static final long CACHE_REFRESH_SETTLE_MILLIS=1000L;
     // Some older/vendor BLE controllers reject LE Create Connection while
     // application scanning/advertising is still active. Serialize the radio
@@ -279,7 +273,6 @@ public final class BleMirror {
     // stalls until Bluetooth is restarted.  Treat API 21-22 as a one-session
     // radio and time-share that session between peers instead of poisoning the
     // controller with concurrent GATT work.
-    private static final int LEGACY_SINGLE_GATT_MAX_SDK=22;
     private static final long LEGACY_STANDBY_RELEASE_MILLIS=1500L;
     private static final long LEGACY_SLOT_IDLE_MILLIS=2500L;
     // A reversed-server peer may need to remain advertised until the other side
@@ -1049,7 +1042,8 @@ public final class BleMirror {
     }
 
     private static boolean legacySingleGattLocked() {
-        return Build.VERSION.SDK_INT<=LEGACY_SINGLE_GATT_MAX_SDK;
+        // Only applied to API 21-22; minSdk is 36.
+        return false;
     }
 
     /** Any physical BLE mirror session, including a connection still authenticating. */
@@ -1289,8 +1283,7 @@ public final class BleMirror {
             // that ordering.  While an Automatic fallback is genuinely pending,
             // modern Android server-role peers periodically scan so they can find
             // and initiate that resource-balanced peripheral connection.
-            return Build.VERSION.SDK_INT>FRAGILE_MULTI_CLIENT_GATT_MAX_SDK&&
-                    link.transport==TRANSPORT_AUTOMATIC&&
+            return link.transport==TRANSPORT_AUTOMATIC&&
                     link.automaticFallbackRequested;
         }
         return link.transport==TRANSPORT_BLUETOOTH||
@@ -1298,16 +1291,13 @@ public final class BleMirror {
     }
 
     private static boolean canReverseScanLocked() {
-        if(Build.VERSION.SDK_INT>=31)
-            return Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_SCAN);
-        return Applic.mayscan();
+        return Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_SCAN);
     }
 
     private static boolean canReverseAdvertiseLocked() {
         if(adapter==null)
             return false;
-        if(Build.VERSION.SDK_INT>=31&&
-                !Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_ADVERTISE))
+        if(!Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_ADVERTISE))
             return false;
         try { return adapter.getBluetoothLeAdvertiser()!=null; }
         catch(Throwable error) {
@@ -1527,23 +1517,12 @@ public final class BleMirror {
         boolean accepted=false;
         try {
             if(connection.serverSide&&gattServer!=null&&connection.device!=null&&connection.serverTx!=null) {
-                if(Build.VERSION.SDK_INT>=33)
-                    accepted=gattServer.notifyCharacteristicChanged(connection.device,connection.serverTx,true,value)==
+                accepted=gattServer.notifyCharacteristicChanged(connection.device,connection.serverTx,true,value)==
                             BluetoothGatt.GATT_SUCCESS;
-                else {
-                    connection.serverTx.setValue(value);
-                    accepted=gattServer.notifyCharacteristicChanged(connection.device,connection.serverTx,true);
-                }
             }
             else if(!connection.serverSide&&connection.gatt!=null&&connection.rx!=null) {
-                if(Build.VERSION.SDK_INT>=33)
-                    accepted=connection.gatt.writeCharacteristic(connection.rx,value,
+                accepted=connection.gatt.writeCharacteristic(connection.rx,value,
                             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)==BluetoothGatt.GATT_SUCCESS;
-                else {
-                    connection.rx.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-                    connection.rx.setValue(value);
-                    accepted=connection.gatt.writeCharacteristic(connection.rx);
-                }
             }
         }
         catch(Throwable error) {
@@ -2770,18 +2749,14 @@ public final class BleMirror {
     private static String operationBlockerLocked(Link link) {
         if(adapter==null||bluetoothManager==null)
             return "Bluetooth LE is unavailable on this device";
-        if(Build.VERSION.SDK_INT>=31) {
-            if(!Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_CONNECT))
-                return "Nearby devices permission for Bluetooth connections is not granted";
-            if(link.role==ROLE_CLIENT&&!link.reverseGattRole&&
-                    !Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_SCAN))
-                return "Nearby devices permission for Bluetooth scanning is not granted";
-            if(offersGattServerLocked(link)&&
-                    !Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_ADVERTISE))
-                return "Nearby devices permission for Bluetooth advertising is not granted";
-        }
-        else if(link.role==ROLE_CLIENT&&!link.reverseGattRole&&!Applic.mayscan())
-            return "Location permission for Bluetooth scanning is not granted";
+        if(!Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_CONNECT))
+            return "Nearby devices permission for Bluetooth connections is not granted";
+        if(link.role==ROLE_CLIENT&&!link.reverseGattRole&&
+                !Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_SCAN))
+            return "Nearby devices permission for Bluetooth scanning is not granted";
+        if(offersGattServerLocked(link)&&
+                !Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_ADVERTISE))
+            return "Nearby devices permission for Bluetooth advertising is not granted";
         try {
             if(!adapter.isEnabled())
                 return "Bluetooth is switched off";
@@ -3561,8 +3536,7 @@ public final class BleMirror {
         // optional process-wide reverse scan while a healthy link exists. The
         // authenticated resource-role request used by the fragile XA1 handoff is
         // exempt because that is an explicit peer-directed role change.
-        if(Build.VERSION.SDK_INT>FRAGILE_MULTI_CLIENT_GATT_MAX_SDK&&
-                hasAuthenticatedBleConnectionLocked()&&
+        if(hasAuthenticatedBleConnectionLocked()&&
                 !hasResourceReverseProbeCandidateLocked()) {
             final long now=monotonicMillis();
             if(now-lastModernReverseProbeSuppressedLogMillis>=DISCOVERY_LOG_MILLIS) {
@@ -3865,7 +3839,8 @@ public final class BleMirror {
     }
 
     private static boolean fragileMultiClientGattLocked() {
-        return Build.VERSION.SDK_INT<=FRAGILE_MULTI_CLIENT_GATT_MAX_SDK;
+        // Only applied to API <=27; minSdk is 36.
+        return false;
     }
 
     private static Connection otherReadyClientConnectionLocked(Link except) {
@@ -4494,10 +4469,8 @@ public final class BleMirror {
             final Link link=connection.link;
             final BluetoothGattCallback callback=newClientCallback(connection);
             try {
-                connection.gatt=Build.VERSION.SDK_INT>=23?
-                        connection.device.connectGatt(Applic.app,false,callback,
-                                BluetoothDevice.TRANSPORT_LE):
-                        connection.device.connectGatt(Applic.app,false,callback);
+                connection.gatt=connection.device.connectGatt(Applic.app,false,callback,
+                        BluetoothDevice.TRANSPORT_LE);
                 if(connection.gatt==null) {
                     disconnectConnectionLocked(connection,
                             "Could not create a BLE GATT connection",false);
@@ -4719,8 +4692,7 @@ public final class BleMirror {
 
     private static void scheduleSubscriptionTimeoutLocked(Connection connection) {
         final long epoch=connection.epoch;
-        final long timeout=Build.VERSION.SDK_INT<=22?
-                LEGACY_SUBSCRIPTION_TIMEOUT_MILLIS:SUBSCRIPTION_TIMEOUT_MILLIS;
+        final long timeout=SUBSCRIPTION_TIMEOUT_MILLIS;
         handler.postDelayed(() -> {
             synchronized(lock) {
                 // A ready connection can legitimately be here while recovering
@@ -5543,13 +5515,8 @@ public final class BleMirror {
             }
             final boolean accepted;
             connection.subscriptionRequested=true;
-            if(Build.VERSION.SDK_INT>=33)
-                accepted=connection.gatt.writeDescriptor(cccd,
+            accepted=connection.gatt.writeDescriptor(cccd,
                         BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)==BluetoothGatt.GATT_SUCCESS;
-            else {
-                cccd.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-                accepted=connection.gatt.writeDescriptor(cccd);
-            }
             if(!accepted) {
                 connection.subscriptionRequested=false;
                 handler.post(() -> disconnectForFailure(connection,
@@ -5859,21 +5826,6 @@ public final class BleMirror {
                         return;
                 }
                 fragmentFinished(connection,statusCode);
-            }
-
-            @Override @SuppressWarnings("deprecation") public void onCharacteristicChanged(
-                    BluetoothGatt gatt,BluetoothGattCharacteristic characteristic) {
-                synchronized(lock) {
-                    if(!connection.alive||gatt!=connection.gatt)
-                        return;
-                }
-                if(Build.VERSION.SDK_INT<33&&connection.tx!=null&&
-                        connection.tx.getUuid().equals(characteristic.getUuid())) {
-                    final byte[] value=characteristic.getValue();
-                    Log.i(LOG_ID,"onCharacteristicChanged: label="+connectionLabel(connection)+
-                            " valueBytes="+(value==null?-1:value.length));
-                    receivedFragment(connection,value);
-                }
             }
 
             @Override public void onCharacteristicChanged(BluetoothGatt gatt,

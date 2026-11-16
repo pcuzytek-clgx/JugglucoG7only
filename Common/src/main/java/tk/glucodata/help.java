@@ -136,10 +136,7 @@ public static   void basehelp(int res,ContextThemeWrapper act,Consumer<ViewGroup
         }
 
 public static void setHtmlIgnoringHtmlColors(TextView textView, String html) {
-    Spanned spanned =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-            ? fromHtml(html, TO_HTML_PARAGRAPH_LINES_CONSECUTIVE)
-            : fromHtml(html);
+    Spanned spanned = fromHtml(html, TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
 
     SpannableStringBuilder cleaned = new SpannableStringBuilder(spanned);
 
@@ -826,19 +823,11 @@ public static   void help(String text,ContextThemeWrapper act,Consumer<ViewGroup
          final View buttonsForInsets=buttons;
          final View searchBarForInsets=helpSearch.bar;
          helplayout.setOnApplyWindowInsetsListener((v, insets) -> { int left, top, right, bottom;
-             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                 var bars = insets.getInsets(WindowInsets.Type.systemBars());
-                 left   = bars.left;
-                 top    = bars.top;
-                 right  = bars.right;
-                 bottom = bars.bottom;
-             }
-             else {
-                 left   = insets.getSystemWindowInsetLeft();
-                 top    = insets.getSystemWindowInsetTop();
-                 right  = insets.getSystemWindowInsetRight();
-                 bottom = insets.getSystemWindowInsetBottom();
-             }
+             var bars = insets.getInsets(WindowInsets.Type.systemBars());
+             left   = bars.left;
+             top    = bars.top;
+             right  = bars.right;
+             bottom = bars.bottom;
 
              setHelpInsets(rootForInsets, helpview, buttonsForInsets, searchBarForInsets, pad, left, top, right, bottom);
              return insets;

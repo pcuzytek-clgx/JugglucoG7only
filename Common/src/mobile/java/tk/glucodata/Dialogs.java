@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.graphics.text.LineBreakConfig;
 import android.graphics.text.LineBreaker;
 import android.net.Uri;
-import android.os.Build;
 import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,18 +130,14 @@ public void showexport(MainActivity activity,int width,int height,View parent) {
                 );
 
         exportlabel=new TextView(activity);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            exportlabel.setElegantTextHeight(true);
-        }
+        exportlabel.setElegantTextHeight(true);
         exportlabel.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
         
    //     exportlabel.setLayoutParams(new ViewGroup.LayoutParams(  (int)(width*(smallScreen?0.6f:.33f)), WRAP_CONTENT));
         exportlabel.setLayoutParams(new ViewGroup.LayoutParams(  MATCH_PARENT, WRAP_CONTENT));
         exportlabel.setSingleLine(false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            exportlabel.setBreakStrategy(BREAK_STRATEGY_SIMPLE);
-        }
+        exportlabel.setBreakStrategy(BREAK_STRATEGY_SIMPLE);
         final int rand=Math.round(5*density);
         final int leftright=Math.round(2*density);
         exportlabel.setPadding(leftright,rand,0,rand);

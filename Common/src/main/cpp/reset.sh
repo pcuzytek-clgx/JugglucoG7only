@@ -1,1 +1,0 @@
-sed -e 's/^.*FindClass.*$//g; s/^.*GetMethodID.*$//g; s/^.*GetStaticMethodID.*$//g; s/^.*GetFieldID.*$//g; s/^.*GetStaticFieldID.*$//g; s/^.*GetStringUTFChars.*$//g; s/^.*GetStringUTFRegion.*$//g; s/^.*NewStringUTF.*$//g;s/^.*\.\.\..*$//g'

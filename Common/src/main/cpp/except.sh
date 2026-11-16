@@ -1,1 +1,0 @@
-grep -e '(ReleaseStringUTFChars\| GetStringUTFChars\| GetStringUTFRegion\| GetMethodID\| GetStaticMethodID\| GetFieldID\| GetStaticFieldID\| NewStringUTF\| FindClass\| CallObjectMethod\| NewObject\| DeleteLocalRef\| DeleteLocalRef\| niets )'

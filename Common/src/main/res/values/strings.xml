@@ -55,6 +55,10 @@
     <string name="dontchangeamounts">Mirror sends amounts</string>
     <string name="thishost">This host:</string>
     <string name="dozemode">Doze mode?</string>
+    <string name="companion">Companion</string>
+    <string name="companion_done">Sensor associated as companion device</string>
+    <string name="companion_nosensor">No sensor address yet</string>
+    <string name="companion_failed">Companion association failed: %1$s</string>
     <string name="sync">Sync</string>
     <string name="alarms">Alarms</string>
     <string name="save">Save</string>

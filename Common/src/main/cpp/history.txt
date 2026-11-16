@@ -1,4 +1,0 @@
-Change history
-glucose.cpp
-
-//bool setbackuptime(crypt_t *pass,int sock,int ind,uint32_t starttime) {

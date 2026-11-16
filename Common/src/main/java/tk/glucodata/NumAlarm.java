@@ -28,7 +28,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import java.util.ArrayList;
 
@@ -139,26 +138,18 @@ static  private  void setalarm(Context context, long alarmtime,boolean profiles)
         if(profiles)
             alarmintent.setAction(scheduleProfileAlarm);
 	final int alarmflags;
-	if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-	   alarmflags = PendingIntent.FLAG_IMMUTABLE;
-	}
-	else
-	   alarmflags = 0;
+	alarmflags = PendingIntent.FLAG_IMMUTABLE;
 
         PendingIntent onalarm = getBroadcast(context, alarmrequest, alarmintent, alarmflags);
         AlarmManager manager= (AlarmManager) context.getSystemService(ALARM_SERVICE);
 //	manager.cancel(onalarm);//is done automatically
         final int type=RTC_WAKEUP;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(isWearable) {
-                 manager.setAlarmClock(new AlarmManager.AlarmClockInfo(alarmtime, onalarm), onalarm);
-                 }
-            else  {
-                manager.setExactAndAllowWhileIdle(type,alarmtime,onalarm);
-                }
+        if(isWearable) {
+             manager.setAlarmClock(new AlarmManager.AlarmClockInfo(alarmtime, onalarm), onalarm);
+             }
+        else  {
+            manager.setExactAndAllowWhileIdle(type,alarmtime,onalarm);
             }
-        else
-            manager.setExact(type,alarmtime,onalarm);
     }
 
 

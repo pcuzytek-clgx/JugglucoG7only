@@ -24,7 +24,6 @@ package tk.glucodata
 import android.content.Intent
 import android.health.connect.datatypes.Metadata
 import android.net.Uri
-import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.health.connect.client.HealthConnectClient
 //import androidx.health.connect.client.permission.HealthPermission.Companion.getReadPermission
@@ -115,12 +114,11 @@ private suspend fun checkPermissionsAndRun(act:MainActivity?) {
 
 companion object {
     val PERMISSIONS =
-        if(Build.VERSION.SDK_INT < 28) setOf("") else
-            setOf(
-                getWritePermission(
-                    BloodGlucoseRecord::class
-                )
+        setOf(
+            getWritePermission(
+                BloodGlucoseRecord::class
             )
+        )
     var hasPermission = false
     private const val LOG_ID = "HealthConnection"
    @Volatile
@@ -146,10 +144,6 @@ companion object {
    }
 private suspend   fun susinit(context: MainActivity): Int {
 
-           if (Build.VERSION.SDK_INT < 28) {
-               return HealthConnectClient.SDK_UNAVAILABLE
-
-           }
            return try {
                var ret = HealthConnectClient.getSdkStatus(context)
                when (ret) {
