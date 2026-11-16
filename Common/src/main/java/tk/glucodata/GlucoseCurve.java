@@ -154,19 +154,12 @@ private void removeSearchEditor() {
     numberview.hidekeyboard();
     editfocus.clearedittext(under);
     editfocus.clearedittext(above);
-    editfocus.clearedittext(mealquantity);
-    if(meallayout!=null) {
-        removeContentView(meallayout);
-        meallayout=null;
-        }
     if(search!=null) {
         removeContentView(search);
         search=null;
         }
     under=null;
     above=null;
-    mealingredient=null;
-    mealquantity=null;
     searchspinner=null;
     searchspinadap=null;
     scansearch=null;
@@ -543,8 +536,6 @@ private void requestOverlayLayoutNow() {
 if(!isWearable) {
     if(search!=null)
         search.requestLayout();
-    if(meallayout!=null)
-        meallayout.requestLayout();
     if(searchcontrol!=null)
         searchcontrol.requestLayout();
     if(numcontrol!=null)
@@ -972,8 +963,6 @@ private void mktimedialog( Button but,final int num ,View parent) {
     private boolean searchStateValid=false;
     private String savedSearchUnder="0";
     private String savedSearchAbove="999";
-    private String savedMealIngredient="";
-    private String savedMealQuantity="";
     private boolean savedScanSearch=false;
     private boolean savedHistorySearch=false;
     private boolean savedStreamSearch=true;
@@ -999,12 +988,6 @@ private void mktimedialog( Button but,final int num ,View parent) {
             savedStreamCalibratedSearch=streamcalibratedsearch.isChecked();
         if(historycalibratedsearch!=null)
             savedHistoryCalibratedSearch=historycalibratedsearch.isChecked();
-
-        // Keep the meal criteria even when the meal row is currently hidden.
-        if(mealingredient!=null)
-            savedMealIngredient=mealingredient.getText().toString();
-        if(mealquantity!=null)
-            savedMealQuantity=mealquantity.getText().toString();
 
         searchStateValid=true;
     }
@@ -1044,14 +1027,6 @@ private void mktimedialog( Button but,final int num ,View parent) {
         labelsel=selection;
         searchspinner.setSelection(selection);
 
-        if(selection==Natives.getmealvar()) {
-            mkmealsearch(context);
-            if(mealingredient!=null)
-                mealingredient.setText(savedMealIngredient);
-            if(mealquantity!=null)
-                mealquantity.setText(savedMealQuantity);
-        }
-
         setSearchTimeButton(fromtime,minutes[0]);
         setSearchTimeButton(totime,minutes[1]);
 
@@ -1079,12 +1054,6 @@ static void reopener() {
 int labelsel=-1;
 void clearsearch(View view) {
 if(!isWearable) {
-    if(mealquantity!=null) {
-         mealquantity.setText("");
-         mealingredient.setText("");
-         }
-    savedMealIngredient="";
-    savedMealQuantity="";
       under.setText("0");
         above.setText("999");
         labelsel=searchspinner.getCount()-1;
@@ -1131,21 +1100,10 @@ void search(boolean forward) {
         try {
                  fabove= Float.parseFloat(above.getText().toString());
             } catch(Exception e) {};
-        float ingamount=0.0f;
-        try {
-            if(mealquantity!=null)
-                ingamount= Float.parseFloat(mealquantity.getText().toString());
-            } catch(Exception e) {};
-        String ingsearch=null;
-        if(mealingredient!=null) {
-            ingsearch=mealingredient.getText().toString();
-            if(ingsearch.length()==0)
-                ingsearch=null;
-                }
            int glsearch=((historysearch.isChecked()?0x40000002:0)| (scansearch.isChecked()?0x40000001:0))|(streamsearch.isChecked()?0x40000004:0)| (streamcalibratedsearch.isChecked()?0x40000008:0)|(historycalibratedsearch.isChecked()?0x40000010:0);
 
 
-       if(Natives.search(glsearch==0?labelsel:glsearch,funder,fabove,minutes[0],minutes[1],forward,ingsearch,ingamount)==0) {
+       if(Natives.search(glsearch==0?labelsel:glsearch,funder,fabove,minutes[0],minutes[1],forward,null,0.0f)==0) {
 
            removeSearchEditor();
            requestRender();
@@ -1295,14 +1253,7 @@ if(searchspinner==null) {
        {if(doLog) {Log.i(LOG_ID,"onItemSelected "+position);};};
             if(position!=(searchspinner.getCount()-1)) {
                 selectnumbers();
-        if(position==Natives.getmealvar()) {
-            mkmealsearch(context);
-            }
-        else
-            hidemealsearch();
         }
-        else
-        hidemealsearch();
          labelsel=position;
         }
         @Override
@@ -1317,82 +1268,6 @@ return searchspinner;
 }
 ColorStateList oldColors;
 float oldsize;
-Layout meallayout=null;
-void hidemealsearch() {
-    if(meallayout!=null) 
-        meallayout.setVisibility(GONE);
-    }
-EditText mealingredient=null,mealquantity=null;
-void mkmealsearch(MainActivity act) {
-    if(meallayout==null) {
-        var inglabel=getlabel(act,R.string.ingredient);
-        var qualabel=getlabel(act,R.string.minimum);
-        mealingredient=new EditText(act);
-        mealingredient.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        mealingredient.setImeOptions(editoptions);
-        mealingredient.setOnFocusChangeListener(new editUIfocus());
-        /*
-    TextView.OnEditorActionListener     actlist= new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
-                    || actionId == EditorInfo.IME_ACTION_DONE) {
-                act.hideSystemUI();
-                 tk.glucodata.help.hidekeyboard(act);
-                 {if(doLog) {Log.i(LOG_ID,"onEditorAction");};};
-// hidekeyboard();
-                return true;
-               }
-            return false;
-            }};
-        mealingredient.setOnEditorActionListener(actlist);
-            */
-
-//        mealingredient.setMinEms(10);
-        ViewGroup.LayoutParams params= new ViewGroup.LayoutParams(  MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mealingredient.setLayoutParams(params);
-        if(smallScreen) {
-            mealquantity=geteditwearos(act);
-            }
-        else
-            mealquantity=geteditview(act,new editclosefocus());
-        mealquantity.setMinEms(3);
-        if(searchStateValid) {
-            mealingredient.setText(savedMealIngredient);
-            mealquantity.setText(savedMealQuantity);
-        }
-        int pad= (int)(tk.glucodata.GlucoseCurve.metrics.density*5);
-             inglabel.setPadding(pad,0,pad,0);
-        qualabel.setPadding(pad,0,pad,0);
-
-//        mealquantity.setPadding(0,0,0,(int)metrics.density*8);
-//        mealquantity.setMinEms(2);
-//        mealingredient.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI| EditorInfo.IME_FLAG_NO_FULLSCREEN| EditorInfo.IME_ACTION_SEARCH);
-//        mealquantity.setOnEditorActionListener(actlist);
-      Log.i(LOG_ID,"systembarTop="+systembarTop);
-        meallayout=new Layout(act,
-(lay, w, h)->{
-            lay.setY(systembarTop*4/5);
-            lay.setX(systembarLeft);
-
-        return new int[] {w- systembarLeft- systembarRight,h};
-        },
-
-      //pick.setPadding(MainActivity.systembarLeft,MainActivity.systembarTop,0,MainActivity.systembarBottom);
-      //buttonlay.setPadding(0,MainActivity.systembarTop/2,MainActivity.systembarRight,MainActivity.systembarBottom);
-
-
-        new View[] {inglabel,mealingredient,qualabel,mealquantity});
-        act.addMyContentView(meallayout, new ViewGroup.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
-            meallayout.setBackgroundColor(Applic.backgroundcolor);
-        }
-    else {
-        meallayout.setVisibility(VISIBLE);
-        meallayout.bringToFront();
-        }
-    
-
-    }
 
 private Layout getsearchlayout(MainActivity context) {
 if(isWearable)

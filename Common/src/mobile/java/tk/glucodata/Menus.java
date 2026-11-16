@@ -455,13 +455,6 @@ static private void showNow(MainActivity act) {
 	amountsview.setChecked(Natives. getshownumbers()) ;
 
 
-        CheckBox mealsview=view.findViewById(R.id.meals);mealsview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowmeals(isChecked);
-				act.requestRender();
-		}); 
- 	mealsview.setChecked(Natives.getshowmeals()) ;
-
-
 
         CheckBox darkmodeview=view.findViewById(R.id.darkmode);darkmodeview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
 

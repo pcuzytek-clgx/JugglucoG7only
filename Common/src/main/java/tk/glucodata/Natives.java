@@ -419,16 +419,6 @@ public static native byte getmealvar( );
 public static native ArrayList<String> getunits();
 public static native float getroundto( );
 public static native void setroundto(float val);
-public static native long foodsearch( String zoek);
-public static native void freefoodptr( long ptr);
-public static native int foodhitnr( long ptr);
-public static native String foodlabel( long ptr,int pos);
-public static native int[] getcomponents(int ingr);
-public static native String[] getcomponentlabels( );
-public static native String[] getcomponentunits( );
-public static native int getfoodid( long ptr,int pos);
-public static native String idfoodlabel( int ind);
-public static native int foodnr( );
 public static native int cpmeal(int mealptr);
 
 

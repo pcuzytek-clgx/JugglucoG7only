@@ -465,44 +465,6 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
     valueedit.requestFocus();
     editfocus.setedittext(valueedit);
 
-    View.OnClickListener menucall= v -> {
-
-        if(!isWearable) {
-            hidekeyboard();
-        if(mealview[0]==null) {
-            EnableControls(newnumview,false);
-//            newnumview.setVisibility(GONE);
-            int mptr=newmealptr[0]==0?((currentnum!=0L)?Natives.hitmeal(currentnum):0):newmealptr[0];
-            if(mptr==0)
-                mptr=Natives.getnewmealptr();
-            mealview[0]=tk.glucodata.Meal.menuview(NumberView.this, context,mptr, (carb,mealptr)->{
-                float roundt=Natives.getroundto();
-                if(roundt>0.0f)
-                    valueedit.setText(Float.toString(roundto(carb,roundt)));
-                else
-                    valueedit.setText(Float.toString(carb));
-                newmealptr[0]=mealptr;
-            },()->{
-                EnableControls(newnumview,true);
-                valueedit.requestFocus();
-
-                if(!smallScreen) {
-                    if(SmallShowKeyboard)
-                            showkeyboard(context);
-                    editfocus.setedittext(valueedit);
-                    }
-               else {
-                    tk.glucodata.help.showkeyboard(context,valueedit);
-                  }
-
-            //    newnumview.setVisibility(VISIBLE);
-                mealview[0]=null;
-
-                }    );
-            }
-    }
-
-    };
     mealbutton.setOnClickListener(v -> {
         if(currentnum!=0L && currentnum!=numio.newhit && Natives.hittype(currentnum)!=Natives.getbloodvar() && (Natives.hitmeal(currentnum)&0x80000000)!=0) {
             try {
@@ -516,7 +478,7 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
                 Log.stack(LOG_ID,"Open activity details from Amount",e);
                 Applic.argToaster(context,e.getMessage()==null?e.toString():e.getMessage(),Toast.LENGTH_LONG);
             }
-        } else menucall.onClick(v);
+        }
     });
     lasttime=time;
     Date dat = new Date(time);
@@ -586,8 +548,6 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
         datebutton.setTextColor( Color.YELLOW);
          newmealptr[0]=tmpmealptr;
         mealview[0]=null;
-        {if(doLog) {Log.i(LOG_ID,"onClick");};};
-        menucall.onClick(mealbutton);
         }
     else {
         timebutton.setTextColor(savebutton.getCurrentTextColor());
@@ -685,19 +645,6 @@ private void seedelete() {
 
         setMarginStart(getMargins(savebutton),hormarg);
         }
-    }
-public void addnumberwithmenu(MainActivity context,int mealptr) {
-    if(currentnum!=0L)  {
-        if(currentnum!=numio.newhit) 
-            Natives.freehitptr(currentnum);
-        currentnum=0L;
-        }
-    var type=Natives.getmealvar();
-     addnumberview(context,1,currentTimeMillis(),Float.MAX_VALUE,type,mealptr);
-    setmealbutton(type,1, 0,shouldexclude) ;
-    nodelete();
-    thetime=-1;
-    thedate=0L;
     }
 public View addnumberview(MainActivity context) {
     if(currentnum!=0L)  {
@@ -1114,13 +1061,7 @@ void setmealbutton(int labelsel,int bron,int mealptr,boolean exclude) {
         }
         mealbutton.setText(R.string.mealname);
 //       if(doLog) {Log.i(LOG_ID,"bron="+bron+" mealptr="+mealptr);};
-        if(!isWearable&&labelsel==Natives.getmealvar() &&(bron==1|| mealptr>0)) {
-            mealbutton.setVisibility(VISIBLE);
-            source.setVisibility(GONE);
-            excludebox.setVisibility(GONE);
-            }
-
-    else {
+    {
        if(labelsel==Natives.getbloodvar()) {
             mealbutton.setVisibility(GONE);
             source.setVisibility(GONE);
