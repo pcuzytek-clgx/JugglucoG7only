@@ -1,68 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="activity_import">Activities</string>
-    <string name="activity_details">Activity</string>
-    <string name="activity_retrieve">Retrieve</string>
-    <string name="activity_permissions">Permissions</string>
-    <string name="activity_history_granted">History access granted.</string>
-    <string name="activity_history_missing">History access not granted.</string>
-    <string name="activity_history_unavailable">History access unavailable.</string>
-    <string name="activity_measure_existing">Existing imported amounts use the selected label, measure and rounding when available. Individual edits are preserved.</string>
-    <string name="activity_round_to">Round to:</string>
-    <string name="activity_round_to_invalid">Enter a positive rounding increment, such as 1 or 0.1</string>
-    <string name="activity_from">Retrieve from</string>
-    <string name="activity_interval">Automatic retrieval</string>
-    <string name="activity_create_amounts">Create Amounts from activities</string>
-    <string name="activity_units">Distance and speed units</string>
+    <string name="activity_import">Aktywności</string>
+    <string name="activity_details">Aktywność</string>
+    <string name="activity_retrieve">Pobierz</string>
+    <string name="activity_history_granted">Przyznano dostęp do historii.</string>
+    <string name="activity_history_missing">Nie przyznano dostępu do historii.</string>
+    <string name="activity_history_unavailable">Dostęp do historii niedostępny.</string>
+    <string name="activity_round_to">Zaokrąglaj do:</string>
+    <string name="activity_round_to_invalid">Wpisz dodatni krok zaokrąglenia, np. 1 lub 0.1</string>
+    <string name="activity_from">Pobieraj od</string>
+    <string name="activity_interval">Automatyczne pobieranie</string>
+    <string name="activity_create_amounts">Twórz wartości z aktywności</string>
+    <string name="activity_units">Jednostki odległości i prędkości</string>
     <string-array name="activity_units">
-        <item>km and km/h</item><item>mi and mi/h</item>
+        <item>km i km/h</item><item>mi i mi/h</item>
     </string-array>
-    <string name="activity_last">Last retrieval:</string>
-    <string name="activity_never">Never</string>
-    <string name="activity_retrieving">Retrieving activities…</string>
-    <string name="activity_retrieving_details">Retrieving activity details: %1$d of %2$d</string>
-    <string name="activity_quota_wait">Health Connect request limit reached. Waiting to retry…</string>
-    <string name="activity_retrieved">Activities retrieved</string>
-    <string name="activity_labels">Labels</string>
-    <string name="activity_saved">Saved activities</string>
-    <string name="activity_default">General activity label</string>
-    <string name="activity_update_existing">Also change existing automatically created amounts</string>
-    <string name="activity_new_label">New label</string>
-    <string name="activity_choose_label">Choose or create an activity label</string>
-    <string name="activity_none">No saved activities</string>
-    <string name="activity_unavailable">Activity details are unavailable on this device</string>
-    <string name="activity_delete_confirm">Delete this activity from Juggluco and prevent it from being imported again? Its generated amounts will be deleted. Manually entered or edited amounts will be kept without the activity link. Health Connect data will stay unchanged.</string>
-    <string name="activity_remove_source">Remove source</string>
-    <string name="activity_remove_source_confirm">Remove %1$s from this activity in Juggluco? Its activity and heart-rate data will be excluded from future retrievals. The other sources and Health Connect data will be kept.</string>
-    <string name="activity_mirrored">Health Connect retrieval is disabled, because amounts are received via mirror.</string>
-    <string name="activity_source">Source</string>
-    <string name="activity_heart_source">Heart rate source</string>
-    <string name="activity_heart_used">Heart rate source used for the summary</string>
-    <string name="activity_source_deleted">This source was deleted in Health Connect</string>
-    <string name="activity_not_returned">Not in the current Health Connect retrieval</string>
-    <string name="activity_excess">Mean HR − resting HR</string>
-    <string name="activity_period_duration">%1$s – %2$s (duration: %3$s)</string>
-    <string name="activity_link">Link to amount</string>
-    <string name="activity_no_match">No unlinked activity amounts in this time interval</string>
-    <string name="activity_distance_miles">Distance (mi)</string>
-    <string name="activity_speed_miles">Mean speed (mi/h)</string>
+    <string name="activity_last">Ostatnie pobranie:</string>
+    <string name="activity_never">Nigdy</string>
+    <string name="activity_retrieving">Pobieranie aktywności…</string>
+    <string name="activity_retrieving_details">Pobieranie szczegółów aktywności: %1$d z %2$d</string>
+    <string name="activity_quota_wait">Osiągnięto limit zapytań Health Connect. Oczekiwanie na ponowienie…</string>
+    <string name="activity_retrieved">Pobrano aktywności</string>
+    <string name="activity_labels">Etykiety</string>
+    <string name="activity_saved">Zapisane aktywności</string>
+    <string name="activity_default">Ogólna etykieta aktywności</string>
+    <string name="activity_update_existing">Zmień też istniejące, automatycznie utworzone wartości</string>
+    <string name="activity_new_label">Nowa etykieta</string>
+    <string name="activity_choose_label">Wybierz lub utwórz etykietę aktywności</string>
+    <string name="activity_none">Brak zapisanych aktywności</string>
+    <string name="activity_unavailable">Szczegóły aktywności są niedostępne na tym urządzeniu</string>
+    <string name="activity_delete_confirm">Usunąć tę aktywność z Juggluco i zablokować jej ponowny import? Wygenerowane z niej wartości zostaną usunięte. Wartości wpisane lub edytowane ręcznie zostaną zachowane bez powiązania z aktywnością. Dane Health Connect pozostaną bez zmian.</string>
+    <string name="activity_remove_source">Usuń źródło</string>
+    <string name="activity_remove_source_confirm">Usunąć %1$s z tej aktywności w Juggluco? Jego dane aktywności i tętna zostaną pominięte przy kolejnych pobraniach. Pozostałe źródła i dane Health Connect zostaną zachowane.</string>
+    <string name="activity_mirrored">Pobieranie z Health Connect jest wyłączone, bo wartości są odbierane przez klonowanie.</string>
+    <string name="activity_not_returned">Brak w bieżącym pobraniu z Health Connect</string>
+    <string name="activity_excess">Śr. tętno − tętno spoczynkowe</string>
+    <string name="activity_period_duration">%1$s – %2$s (czas trwania: %3$s)</string>
+    <string name="activity_link">Powiąż z wartością</string>
+    <string name="activity_no_match">Brak niepowiązanych wartości aktywności w tym przedziale czasu</string>
+    <string name="activity_distance_miles">Dystans (mi)</string>
+    <string name="activity_speed_miles">Śr. prędkość (mi/h)</string>
     <string-array name="activity_intervals">
-        <item>Off</item><item>15 minutes</item><item>30 minutes</item><item>1 hour</item>
-        <item>3 hours</item><item>6 hours</item><item>24 hours</item>
+        <item>Wyłączone</item><item>15 minut</item><item>30 minut</item><item>1 godzina</item>
+        <item>3 godziny</item><item>6 godzin</item><item>24 godziny</item>
     </string-array>
     <string-array name="activity_measures">
-        <item>Elapsed duration (min)</item><item>Distance (km)</item><item>Mean HR − resting HR (bpm)</item>
-        <item>Mean heart rate (bpm)</item><item>Heart rate SD (bpm)</item><item>Active energy (kcal)</item>
-        <item>Mean speed (km/h)</item><item>Steps</item><item>Elevation gained (m)</item>
-        <item>Mean power (W)</item><item>Mean cycling cadence (rpm)</item>
+        <item>Czas trwania (min)</item><item>Dystans (km)</item><item>Śr. tętno − tętno spoczynkowe (bpm)</item>
+        <item>Średnie tętno (bpm)</item><item>SD tętna (bpm)</item><item>Energia aktywna (kcal)</item>
+        <item>Średnia prędkość (km/h)</item><item>Kroki</item><item>Przewyższenie (m)</item>
+        <item>Średnia moc (W)</item><item>Średnia kadencja (rpm)</item>
         <item>@string/activity_distance_miles</item><item>@string/activity_speed_miles</item>
-        <item>Maximum heart rate (bpm)</item>
+        <item>Maksymalne tętno (bpm)</item>
     </string-array>
     <string-array name="activity_fields">
-        <item>Duration</item><item>Distance</item><item>Resting HR</item>
-        <item>Mean HR</item><item>HR SD</item><item>HR coverage</item>
-        <item>Active energy</item><item>Mean speed</item><item>Steps</item>
-        <item>Elevation gained</item><item>Mean power</item><item>Cycling cadence</item>
-        <item>Max HR</item><item>Max speed</item>
+        <item>Czas trwania</item><item>Dystans</item><item>Tętno spocz.</item>
+        <item>Śr. tętno</item><item>SD tętna</item><item>Pokrycie tętna</item>
+        <item>Energia aktywna</item><item>Śr. prędkość</item><item>Kroki</item>
+        <item>Przewyższenie</item><item>Średnia moc</item><item>Kadencja</item>
+        <item>Maks. tętno</item><item>Maks. prędkość</item>
     </string-array>
 </resources>

@@ -1214,7 +1214,7 @@ Layout getkeyboard(Context context,View anchor,int keyboardMode) {
     tmp[1]=but=new Button(context);
     but.setText("\u232B");
 
-    but.setContentDescription("Backspace");
+    but.setContentDescription("Usuń znak");
     but.setOnClickListener(v->{
         final Editable edit=editfocus.getedit();
         if(edit==null)
@@ -1234,7 +1234,7 @@ Layout getkeyboard(Context context,View anchor,int keyboardMode) {
     } );
     tmp[2]=but=new Button(context);
     but.setText(".");
-    but.setContentDescription("Decimal point");
+    but.setContentDescription("Przecinek dziesiętny");
     but.setOnClickListener(click);
     Layout layout=new Layout(context, (lay, w, h)->{
             int hei=GlucoseCurve.getheight();

@@ -203,8 +203,7 @@ are needed. In your case it has problems with the following file)",
 
 		;
 
-language language_en("en",&engtext);
-const jugglucotext *usedtext= &engtext;
+const jugglucotext *usedtext= &pltext;
 #include "logs.hpp"
 /*
 void setuseeng() {

@@ -188,7 +188,7 @@ private static void scanGoogle(MainActivity act,int type,long sensorptr) {
                })
            .addOnCanceledListener(
                () -> {
-                    var message="Scan cancelled";
+                    var message="Skanowanie anulowane";
                     if(doLog) {Log.i(LOG_ID,message);};
                     Toast.makeText(act, message, Toast.LENGTH_LONG).show();
                     transmitterScanCancelled(sensorptr);
@@ -200,7 +200,7 @@ private static void scanGoogle(MainActivity act,int type,long sensorptr) {
             if(doLog) {Log.i(LOG_ID,message);};
             Toast.makeText(act, message, Toast.LENGTH_SHORT).show();  
             if(useZXing) {
-                Toast.makeText(act, "Move to zXing", Toast.LENGTH_SHORT).show();
+                Toast.makeText(act, "Przełączanie na zXing", Toast.LENGTH_SHORT).show();
                 scanZXingAlg(act,type,sensorptr);
                 }
         

@@ -712,6 +712,7 @@ public static    int stopprogram=0;
     @Override
     public void onCreate() {
         super.onCreate();
+    util.forcePolish(this);
 
     supportsRtl = (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_SUPPORTS_RTL) != 0;
     if(DiskSpace.check(this)) {

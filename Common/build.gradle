@@ -147,7 +147,7 @@ android {
 
             }
         }
-//    resourceConfigurations += ["en", "nl", "fr","it", "de", "pl", "pt","be","uk"]
+    resourceConfigurations += ["pl"]
     ndk { abiFilters.addAll(selectedAbis) }
         signingConfig signingConfigs.alg
     //buildToolsVersion '33.0.0'

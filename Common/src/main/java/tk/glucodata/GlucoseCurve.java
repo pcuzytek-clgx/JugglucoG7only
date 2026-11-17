@@ -218,7 +218,7 @@ void getnumcontrol(MainActivity activity) {
         Natives.firstpage();
                   requestRender();
            });
-        first.setContentDescription("First number");
+        first.setContentDescription("Pierwsza pozycja");
 
            ImageButton back=new ImageButton(activity);
            back.setImageResource( R.drawable.baseline_arrow_back_24);
@@ -227,13 +227,13 @@ void getnumcontrol(MainActivity activity) {
                   requestRender();
 
            });
-        back.setContentDescription("Page back");
+        back.setContentDescription("Poprzednia strona");
             
 
 
      ImageButton search=new ImageButton(activity);
      search.setImageResource( android.R.drawable.ic_menu_search);
-        search.setContentDescription("Search");
+        search.setContentDescription("Szukaj");
 //     search.setImageResource( android.R.attr.actionModeWebSearchDrawable);
 
        search.setOnClickListener(v-> {
@@ -269,7 +269,7 @@ void getnumcontrol(MainActivity activity) {
 
        });
            ImageButton last=new ImageButton(activity);
-       last.setContentDescription("Last number");
+       last.setContentDescription("Ostatnia pozycja");
            last.setImageResource( R.drawable.baseline_last_page_24);
 
            last.setOnClickListener(v-> {
@@ -1187,7 +1187,7 @@ if(searchspinner==null) {
     int minheight=GlucoseCurve.dpToPx(48);
     searchspinner.setMinimumHeight(minheight);
 */
-    searchspinner.setContentDescription("Amount type selector");
+    searchspinner.setContentDescription("Wybór rodzaju ilości");
    NumberView.avoidSpinnerDropdownFocus(searchspinner);
     searchspinadap= new LabelAdapter<String>(context,Natives.getLabels(),0);
         searchspinner.setAdapter(searchspinadap);
@@ -1286,7 +1286,7 @@ else {
 
         ImageButton forward=new ImageButton(context);
 
-    forward.setContentDescription("Search forward");
+    forward.setContentDescription("Szukaj dalej");
 
         forward.setImageResource( R.drawable.baseline_navigate_next_white_36);
         forward.setOnClickListener(v-> {

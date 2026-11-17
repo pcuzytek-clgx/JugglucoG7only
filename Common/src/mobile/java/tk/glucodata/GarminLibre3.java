@@ -449,15 +449,15 @@ public final class GarminLibre3 {
 
     private static boolean switchSensor(final String serial, final String address, final byte[] secret180) {
         if (activeTransfer != null) {
-            Applic.Toaster("Already sending a Libre 3 sensor to Garmin");
+            Applic.Toaster("Sensor Libre 3 jest już wysyłany do Garmina");
             return false;
         }
         if (secret180 == null || secret180.length != 180 || address == null) {
-            Applic.Toaster("Libre 3 authorization data is not available");
+            Applic.Toaster("Dane autoryzacji Libre 3 są niedostępne");
             return false;
         }
         if (serial == null) {
-            Applic.Toaster("Libre 3 sensor identity is not available");
+            Applic.Toaster("Identyfikator sensora Libre 3 jest niedostępny");
             Log.e(LOG_ID,"No sensor serial for Garmin handoff address="+address);
             return false;
         }
@@ -468,12 +468,12 @@ public final class GarminLibre3 {
 
         final AllData all = Applic.app == null ? null : Applic.app.numdata;
         if (all == null) {
-            Applic.Toaster("Garmin communication is not available");
+            Applic.Toaster("Komunikacja z Garminem jest niedostępna");
             return false;
         }
         final long peerId = all.getLibre3DirectPeerId();
         if (peerId == Long.MIN_VALUE) {
-            Applic.Toaster("Select Libre 3 direct for a Garmin watch first");
+            Applic.Toaster("Najpierw wybierz bezpośrednie Libre 3 dla zegarka Garmin");
             return false;
         }
         Log.i(LOG_ID, "handoff start peer=" + peerId + " address=" + address);
@@ -483,7 +483,7 @@ public final class GarminLibre3 {
             message = GarminLibre3Provisioning.makeMessage(address, secret180);
         } catch (Throwable th) {
             Log.stack(LOG_ID, "Making Libre 3 Garmin provisioning data", th);
-            Applic.Toaster("Can't make Libre 3 Garmin provisioning data");
+            Applic.Toaster("Nie można utworzyć danych Libre 3 dla Garmina");
             return false;
         }
 
@@ -518,7 +518,7 @@ public final class GarminLibre3 {
                 // Keep direct mode OFF while replacing provisioning.  The watch
                 // stores L3G2 but does not start BLE until the final DIRECT=1.
                 if (!all.sendLibre3Message(context, peerId, provisioning)) {
-                    fail("Can't send Libre 3 sensor to the selected Garmin watch", null);
+                    fail("Nie można wysłać sensora Libre 3 na wybrany zegarek Garmin", null);
                     return false;
                 }
 
@@ -529,7 +529,7 @@ public final class GarminLibre3 {
                 try { unit = Natives.getunit() == 1 ? 1 : 0; }
                 catch (Throwable th) { Log.stack(LOG_ID, "Reading glucose unit", th); }
                 if (!all.sendLibre3Message(context, peerId, Arrays.asList(GLUNITS, unit))) {
-                    fail("Can't send glucose unit to the selected Garmin watch", null);
+                    fail("Nie można wysłać jednostki glukozy na wybrany zegarek Garmin", null);
                     return false;
                 }
 
@@ -542,7 +542,7 @@ public final class GarminLibre3 {
                 // DIRECT=1 is deliberately last: if the watch held credentials
                 // for another sensor, it cannot race to connect to that old sensor.
                 if (!all.sendLibre3Message(context, peerId, Arrays.asList(LIBRE3DIRECT, 1))) {
-                    fail("Can't enable direct Libre 3 on the selected Garmin watch", null);
+                    fail("Nie można włączyć bezpośredniego Libre 3 na wybranym zegarku Garmin", null);
                     return false;
                 }
 
@@ -554,7 +554,7 @@ public final class GarminLibre3 {
                 succeed();
                 return true;
             } catch (Throwable th) {
-                fail("Sending Libre 3 sensor to Garmin failed", th);
+                fail("Wysyłanie sensora Libre 3 do Garmina nie powiodło się", th);
                 return false;
             }
         }
@@ -562,7 +562,7 @@ public final class GarminLibre3 {
         void succeed() {
             if (done) return;
             done = true;
-            Applic.Toaster("Libre 3 transferred to selected Garmin watch");
+            Applic.Toaster("Libre 3 przeniesiony na wybrany zegarek Garmin");
             finished(this);
         }
 

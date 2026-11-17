@@ -128,7 +128,7 @@ public boolean reconnect(long now,long delay) {
         final long generation;
         try {
             if(doLog) {Log.i(LOG_ID,"reconnect "+SerialNumber);};
-            constatstatusstr = "Loss of signal";
+            constatstatusstr = "Utrata sygnału";
             constatchange[1] = now;
             synchronized(gattLock) {
                 thegatt=mBluetoothGatt;

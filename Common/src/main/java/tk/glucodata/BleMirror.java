@@ -543,7 +543,7 @@ public final class BleMirror {
         }
         for(Config config:configurations) {
             if(labelCounts.getOrDefault(config.normalizedLabel,0)>1)
-                config.invalidate("Bluetooth mirror labels must be unique");
+                config.invalidate("Etykiety klonowania Bluetooth muszą być unikalne");
             config.finishSecurity();
             Log.i(LOG_ID,"Bluetooth discovery identity: index="+config.hostIndex+
                     " label="+config.label+" token="+tokenFingerprint(config.discoveryToken)+
@@ -568,7 +568,7 @@ public final class BleMirror {
                 else {
                     changed=true;
                     if(old!=null)
-                        disconnectLinkLocked(old,"Bluetooth mirror configuration changed");
+                        disconnectLinkLocked(old,"Zmieniono konfigurację klonowania Bluetooth");
                 }
                 newByIndex.put(link.hostIndex,link);
                 if(link.configError==null)
@@ -576,7 +576,7 @@ public final class BleMirror {
             }
             for(Link old:oldLinks.values()) {
                 if(!reused.contains(old)&&newByIndex.get(old.hostIndex)!=old)
-                    disconnectLinkLocked(old,"Bluetooth mirror is no longer configured");
+                    disconnectLinkLocked(old,"Klonowanie Bluetooth nie jest już skonfigurowane");
             }
             linksByIndex.clear();
             linksByIndex.putAll(newByIndex);
@@ -911,7 +911,7 @@ public final class BleMirror {
                 return false;
             }
             if(active&&!isReadyLocked(link)) {
-                link.status="TCP/IP failed; waiting for Bluetooth fallback "+link.label;
+                link.status="TCP/IP nie działa; oczekiwanie na zapasowe Bluetooth "+link.label;
                 Log.e(LOG_ID,"Cannot activate Automatic BLE fallback before authentication: "+link.label);
                 return false;
             }
@@ -946,7 +946,7 @@ public final class BleMirror {
             remote=link.connection==null?-1:link.connection.remoteHostIndex;
             phonePeer=link.connection!=null&&!Applic.isWearable&&!link.connection.remoteIsWearable;
             link.status=link.connection==null?
-                    "Bluetooth fallback disconnected: "+link.label:connectedStatus(link,link.connection);
+                    "Zapasowe Bluetooth rozłączone: "+link.label:connectedStatus(link,link.connection);
             if(legacySingleGattLocked()&&link.connection!=null)
                 maybeScheduleLegacySlotCheckLocked(link.connection);
             else if(fragileClientSlotLocked()&&link.connection!=null)
@@ -1007,14 +1007,14 @@ public final class BleMirror {
                 final long silentFor=Math.max(0L,monotonicMillis()-outbound.lastProgressMillis);
                 if(silentFor<SEND_PROGRESS_TIMEOUT_MILLIS)
                     continue;
-                disconnectForFailure(connection,"Timeout sending "+path+
-                        " over BLE GATT after "+silentFor+" ms without fragment progress");
+                disconnectForFailure(connection,"Przekroczono czas wysyłania "+path+
+                        " przez BLE GATT po "+silentFor+" ms bez postępu fragmentów");
                 return false;
             }
         }
         catch(InterruptedException interrupted) {
             Thread.currentThread().interrupt();
-            disconnectForFailure(connection,"BLE send interrupted");
+            disconnectForFailure(connection,"Przerwano wysyłanie BLE");
             return false;
         }
     }
@@ -1410,13 +1410,13 @@ public final class BleMirror {
         }
         catch(GeneralSecurityException error) {
             Log.stack(LOG_ID,"protect "+path,error);
-            handler.post(() -> disconnectForFailure(connection,"BLE mirror encryption failed"));
+            handler.post(() -> disconnectForFailure(connection,"Błąd szyfrowania klonowania BLE"));
             return null;
         }
         final long requestedBytes=(long)transported.length+path.length()+1L;
         if(requestedBytes>MAX_QUEUED_BYTES||connection.queuedBytes+requestedBytes>MAX_QUEUED_BYTES) {
             if(connection.link!=null)
-                connection.link.status="BLE mirror send queue is full";
+                connection.link.status="Kolejka wysyłania klonowania BLE jest pełna";
             return null;
         }
         final List<byte[]> fragments;
@@ -1532,7 +1532,7 @@ public final class BleMirror {
             if(connection.serverSide&&serverSendingConnection==connection)
                 serverSendingConnection=null;
             gattOperationConnection=null;
-            final String reason="GATT rejected "+sending.path+" fragment "+fragmentNumber+"/"+
+            final String reason="GATT odrzucił "+sending.path+" fragment "+fragmentNumber+"/"+
                     fragmentCount+" (valueBytes="+value.length+", mtu="+connection.mtu+
                     ", carrier="+carrier+")";
             if(!connection.serverSide&&PROBE_PATH.equals(sending.path)&&connection.ready&&
@@ -1567,7 +1567,7 @@ public final class BleMirror {
                 }
             }
             if(timedOut)
-                disconnectForFailure(connection,"BLE GATT timeout for "+sending.path+" fragment "+
+                disconnectForFailure(connection,"Przekroczono czas BLE GATT dla "+sending.path+" fragment "+
                         (pendingIndex+1)+"/"+fragmentCount+" (valueBytes="+value.length+
                         ", mtu="+connection.mtu+", carrier="+carrier+")");
         },FRAGMENT_TIMEOUT_MILLIS);
@@ -1600,7 +1600,7 @@ public final class BleMirror {
             if(statusCode!=BluetoothGatt.GATT_SUCCESS) {
                 final String path=sending.path;
                 failQueueLocked(connection);
-                handler.post(() -> disconnectForFailure(connection,"GATT fragment failed for "+path+
+                handler.post(() -> disconnectForFailure(connection,"Błąd fragmentu GATT dla "+path+
                         " fragment "+fragmentNumber+"/"+fragmentCount+": status="+statusCode));
                 return;
             }
@@ -1712,7 +1712,7 @@ public final class BleMirror {
             }
             catch(Throwable error) {
                 Log.stack(LOG_ID,"receive "+complete.path(),error);
-                disconnectForFailure(connection,"Invalid BLE mirror message");
+                disconnectForFailure(connection,"Nieprawidłowa wiadomość klonowania BLE");
             }
         });
     }
@@ -2104,7 +2104,7 @@ public final class BleMirror {
                     return;
                 }
                 Log.i(LOG_ID,"releasing Android 5 BLE standby slot: label="+current.label);
-                disconnectConnectionLocked(connection,"Android 5 BLE standby slot released",true);
+                disconnectConnectionLocked(connection,"Zwolniono rezerwowy slot BLE Androida 5",true);
                 reconcileOperationsLocked();
                 return;
             }
@@ -2167,7 +2167,7 @@ public final class BleMirror {
             }
             Log.i(LOG_ID,"yielding Android 5 BLE slot: current="+current.label+
                     " next="+waiting.label+" lease="+LEGACY_SLOT_LEASE_MILLIS+" ms");
-            disconnectConnectionLocked(connection,"Yielding Android 5 BLE slot to "+waiting.label,true);
+            disconnectConnectionLocked(connection,"Przekazywanie slotu BLE Androida 5 do "+waiting.label,true);
             reconcileOperationsLocked();
             final long generation=configurationGeneration;
             handler.postDelayed(() -> {
@@ -2401,7 +2401,7 @@ public final class BleMirror {
             Log.w(LOG_ID,"expiring silent logical BLE server session: label="+
                     connection.link.label+" address="+address+" idleMillis="+idle+
                     " physicalPeerStillShared="+hasOtherServerSessionForAddressLocked(connection,address));
-            disconnectConnectionLocked(connection,"BLE mirror logical session timed out",true);
+            disconnectConnectionLocked(connection,"Przekroczono czas sesji klonowania BLE",true);
             reconcileOperationsLocked();
         }
     }
@@ -2456,7 +2456,7 @@ public final class BleMirror {
             // fresh session counters without accepting a counter gap.
             Log.w(LOG_ID,"BLE reverse indication path stopped responding; reconnecting GATT session: label="+
                     connectionLabel(connection)+" address="+safeAddress(connection.device));
-            disconnectForFailure(connection,"BLE reverse indication path stopped responding");
+            disconnectForFailure(connection,"Odwrotna ścieżka wskazań BLE przestała odpowiadać");
         }
     }
 
@@ -2505,7 +2505,7 @@ public final class BleMirror {
             enqueueFailed=!enqueueProbeRequestLocked(connection);
         }
         if(enqueueFailed)
-            disconnectForFailure(connection,"Could not queue BLE liveness probe");
+            disconnectForFailure(connection,"Nie można zakolejkować sondy aktywności BLE");
     }
 
     private static long monotonicMillis() {
@@ -2516,18 +2516,18 @@ public final class BleMirror {
         final String address=" ("+safeAddress(connection.device)+")";
         if(link.transport==TRANSPORT_AUTOMATIC)
             return link.carrierActive?
-                    "Bluetooth fallback active: "+link.label+address:
-                    "Bluetooth fallback ready; TCP/IP preferred: "+link.label+address;
-        return "BLE mirror connected: "+link.label+address;
+                    "Zapasowe Bluetooth aktywne: "+link.label+address:
+                    "Zapasowe Bluetooth gotowe; preferowane TCP/IP: "+link.label+address;
+        return "Klonowanie BLE połączone: "+link.label+address;
     }
 
     private static String waitingStatus(Link link) {
         final boolean offering=offersGattServerLocked(link);
         if(link.transport==TRANSPORT_AUTOMATIC)
-            return (offering?"Offering automatic Bluetooth fallback ":
-                    "Looking for automatic Bluetooth fallback ")+link.label;
-        return (offering?"Offering direct Bluetooth mirror ":
-                "Looking for direct Bluetooth mirror ")+link.label;
+            return (offering?"Oferowanie zapasowego Bluetooth ":
+                    "Szukanie zapasowego Bluetooth ")+link.label;
+        return (offering?"Oferowanie bezpośredniego klonowania Bluetooth ":
+                "Szukanie bezpośredniego klonowania Bluetooth ")+link.label;
     }
 
     private static String connectionLabel(Connection connection) {
@@ -2538,13 +2538,13 @@ public final class BleMirror {
 
     private static String safeAddress(BluetoothDevice device) {
         if(device==null)
-            return "unknown address";
+            return "nieznany adres";
         try {
             final String address=device.getAddress();
-            return address==null||address.isEmpty()?"unknown address":address;
+            return address==null||address.isEmpty()?"nieznany adres":address;
         }
         catch(Throwable ignored) {
-            return "unknown address";
+            return "nieznany adres";
         }
     }
 
@@ -2706,7 +2706,7 @@ public final class BleMirror {
             stopAdvertisingLocked();
             for(Link link:linksByIndex.values())
                 if(link!=null&&link.configError==null&&!isReadyLocked(link))
-                    link.status="Waiting for Bluetooth service restart to settle";
+                    link.status="Oczekiwanie na ustabilizowanie Bluetooth po restarcie";
             return;
         }
         boolean wantServer=false;
@@ -2736,7 +2736,7 @@ public final class BleMirror {
         if(wantServer)
             ensureServerLocked();
         else
-            stopServerLocked("Bluetooth mirror server is not configured");
+            stopServerLocked("Serwer klonowania Bluetooth nie jest skonfigurowany");
         final boolean incomingHandshake=serverHandshakeHoldRemainingLocked()>0L;
         if(!incomingHandshake&&(wantClient||reverseProbeActiveLocked()))
             refreshScanLocked();
@@ -2748,25 +2748,25 @@ public final class BleMirror {
 
     private static String operationBlockerLocked(Link link) {
         if(adapter==null||bluetoothManager==null)
-            return "Bluetooth LE is unavailable on this device";
+            return "Bluetooth LE jest niedostępny na tym urządzeniu";
         if(!Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_CONNECT))
-            return "Nearby devices permission for Bluetooth connections is not granted";
+            return "Brak uprawnienia „Urządzenia w pobliżu” do połączeń Bluetooth";
         if(link.role==ROLE_CLIENT&&!link.reverseGattRole&&
                 !Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_SCAN))
-            return "Nearby devices permission for Bluetooth scanning is not granted";
+            return "Brak uprawnienia „Urządzenia w pobliżu” do skanowania Bluetooth";
         if(offersGattServerLocked(link)&&
                 !Applic.bluetoothPermissionGranted(Manifest.permission.BLUETOOTH_ADVERTISE))
-            return "Nearby devices permission for Bluetooth advertising is not granted";
+            return "Brak uprawnienia „Urządzenia w pobliżu” do rozgłaszania Bluetooth";
         try {
             if(!adapter.isEnabled())
-                return "Bluetooth is switched off";
+                return "Bluetooth jest wyłączony";
         }
         catch(SecurityException error) {
-            return "Nearby devices permission for Bluetooth is not granted";
+            return "Brak uprawnienia „Urządzenia w pobliżu” dla Bluetooth";
         }
         catch(Throwable error) {
             Log.stack(LOG_ID,"read Bluetooth adapter state",error);
-            return "Bluetooth adapter state could not be read";
+            return "Nie można odczytać stanu adaptera Bluetooth";
         }
         return null;
     }
@@ -2874,7 +2874,7 @@ public final class BleMirror {
             serverDeviceMtu.clear();
             gattServer=bluetoothManager.openGattServer(Applic.app,newServerCallback(generation));
             if(gattServer==null) {
-                setServerStatusesLocked("This device cannot open a BLE GATT server");
+                setServerStatusesLocked("To urządzenie nie może uruchomić serwera BLE GATT");
                 return;
             }
             // A newly opened server has no live mirror handles. Build the initial
@@ -2900,7 +2900,7 @@ public final class BleMirror {
         }
         catch(Throwable error) {
             Log.stack(LOG_ID,"startServer",error);
-            setServerStatusesLocked("Could not start BLE mirror server");
+            setServerStatusesLocked("Nie można uruchomić serwera klonowania BLE");
             ++serverGeneration;
             if(gattServer!=null)
                 try { gattServer.close(); } catch(Throwable ignored) {}
@@ -2947,7 +2947,7 @@ public final class BleMirror {
             return;
         }
         if(!gattServer.addService(endpoint.service)) {
-            dropFailedServerEndpointLocked(endpoint,"Could not add BLE mirror service "+
+            dropFailedServerEndpointLocked(endpoint,"Nie można dodać usługi klonowania BLE "+
                     endpoint.service.getUuid());
             addNextServerServiceLocked(generation);
         }
@@ -3240,7 +3240,7 @@ public final class BleMirror {
         if(!changed)
             return false;
         link.newTcpCandidates=true;
-        link.status="Learned TCP/IP endpoint from Bluetooth advertisement "+link.label;
+        link.status="Adres TCP/IP pobrany z rozgłoszenia Bluetooth "+link.label;
         Log.i(LOG_ID,"accepted password-bound BLE IPv4 endpoint hint: label="+link.label+
                 "; waking TCP/IP while continuing Bluetooth GATT establishment");
         handler.post(Applic::wakemirrors);
@@ -3313,7 +3313,7 @@ public final class BleMirror {
         final Link link=candidates.get(advertiseCursor++);
         advertiser=adapter.getBluetoothLeAdvertiser();
         if(advertiser==null) {
-            setServerStatusesLocked("BLE advertising is not supported by this device");
+            setServerStatusesLocked("To urządzenie nie obsługuje rozgłaszania BLE");
             return;
         }
         final boolean reversedServerRendezvous=link.role==ROLE_CLIENT&&link.reverseGattRole;
@@ -3377,7 +3377,7 @@ public final class BleMirror {
                     advertisedLink=null;
                     advertiseCallback=null;
                     advertiser=null;
-                    link.status="BLE advertising failed: "+errorCode;
+                    link.status="Błąd rozgłaszania BLE: "+errorCode;
                     final boolean resourceFailure=errorCode==
                             AdvertiseCallback.ADVERTISE_FAILED_TOO_MANY_ADVERTISERS;
                     final long retry=resourceFailure?
@@ -3409,7 +3409,7 @@ public final class BleMirror {
                         link.oppositeRoleNotBeforeMillis=now+PREFERRED_ROLE_TRY_MILLIS;
                         if(link.automaticFallbackRequested)
                             schedulePreferredClientNoPeerRecoveryLocked(link);
-                        link.status="Reversed Bluetooth role could not advertise; retrying client "+
+                        link.status="Odwrócona rola Bluetooth nie mogła rozgłaszać; ponawianie jako klient "+
                                 link.label;
                         Log.w(LOG_ID,"temporary reversed GATT role failed to advertise; returning to client: label="+
                                 link.label+" error="+errorCode);
@@ -3447,7 +3447,7 @@ public final class BleMirror {
             advertising=false;
             advertisedLink=null;
             advertiseCallback=null;
-            link.status="Could not advertise the BLE mirror service";
+            link.status="Nie można rozgłaszać usługi klonowania BLE";
         }
     }
 
@@ -3804,7 +3804,7 @@ public final class BleMirror {
                         discoveryParcelUuid(link.discoveryToken),CURRENT_DISCOVERY_MASK).build());
         scanner=adapter.getBluetoothLeScanner();
         if(scanner==null) {
-            setClientStatusesLocked("BLE scanning is not available");
+            setClientStatusesLocked("Skanowanie BLE jest niedostępne");
             return;
         }
         final int scanMode=lowLatencyScan?ScanSettings.SCAN_MODE_LOW_LATENCY:
@@ -3834,7 +3834,7 @@ public final class BleMirror {
         }
         catch(Throwable error) {
             Log.stack(LOG_ID,"startScan",error);
-            setClientStatusesLocked("Could not scan for Bluetooth mirrors");
+            setClientStatusesLocked("Nie można wyszukiwać klonowania Bluetooth");
         }
     }
 
@@ -3961,12 +3961,12 @@ public final class BleMirror {
                 // an active BLE fallback merely because it is waiting for this slot.
                 waiting.discoveryBoostUntilMillis=Math.max(waiting.discoveryBoostUntilMillis,
                         yieldUntil);
-                waiting.status="Waiting for serialized Bluetooth slot "+waiting.label;
+                waiting.status="Oczekiwanie na wolny slot Bluetooth "+waiting.label;
                 Log.w(LOG_ID,"serializing fragile outgoing BLE clients: yielding "+
                         current.label+" to "+waiting.label+" for "+
                         FRAGILE_CLIENT_SLOT_LEASE_MILLIS+" ms");
                 disconnectConnectionLocked(connection,
-                        "Yielding fragile BLE client slot to "+waiting.label,true);
+                        "Przekazywanie niestabilnego slotu klienta BLE do "+waiting.label,true);
                 reconcileOperationsLocked();
             }
         },Math.max(1L,delayMillis));
@@ -4006,7 +4006,7 @@ public final class BleMirror {
         waiting.automaticFallbackRequested=true;
         waiting.discoveryBoostUntilMillis=Math.max(waiting.discoveryBoostUntilMillis,
                 monotonicMillis()+DISCOVERY_BOOST_MILLIS);
-        waiting.status="Offering resource-balanced Bluetooth server role "+waiting.label;
+        waiting.status="Oferowanie zrównoważonej roli serwera Bluetooth "+waiting.label;
         Log.w(LOG_ID,"fragile Android GATT client limit: existing client cannot be moved; "+
                 "offering waiting Automatic mirror as runtime server instead: waiting="+
                 waiting.label+" existing="+connectionLabel(existing)+" existingPeerSdk="+
@@ -4044,7 +4044,7 @@ public final class BleMirror {
         final long generation=++move.resourceRoleSwapGeneration;
         waiting.clientRetryNotBeforeMillis=Math.max(waiting.clientRetryNotBeforeMillis,
                 monotonicMillis()+RESOURCE_ROLE_SWITCH_SETTLE_MILLIS+CLIENT_CONNECT_SETTLE_MILLIS);
-        waiting.status="Waiting for BLE GATT role balancing before connecting "+waiting.label;
+        waiting.status="Oczekiwanie na równoważenie ról BLE GATT przed połączeniem "+waiting.label;
         Log.w(LOG_ID,"fragile Android GATT client limit: requesting runtime role balance for existing Automatic mirror: existing="+
                 move.label+" peerSdk="+move.remoteSdk+" waiting="+waiting.label);
         final long configuration=configurationGeneration;
@@ -4087,7 +4087,7 @@ public final class BleMirror {
                     move.label+" waiting="+waiting.label);
             if(move.connection!=null&&move.connection.alive&&!move.connection.serverSide)
                 disconnectConnectionLocked(move.connection,
-                        "Rebalancing fragile Android BLE GATT client roles",true);
+                        "Równoważenie ról klienta BLE GATT Androida",true);
             boostDiscoveryLocked(move,"fragile Android multi-client role balance");
             waiting.clientRetryNotBeforeMillis=0L;
             boostDiscoveryLocked(waiting,"retry after GATT client role balance");
@@ -4409,7 +4409,7 @@ public final class BleMirror {
             boolean android5SharedProtocol) {
         if(bluetoothRestartSettleRemainingLocked()>0L) {
             if(link!=null)
-                link.status="Waiting for Bluetooth service restart to settle";
+                link.status="Oczekiwanie na ustabilizowanie Bluetooth po restarcie";
             return;
         }
         if(link.connection!=null||device==null)
@@ -4420,7 +4420,7 @@ public final class BleMirror {
                 // Do not change either proven GATT direction. XA1 repeatedly failed
                 // both with two simultaneous clients and with one client plus one
                 // reversed server. Time-share the reliable outgoing slot instead.
-                link.status="Waiting for serialized Bluetooth slot "+link.label;
+                link.status="Oczekiwanie na wolny slot Bluetooth "+link.label;
                 link.clientRetryNotBeforeMillis=0L;
                 Log.i(LOG_ID,"deferring second outgoing BLE GATT client until current slot yields: label="+
                         link.label+" existing="+connectionLabel(existing));
@@ -4443,7 +4443,7 @@ public final class BleMirror {
         link.connection=connection;
         link.clientRetryNotBeforeMillis=0;
         link.status=(link.transport==TRANSPORT_AUTOMATIC?
-                "Connecting automatic Bluetooth fallback ":"Connecting direct Bluetooth mirror ")+
+                "Łączenie zapasowego Bluetooth ":"Łączenie bezpośredniego klonowania Bluetooth ")+
                 link.label;
 
         // Do not overlap our scanner/advertiser with the controller's initiating
@@ -4473,7 +4473,7 @@ public final class BleMirror {
                         BluetoothDevice.TRANSPORT_LE);
                 if(connection.gatt==null) {
                     disconnectConnectionLocked(connection,
-                            "Could not create a BLE GATT connection",false);
+                            "Nie można utworzyć połączenia BLE GATT",false);
                     reconcileOperationsLocked();
                     return;
                 }
@@ -4486,7 +4486,7 @@ public final class BleMirror {
             }
             catch(Throwable error) {
                 Log.stack(LOG_ID,"connectGatt",error);
-                disconnectConnectionLocked(connection,"Could not connect the BLE mirror",false);
+                disconnectConnectionLocked(connection,"Nie można połączyć klonowania BLE",false);
                 reconcileOperationsLocked();
             }
         }
@@ -4565,7 +4565,7 @@ public final class BleMirror {
         link.reverseGattRole=true;
         link.discoveryBoostUntilMillis=Math.max(link.discoveryBoostUntilMillis,
                 monotonicMillis()+DISCOVERY_BOOST_MILLIS);
-        link.status="Offering reversed Bluetooth GATT role "+link.label;
+        link.status="Oferowanie odwróconej roli Bluetooth GATT "+link.label;
         Log.w(LOG_ID,"reversing physical Bluetooth GATT role: index="+link.hostIndex+
                 " label="+link.label+" reason="+reason);
         scheduleTemporaryReverseRoleExpiryLocked(link);
@@ -4602,7 +4602,7 @@ public final class BleMirror {
                 // temporary direction alive indefinitely.
                 if(link.connection!=null)
                     disconnectConnectionLocked(link.connection,
-                            "Unproven reversed Bluetooth role expired",true);
+                            "Wygasła niepotwierdzona odwrócona rola Bluetooth",true);
                 link.reverseGattRole=false;
                 link.transientClientFailures=0;
                 final long retryNow=monotonicMillis();
@@ -4617,7 +4617,7 @@ public final class BleMirror {
                 link.oppositeRoleNotBeforeMillis=retryNow+PREFERRED_ROLE_TRY_MILLIS;
                 if(link.automaticFallbackRequested)
                     schedulePreferredClientNoPeerRecoveryLocked(link);
-                link.status="Reversed Bluetooth role did not authenticate; retrying client "+
+                link.status="Odwrócona rola Bluetooth nie uwierzytelniła się; ponawianie jako klient "+
                         link.label;
                 Log.w(LOG_ID,"temporary reversed GATT role expired without authentication; "+
                         "returning to preferred client and re-arming recovery: label="+link.label);
@@ -4634,7 +4634,7 @@ public final class BleMirror {
                         connection.epoch!=epoch)
                     return;
                 final Link link=connection.link;
-                final String reason="BLE physical connection did not establish within "+
+                final String reason="Nie nawiązano fizycznego połączenia BLE w ciągu "+
                         CLIENT_ESTABLISH_TIMEOUT_MILLIS+" ms";
                 Log.e(LOG_ID,reason+" label="+connectionLabel(connection)+
                         " address="+safeAddress(connection.device));
@@ -4671,7 +4671,7 @@ public final class BleMirror {
                 timedOut=connection.alive&&!connection.ready&&connection.epoch==epoch;
             }
             if(timedOut)
-                disconnectForFailure(connection,"BLE mirror authentication timed out");
+                disconnectForFailure(connection,"Przekroczono czas uwierzytelniania klonowania BLE");
         },HANDSHAKE_TIMEOUT_MILLIS);
     }
 
@@ -4724,8 +4724,8 @@ public final class BleMirror {
                 final boolean reverse=canReverseAfterClientSetupFailureLocked(connection);
                 final Link link=connection.link;
                 final boolean refreshed=refreshGattCacheLocked(connection);
-                final String reason="BLE indication setup timed out; GATT cache refresh "+
-                        (refreshed?"accepted":"unavailable");
+                final String reason="Przekroczono czas konfiguracji wskazań BLE; odświeżenie pamięci GATT "+
+                        (refreshed?"przyjęte":"niedostępne");
                 Log.e(LOG_ID,reason+" label="+connectionLabel(connection)+
                         " address="+safeAddress(connection.device)+
                         " reverseRole="+reverse+" timeout="+timeout+" ms");
@@ -4955,7 +4955,7 @@ public final class BleMirror {
                     // advertiser is therefore not proof that the controller is still
                     // transmitting. Rebuild the complete BLE mirror side whenever the
                     // adapter reaches ON, even if OFF was not observed by this process.
-                    stopAllConnectionsLocked("Bluetooth adapter restarted");
+                    stopAllConnectionsLocked("Adapter Bluetooth uruchomiony ponownie");
                     bluetoothManager=(BluetoothManager)Applic.app.getSystemService(
                             Context.BLUETOOTH_SERVICE);
                     adapter=bluetoothManager==null?null:bluetoothManager.getAdapter();
@@ -4995,7 +4995,7 @@ public final class BleMirror {
                 synchronized(lock) {
                     ++bluetoothOnRecoveryGeneration;
                     bluetoothRestartSettleUntilMillis=0L;
-                    stopAllConnectionsLocked("Bluetooth is switched off");
+                    stopAllConnectionsLocked("Bluetooth jest wyłączony");
                     advertiser=null;
                     scanner=null;
                     advertiseCursor=0;
@@ -5020,7 +5020,7 @@ public final class BleMirror {
             synchronized(lock) {
                 scanRunning=false;
                 scanLowLatency=false;
-                setClientStatusesLocked("BLE scan failed: "+errorCode);
+                setClientStatusesLocked("Błąd skanowania BLE: "+errorCode);
                 Log.e(LOG_ID,"scan failed: "+errorCode);
                 final long config=configurationGeneration;
                 handler.postDelayed(() -> retryOperations(config),RETRY_MILLIS);
@@ -5103,7 +5103,7 @@ public final class BleMirror {
                         return;
                     final ServerEndpoint endpoint=serverEndpoints.get(service.getUuid());
                     if(statusCode!=BluetoothGatt.GATT_SUCCESS||endpoint==null) {
-                        final String reason="Adding BLE mirror service failed: "+statusCode+
+                        final String reason="Nie udało się dodać usługi klonowania BLE: "+statusCode+
                                 " uuid="+service.getUuid();
                         if(endpoint!=null) {
                             dropFailedServerEndpointLocked(endpoint,reason);
@@ -5182,7 +5182,7 @@ public final class BleMirror {
                         final boolean expiredUnauthenticated=
                                 expiredUnauthenticatedServerAddresses.contains(address);
                         finishServerHandshakeHoldLocked(address,"physical disconnect");
-                        closeServerSessionsForAddressLocked(address,"BLE mirror disconnected (status "+statusCode+")");
+                        closeServerSessionsForAddressLocked(address,"Klonowanie BLE rozłączone (status "+statusCode+")");
                         serverDeviceMtu.remove(address);
                         if(expiredUnauthenticated) {
                             // Huawei M5 evidence: while an unrelated/unauthenticated
@@ -5327,7 +5327,7 @@ public final class BleMirror {
             epoch=connection.epoch;
             if(!connection.gatt.discoverServices()) {
                 connection.servicesRequested=false;
-                handler.post(() -> disconnectForFailure(connection,"BLE service discovery was rejected"));
+                handler.post(() -> disconnectForFailure(connection,"Odrzucono wykrywanie usług BLE"));
                 return;
             }
         }
@@ -5343,8 +5343,8 @@ public final class BleMirror {
                     // bootstrap. The next attempt should negotiate MTU normally.
                     link.skipInitialMtu=false;
                 final boolean refreshed=refreshGattCacheLocked(connection);
-                final String reason="BLE service discovery timed out; GATT cache refresh "+
-                        (refreshed?"accepted":"unavailable");
+                final String reason="Przekroczono czas wykrywania usług BLE; odświeżenie pamięci GATT "+
+                        (refreshed?"przyjęte":"niedostępne");
                 Log.e(LOG_ID,reason+" label="+connectionLabel(connection)+
                         " address="+safeAddress(connection.device));
                 disconnectConnectionLocked(connection,reason,true);
@@ -5385,7 +5385,7 @@ public final class BleMirror {
             // onCharacteristicWrite() ignore that callback and leave
             // connection.sending stuck until FRAGMENT_TIMEOUT_MILLIS.
             connection.subscribed=false;
-            connection.link.status="BLE connected; refreshing GATT services "+connection.link.label;
+            connection.link.status="BLE połączone; odświeżanie usług GATT "+connection.link.label;
             Log.w(LOG_ID,"refreshing authenticated BLE GATT services and CCCD: label="+
                     connectionLabel(connection)+" address="+safeAddress(connection.device));
         }
@@ -5440,7 +5440,7 @@ public final class BleMirror {
                 return;
             if(!connection.currentGattProtocol) {
                 handler.post(() -> disconnectForFailure(connection,
-                        "Legacy BLE mirror GATT endpoint is no longer accepted"));
+                        "Stary punkt końcowy GATT klonowania BLE nie jest już akceptowany"));
                 return;
             }
             final UUID tokenServiceUuid=discoveryUuid(connection.link.discoveryToken);
@@ -5470,8 +5470,8 @@ public final class BleMirror {
             }
             if(service==null||rx==null||tx==null) {
                 final boolean refreshed=refreshGattCacheLocked(connection);
-                final String reason="current BLE GATT endpoint missing; cache refresh "+
-                        (refreshed?"accepted":"unavailable");
+                final String reason="Brak bieżącego punktu końcowego BLE GATT; odświeżenie pamięci "+
+                        (refreshed?"przyjęte":"niedostępne");
                 Log.w(LOG_ID,reason+" label="+connectionLabel(connection)+
                         " tokenService="+tokenServiceUuid+" android5SharedService="+
                         ANDROID5_SERVICE_UUID+" previousSharedService="+SERVICE_UUID);
@@ -5490,7 +5490,7 @@ public final class BleMirror {
                     " service="+service.getUuid()+" rx="+rx.getUuid()+" tx="+tx.getUuid());
             if(!connection.gatt.setCharacteristicNotification(connection.tx,true)) {
                 handler.post(() -> disconnectForFailure(connection,
-                        "BLE mirror characteristics are missing"));
+                        "Brak charakterystyk klonowania BLE"));
                 return;
             }
             final BluetoothGattDescriptor cccd=tx.getDescriptor(CCCD_UUID);
@@ -5500,8 +5500,8 @@ public final class BleMirror {
                         if(!connection.alive)
                             return;
                         final boolean refreshed=refreshGattCacheLocked(connection);
-                        final String reason="BLE mirror indication descriptor is missing; GATT cache refresh "+
-                                (refreshed?"accepted":"unavailable");
+                        final String reason="Brak deskryptora wskazań klonowania BLE; odświeżenie pamięci GATT "+
+                                (refreshed?"przyjęte":"niedostępne");
                         Log.w(LOG_ID,reason+" label="+connectionLabel(connection)+
                                 " address="+safeAddress(connection.device));
                         disconnectConnectionLocked(connection,reason,true);
@@ -5520,10 +5520,10 @@ public final class BleMirror {
             if(!accepted) {
                 connection.subscriptionRequested=false;
                 handler.post(() -> disconnectForFailure(connection,
-                        "Could not enable BLE mirror indications"));
+                        "Nie można włączyć wskazań klonowania BLE"));
             }
             else {
-                connection.link.status="BLE connected; enabling indications "+connection.link.label;
+                connection.link.status="BLE połączone; włączanie wskazań "+connection.link.label;
                 Log.i(LOG_ID,"CCCD write accepted; waiting for descriptor callback: label="+
                         connectionLabel(connection));
                 scheduleSubscriptionTimeoutLocked(connection);
@@ -5545,12 +5545,12 @@ public final class BleMirror {
                         connection.link.hostIndex+" label="+connection.link.label);
                 if(enqueueLocked(connection,HELLO_PATH,hello)==null)
                     handler.post(() -> disconnectForFailure(connection,
-                            "Could not queue BLE mirror authentication"));
+                            "Nie można zakolejkować uwierzytelniania klonowania BLE"));
             }
             catch(GeneralSecurityException error) {
                 Log.stack(LOG_ID,"create BLE hello",error);
                 handler.post(() -> disconnectForFailure(connection,
-                        "Could not create BLE mirror authentication"));
+                        "Nie można utworzyć uwierzytelniania klonowania BLE"));
             }
         }
     }
@@ -5568,7 +5568,7 @@ public final class BleMirror {
                             return;
                         connection.connected=true;
                         connection.link.concurrentClientFailures=0;
-                        connection.link.status="BLE connected; authenticating "+connection.link.label;
+                        connection.link.status="BLE połączone; uwierzytelnianie "+connection.link.label;
                         connection.mtu=23;
                         // Do not force CONNECTION_PRIORITY_HIGH for ordinary phone/tablet
                         // mirrors. Android's GATT implementation can couple that request to
@@ -5609,7 +5609,7 @@ public final class BleMirror {
                                         return;
                                     connection.mtuRequested=false;
                                     connection.link.skipInitialMtu=true;
-                                    final String reason="Initial BLE MTU negotiation timed out; retrying with default MTU";
+                                    final String reason="Przekroczono czas negocjacji MTU BLE; ponawianie z domyślnym MTU";
                                     Log.w(LOG_ID,reason+": label="+connection.link.label+
                                             " address="+safeAddress(connection.device));
                                     disconnectConnectionLocked(connection,reason,true);
@@ -5650,7 +5650,7 @@ public final class BleMirror {
                                         "using default MTU on next attempt: label="+link.label+
                                         " status="+statusCode);
                             }
-                            disconnectConnectionLocked(connection,"BLE mirror disconnected (status "+
+                            disconnectConnectionLocked(connection,"Klonowanie BLE rozłączone (status "+
                                     statusCode+")",false);
                             if(neverConnected&&link!=null) {
                                 if(link.directionProven) {
@@ -5718,7 +5718,7 @@ public final class BleMirror {
                 if(statusCode==BluetoothGatt.GATT_SUCCESS)
                     subscribeClient(connection);
                 else
-                    disconnectForFailure(connection,"BLE service discovery failed: "+statusCode);
+                    disconnectForFailure(connection,"Błąd wykrywania usług BLE: "+statusCode);
             }
 
             @Override public void onServiceChanged(BluetoothGatt gatt) {
@@ -5741,7 +5741,7 @@ public final class BleMirror {
                 }
                 Log.i(LOG_ID,"remote GATT services changed during setup: label="+
                         connectionLabel(connection)+" address="+safeAddress(gatt.getDevice()));
-                disconnectForFailure(connection,"BLE mirror service changed during setup; reconnecting");
+                disconnectForFailure(connection,"Usługa klonowania BLE zmieniła się podczas konfiguracji; ponowne łączenie");
             }
 
             @Override public void onDescriptorWrite(BluetoothGatt gatt,
@@ -5797,9 +5797,9 @@ public final class BleMirror {
                          * already-proven physical role.
                          */
                         final boolean refreshed=refreshGattCacheLocked(connection);
-                        final String reason="BLE indication CCCD uses stale/invalid GATT handle "+
-                                "(status "+statusCode+"); cache refresh "+
-                                (refreshed?"accepted":"unavailable");
+                        final String reason="Wskazanie BLE CCCD używa nieaktualnego/nieprawidłowego uchwytu GATT "+
+                                "(status "+statusCode+"); odświeżenie pamięci "+
+                                (refreshed?"przyjęte":"niedostępne");
                         Log.w(LOG_ID,reason+" label="+connectionLabel(connection)+
                                 " address="+safeAddress(gatt.getDevice()));
                         disconnectConnectionLocked(connection,reason,true);
@@ -5810,7 +5810,7 @@ public final class BleMirror {
                     }
                 }
                 else
-                    disconnectForFailure(connection,"BLE indication setup failed: "+statusCode);
+                    disconnectForFailure(connection,"Błąd konfiguracji wskazań BLE: "+statusCode);
             }
 
             @Override public void onCharacteristicWrite(BluetoothGatt gatt,
@@ -5870,11 +5870,11 @@ public final class BleMirror {
             this.wearOS=wearOS;
             this.transport=transport;
             if(normalizedLabel.isEmpty())
-                error="Bluetooth mirror requires a connection label";
+                error="Klonowanie Bluetooth wymaga etykiety połączenia";
             else if(this.label.getBytes(java.nio.charset.StandardCharsets.UTF_8).length>255)
-                error="Bluetooth mirror connection label is too long";
+                error="Etykieta połączenia klonowania Bluetooth jest za długa";
             else if(password==null||password.isEmpty())
-                error="Bluetooth mirror requires a mirror password";
+                error="Klonowanie Bluetooth wymaga hasła";
         }
 
         void invalidate(String reason) {
@@ -5890,7 +5890,7 @@ public final class BleMirror {
                 discoveryToken=BleMirrorSecurity.discoveryToken(masterKey);
             }
             catch(GeneralSecurityException securityError) {
-                error="Could not initialize Bluetooth mirror security";
+                error="Nie można zainicjować zabezpieczeń klonowania Bluetooth";
                 Log.stack(LOG_ID,"initialize security for "+label,securityError);
             }
         }
@@ -5988,10 +5988,10 @@ public final class BleMirror {
                 discoveryBoostUntilMillis=monotonicMillis()+DISCOVERY_BOOST_MILLIS;
             status=config.error==null?
                     (transport==TRANSPORT_AUTOMATIC?
-                            (role==ROLE_CLIENT?"Looking for automatic Bluetooth fallback ":
-                                    "Offering automatic Bluetooth fallback "):
-                            (role==ROLE_CLIENT?"Looking for direct Bluetooth mirror ":
-                                    "Offering direct Bluetooth mirror "))+label:config.error;
+                            (role==ROLE_CLIENT?"Szukanie zapasowego Bluetooth ":
+                                    "Oferowanie zapasowego Bluetooth "):
+                            (role==ROLE_CLIENT?"Szukanie bezpośredniego klonowania Bluetooth ":
+                                    "Oferowanie bezpośredniego klonowania Bluetooth "))+label:config.error;
         }
 
         boolean matches(Config config) {

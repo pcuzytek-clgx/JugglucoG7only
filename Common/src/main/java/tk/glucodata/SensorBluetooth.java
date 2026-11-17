@@ -950,7 +950,7 @@ private void addBluetoothStateReceiver() {
                 for(var cb: gattcallbacks)  {
                     if(cb.constatchange[1]<cb.constatchange[0] ) {
                         cb.constatchange[1] = System.currentTimeMillis();
-                        cb.constatstatusstr="Bluetooth off"; //"
+                        cb.constatstatusstr="Bluetooth wyłączony"; //"
                         }
                     cb.close();
                     }

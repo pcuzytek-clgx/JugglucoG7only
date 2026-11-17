@@ -164,6 +164,7 @@ int spokenmonthlabel(int month,char *buf,int max) const {
 
 extern const jugglucotext *usedtext;
 extern const jugglucotext engtext;
+extern jugglucotext pltext;
 #include <ctype.h>
 #define mklanguagenum2(a,b) a|b<<8
 #define mklanguagenum(lang) mklanguagenum2(lang[0],lang[1])
@@ -178,7 +179,7 @@ class language {
     static const jugglucotext* gettext(uint16_t lang)  {
     if(auto hit = langmap.find(lang); hit != langmap.end())
             return hit->second;
-        return &engtext;
+        return &pltext;
         }
     static const jugglucotext* gettext(const char *name)  {
         return gettext(mklanguagenumlow(name));

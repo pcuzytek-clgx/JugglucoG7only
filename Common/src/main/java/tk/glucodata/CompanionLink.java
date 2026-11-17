@@ -36,7 +36,7 @@ final class CompanionLink {
         try {
             var cdm = manager(act);
             if (cdm == null) {
-                Applic.argToaster(act, act.getString(R.string.companion_failed, "no CompanionDeviceManager"), Toast.LENGTH_LONG);
+                Applic.argToaster(act, act.getString(R.string.companion_failed, "brak CompanionDeviceManager"), Toast.LENGTH_LONG);
                 return;
             }
             // Bonded sensors are matched directly; the LE filter covers a sensor that is only advertising.

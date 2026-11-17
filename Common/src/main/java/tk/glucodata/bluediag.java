@@ -224,7 +224,7 @@ void showinfo(final SuperGattCallback gatt,MainActivity act) {
             }
         }
 
-    address.setText(gatt.mActiveDeviceAddress == null?"Address unknown":gatt.mActiveDeviceAddress);
+    address.setText(gatt.mActiveDeviceAddress == null?"Adres nieznany":gatt.mActiveDeviceAddress);
     if(gatt.sensorgen == 2) {
 //        address.setBackgroundColor(RED); address.setTextColor(BLACK);
         address.setTextColor(RED);

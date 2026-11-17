@@ -91,9 +91,8 @@ static void makefilesfailed()   { throw new noAccessToFilesDirException("no acce
 
 static public boolean setlibrary(Applic con) {
 if(true) {
-   var loc=Locale.getDefault();
    String country=tk.glucodata.util.getCountry();
-   var locstr=loc.getLanguage();
+   var locstr=tk.glucodata.util.getlocale().getLanguage();
    Applic.curlang=locstr;
    File files=con.getFilesDir();
    String filespath=files.getAbsolutePath();

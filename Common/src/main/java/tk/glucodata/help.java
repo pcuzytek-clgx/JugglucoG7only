@@ -559,7 +559,7 @@ private static final class HelpSearch {
                     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE);
         }
         catch (PatternSyntaxException error) {
-            query.setError("Invalid regular expression");
+            query.setError("Nieprawidłowe wyrażenie regularne");
             updateCounter();
             return;
         }

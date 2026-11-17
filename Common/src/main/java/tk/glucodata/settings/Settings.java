@@ -34,7 +34,6 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static android.widget.Spinner.MODE_DIALOG;
 import static android.widget.Spinner.MODE_DROPDOWN;
-import static androidx.core.os.LocaleListCompat.getEmptyLocaleList;
 import static tk.glucodata.Applic.DynamicTheme;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.usedlocale;
@@ -60,7 +59,6 @@ import static tk.glucodata.help.help;
 import static tk.glucodata.util.getbutton;
 import static tk.glucodata.util.getcheckbox;
 import static tk.glucodata.util.getlabel;
-import static tk.glucodata.util.getlocale;
 import static tk.glucodata.util.getradiobuttonId;
 
 
@@ -96,8 +94,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.os.LocaleListCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -515,7 +511,7 @@ static private void changeProfile(MainActivity act,int wasindex, ProfileSchedule
     if(wasindex<0) {
         index=Natives.nrScheduledProfiles( );
         if(index>=10) {
-                Applic.argToaster(act,"Too many schedules",Toast.LENGTH_LONG);
+                Applic.argToaster(act,"Za dużo harmonogramów",Toast.LENGTH_LONG);
                 return;
                 }
           }
@@ -577,7 +573,7 @@ static private void changeProfile(MainActivity act,int wasindex, ProfileSchedule
             return;
             }
         else {
-            Applic.argToaster(act,"Too many schedules",Toast.LENGTH_SHORT);
+            Applic.argToaster(act,"Za dużo harmonogramów",Toast.LENGTH_SHORT);
             }
     	});
 //    Button help=getbutton(act,R.string.helpname);
@@ -928,8 +924,6 @@ new View[]{isvalue},new View[]{ringisvalue},new View[]{alarmis,alarmtype},new Vi
 final private static String  codestr=String.valueOf(BuildConfig.VERSION_CODE);
 
 
-static private final List<String> supportedlanguages= Arrays.asList("Language","en","pl");
-
 static public Spinner getGenSpin(Activity context) {
     var spin=  new Spinner(context,isWearable?MODE_DIALOG: MODE_DROPDOWN);
     avoidSpinnerDropdownFocus(spin);
@@ -943,39 +937,6 @@ static public Spinner getGenSpin(Activity context) {
      return spin;
      }
 
-static private Spinner languagespinner(MainActivity context) {
-   var spin=  getGenSpin(context);
-//   spin.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
- //  spin.setTextDirection(View.TEXT_DIRECTION_LTR);
-    var locales=AppCompatDelegate.getApplicationLocales();
-    int prepos;
-    if(locales.isEmpty()||(prepos=supportedlanguages.indexOf(locales.get(0).getLanguage()))<1)
-        prepos=0;
-    final int pos=prepos;
-    spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-        @Override
-        public  void onItemSelected (AdapterView<?> parent, View view, int position, long id) {
-            if(position!=pos) {
-               var newlocale=(position==0)?getEmptyLocaleList():LocaleListCompat.forLanguageTags(supportedlanguages.get(position));
-               AppCompatDelegate.setApplicationLocales(newlocale);
-               }
-            }
-        @Override
-        public  void onNothingSelected (AdapterView<?> parent) {
-
-        } });
-
-    supportedlanguages.set(0,context.getString(R.string.languagename));
-   final var adapt=new LabelAdapter<String>(context,supportedlanguages,0);
-    spin.setAdapter(adapt);
-//    adapt.setDropDownViewResource(R.layout.spinner_dialog_item_center);
-
-//    var pos=supportedlanguages.indexOf(getlocale().getLanguage()); if(pos<0) pos=0;
-    spin.setSelection(pos);
-
-//       spin.setPadding(0,0,0,0);
-    return spin;
-    }
 static void mkrangelabel(TextView view,int res,float low, float high) {
      view.setText(view.getContext().getString(res)+" "+float2string(low)+"-"+float2string(high));
    }
@@ -1044,7 +1005,6 @@ static private void displaysettings(MainActivity context,Settings settings) {
       
       var close=getbutton(context,R.string.closename);
 
-    var langspin=languagespinner(context);
       Layout lay;
     if(isWearable)  {
       var iob=getcheckbox(context,"IOB",Natives.getIOB());
@@ -1085,7 +1045,7 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
         lay = new Layout(context, (l, w, h) -> {
                   int[] ret={w,h};
                  return ret;
-               },new View[]{colbut},graphrow,targetrow,new View[]{scalelabel}, new View[]{fixatex},new View[]{fixatey},new View[]{threslabel,threshold},new View[]{iob}/*,new View[]{Scans},new View[]{History},new View[]{Stream},new View[]{Calibrated},new View[]{Amounts}*/,new View[]{setuseclose},new View[]{close},new View[]{langspin});
+               },new View[]{colbut},graphrow,targetrow,new View[]{scalelabel}, new View[]{fixatex},new View[]{fixatey},new View[]{threslabel,threshold},new View[]{iob}/*,new View[]{Scans},new View[]{History},new View[]{Stream},new View[]{Calibrated},new View[]{Amounts}*/,new View[]{setuseclose},new View[]{close});
          }
       else {    
 //      var iob=getcheckbox(context,"IOB",Natives.getIOB());
@@ -1134,14 +1094,14 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
         lay = new Layout(context, (l, w, h) -> {
                   int[] ret={w,h};
                  return ret;
-               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,reverseorientation},new View[] {langspin,iob},new View[]{colbut,themebut,help,close})
+               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,reverseorientation},new View[] {iob},new View[]{colbut,themebut,help,close})
                .portraitLayout(
                     new View[]{graphlabel,glow,line,ghigh},
                     new View[]{scalelabel},new View[]{fixatex,fixatey},
                     new View[]{targetlabel,tlow,line2,thigh},
                     new View[]{threslabel,threshold},new View[]{dexfuture},
                     new View[]{levelleft},
-                    new View[]{langspin,iob},
+                    new View[]{iob},
                     new View[]{help,themebut},new View[]{colbut,close});
 
        themebut.setOnClickListener(v-> {
@@ -1178,7 +1138,7 @@ Runnable closerun= () -> {
       if(!thresstring.equals(newthreshold)) {
         float thres=str2float(newthreshold);
         if(thres>0.8f||thres<0.0f) {
-          Applic.argToaster(context, "A threshold should 0.0 - 0.8",Toast.LENGTH_LONG);
+          Applic.argToaster(context, "Próg powinien wynosić od 0.0 do 0.8",Toast.LENGTH_LONG);
            }
          else
            setthreshold(thres);
@@ -1341,7 +1301,7 @@ private    void mksettings(MainActivity context) {
         var hormarg=(int)(tk.glucodata.GlucoseCurve.metrics.density*30);
         alarmmarg.setMarginEnd(hormarg);
         View[] row9;
-        var intro=getbutton(context,"Intro");
+        var intro=getbutton(context,"Wprowadzenie");
          intro.setOnClickListener(v-> help(R.string.introhelp,context));
         if(advhelp!=null) {
             advanced=new Button(context);

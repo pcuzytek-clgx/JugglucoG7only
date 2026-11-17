@@ -52,7 +52,6 @@ import static android.text.Html.fromHtml;
 
 import static tk.glucodata.Log.doLog;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.core.app.LocaleManagerCompat;
 import androidx.core.os.LocaleListCompat;
@@ -115,18 +114,18 @@ static void sethtml(TextView view,int res) {
 static  Locale getReslocale() {
         return Applic.app.getResources().getConfiguration().getLocales().get(0);
     }
+public static final Locale POLISH=Locale.forLanguageTag("pl-PL");
 static public Locale getlocale() {
-	final var locales= AppCompatDelegate.getApplicationLocales();
-	if(locales.isEmpty())  {
-//		final var lang=Locale.getDefault();
-		final var lang=getReslocale();
-		{if(doLog) {Log.i("getlocale","Locale.getDefault()="+lang);};};
-		return lang;
-		}
-	final var lang2=locales.get(0);
-	{if(doLog) {Log.i("getlocale" ,"getApplicationLocales()="+lang2);};};
-	return lang2;
-
+	return POLISH;
+	}
+static void forcePolish(Context context) {
+	Locale.setDefault(POLISH);
+	var manager=context.getSystemService(android.app.LocaleManager.class);
+	if(manager==null)
+		return;
+	var current=manager.getApplicationLocales();
+	if(current.size()!=1||!POLISH.equals(current.get(0)))
+		manager.setApplicationLocales(new android.os.LocaleList(POLISH));
 	}
 
 

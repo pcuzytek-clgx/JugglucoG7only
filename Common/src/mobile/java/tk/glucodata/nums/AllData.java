@@ -1488,7 +1488,7 @@ private void applicationOpened(GarminPeer gp,IQOpenApplicationStatus status) {
                 Applic.argToaster(getApplication(), "APP_IS_ALREADY_RUNNING", Toast.LENGTH_SHORT);
                 mAppIsOpen = true;
             } else {
-                Applic.argToaster(getApplication(), "Open App", Toast.LENGTH_SHORT);
+                Applic.argToaster(getApplication(), "Otwórz aplikację", Toast.LENGTH_SHORT);
                 mAppIsOpen = false;
             }
            // Bootstrap this peer independently.  START's reply marks it ready
@@ -3673,7 +3673,7 @@ void onGarminSdkShutDown(MyConnectIQListener listener) {
          ++gp.glucoseGeneration;
          if(gp.queuedGlucose==null) gp.queuedGlucose=gp.inflightGlucose;
          gp.inflightGlucose=null;
-         gp.lastError="Garmin Connect SDK stopped";
+         gp.lastError="Garmin Connect SDK zatrzymany";
          }
       }
    if(doLog) Log.i(LOG_ID,"Garmin Connect SDK stopped; hard SDK restart armed"+

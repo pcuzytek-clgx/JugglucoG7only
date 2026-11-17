@@ -36,7 +36,7 @@ union bounds_t ;
 typedef std::pair<std::string_view,std::string_view> errortype;
 struct geo_t;
 struct jugglucotext;
-extern const jugglucotext engtext;
+extern jugglucotext pltext;
 
 struct JCurve {
 protected:
@@ -76,7 +76,7 @@ inline float gconvert(const float mgperL) const {
 inline int userunit2mgL(const float unit) const {
         return (int)round(unit/convertmult);
         }
-const jugglucotext *usedtext=&engtext;
+const jugglucotext *usedtext=&pltext;
 
 bool isRTL() const {
     return false;

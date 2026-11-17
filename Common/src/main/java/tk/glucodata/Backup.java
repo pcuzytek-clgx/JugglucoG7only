@@ -284,10 +284,10 @@ static public String changehostError(MainActivity act,int pos) {
                case -2 : yield act.getString(R.string.parseip);
                case -3 : yield act.getString(R.string.toomanyhosts);
                case -4 : yield act.getString(R.string.senthosts);
-               case -5 : yield "Hostname too long";
-            case -6 : yield "Database busy, try again";
-               case -7 : yield "Invalid mirror transport or missing connection label";
-               default : yield "Error";
+               case -5 : yield "Nazwa hosta jest za długa";
+            case -6 : yield "Baza danych zajęta, spróbuj ponownie";
+               case -7 : yield "Nieprawidłowy transport klonowania lub brak etykiety połączenia";
+               default : yield "Błąd";
             };
             return mess;
             }
@@ -456,7 +456,7 @@ CheckDirectionBox ICE;
 
        checkhostname.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
          if(isChecked) {
-            Applic.argToaster(act,"hostname is slow",Toast.LENGTH_LONG);
+            Applic.argToaster(act,"Nazwa hosta spowalnia działanie",Toast.LENGTH_LONG);
             doHasName.run();
             }
          else {
@@ -541,7 +541,7 @@ CheckDirectionBox ICE;
        fromrow=new View[]{startlabel, alldata,fromnow,screenpos};
 
       setradio(sendfrom);
-      CheckDirectionBox restore=new CheckDirectionBox(act);restore.setText("Restore");
+      CheckDirectionBox restore=new CheckDirectionBox(act);restore.setText("Przywróć");
       if(!Natives.backuphasrestore( ))
          restore.setVisibility(GONE);
 
@@ -1043,7 +1043,7 @@ new View[]{Portlabel,portedit,checkhostname},new View[]{IPslabel,detect},
       String mirrorInfo=mirrorStatus(pos);
       final String bluetoothStatus=BleMirror.statusForConnection(pos);
       if(bluetoothStatus!=null)
-         mirrorInfo+="<p><b>Bluetooth mirror:</b> "+TextUtils.htmlEncode(bluetoothStatus)+"</p>";
+         mirrorInfo+="<p><b>Klonowanie Bluetooth:</b> "+TextUtils.htmlEncode(bluetoothStatus)+"</p>";
       sethtml(info,mirrorInfo);
 
       ViewGroup layall;
@@ -1396,7 +1396,7 @@ private int getMirrorListColor(MainActivity act) {
        if(!isWearable) {
           if(transport==BleMirror.TRANSPORT_AUTOMATIC||transport==BleMirror.TRANSPORT_TCP) {
              if(ICElabelstr==null) {
-                  sb.append((names!=null&&names.length!=0)?names[0]:(Natives.detectIP(pos)?"Detect":"---"));
+                  sb.append((names!=null&&names.length!=0)?names[0]:(Natives.detectIP(pos)?"Wykryj":"---"));
                   if(!passive) {
                      sb.append(" ");
                      sb.append(port);

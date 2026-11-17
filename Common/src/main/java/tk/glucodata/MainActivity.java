@@ -311,7 +311,7 @@ boolean glversion() {
         try {
         {if(doLog) {Log.i(LOG_ID,"OpenGl "+Double.parseDouble(configurationInfo.getGlEsVersion()));};};
         if(( configurationInfo.reqGlEsVersion>>16)<openglversion) {
-            help.help("This program requires OpenGL ES "+openglversion+".0 or higher. This device has OpenGL ES "+ Double.parseDouble(configurationInfo.getGlEsVersion())+" so can't be used.\n\n\n\n\n",this,l->finish());
+            help.help("Ten program wymaga OpenGL ES "+openglversion+".0 lub nowszego. To urządzenie ma OpenGL ES "+ Double.parseDouble(configurationInfo.getGlEsVersion())+", więc nie może być używane.\n\n\n\n\n",this,l->finish());
             return false;
             }
            } catch(Throwable e){
@@ -1137,20 +1137,20 @@ static boolean hasTech(String[] techs, String want) {
     return false;
      }
 private void outofStorageSpace() {
-    String message= "Not enough Storage Space!!";
+    String message= "Za mało miejsca w pamięci!!";
     Applic.argToaster(this,message,Toast.LENGTH_SHORT);
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setNegativeButton(R.string.ok, (dialog, id) -> { // User cancelled the dialog
         finish();    
     keeprunning.stop();
     System.exit(7);
-    }).setTitle("Juggluco has to exit").setMessage(message).show().setCanceledOnTouchOutside(false);
+    }).setTitle("Juggluco musi zostać zamknięty").setMessage(message).show().setCanceledOnTouchOutside(false);
    
    }
 private void makefilesfailed() {
 File files=getFilesDir();
 String filespath=files.getAbsolutePath();
-    String message= "Can't create directory:\n"+filespath+(files.isFile()?"\nA regular file with that name exists":"\nNot enough storage space?");
+    String message= "Nie można utworzyć katalogu:\n"+filespath+(files.isFile()?"\nIstnieje zwykły plik o tej nazwie":"\nZa mało miejsca w pamięci?");
     Applic.argToaster(this,message,Toast.LENGTH_SHORT);
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     Runnable end=()-> {
@@ -1161,7 +1161,7 @@ String filespath=files.getAbsolutePath();
     var dialog=builder.setNegativeButton(R.string.ok, (dial, id) -> {
     end.run();
         // User cancelled the dialog
-    }).setTitle("Juggluco has to exit").setMessage(message).create();
+    }).setTitle("Juggluco musi zostać zamknięty").setMessage(message).create();
    dialog.setCanceledOnTouchOutside(false);
    dialog.setOnShowListener(d->{
        Log.e(LOG_ID,"setOnShowListener");
@@ -1175,7 +1175,7 @@ String filespath=files.getAbsolutePath();
    }
 
 void activateresult(boolean res) {
-    String message= "Activation "+(res?"successfull":"failed");
+    String message= "Aktywacja "+(res?"udana":"nieudana");
     Applic.argToaster(this,message,Toast.LENGTH_SHORT);
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setNegativeButton(R.string.ok, (dialog, id) -> { // User cancelled the dialog
@@ -1468,7 +1468,7 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
             } else {
                 {if(doLog) {Log.i(LOG_ID,"denied");};};
                 //setbluetoothmain(false);
-                Applic.argToaster(this,"No permission. Sensor via Bluetooth turned off", Toast.LENGTH_LONG);
+                Applic.argToaster(this,"Brak uprawnień. Sensor przez Bluetooth wyłączony", Toast.LENGTH_LONG);
 
                 if(!gaverational) {
                     bluediag.returntoblue=false;
@@ -1879,7 +1879,7 @@ private boolean systemlocation() {
                  case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                      // Location settings are not satisfied. However, we have no way to fix the
                      // settings so we won't show the dialog.
-                     Applic.Toaster("No location, don't know how to fix it");
+                     Applic.Toaster("Brak lokalizacji, nie wiadomo jak to naprawić");
                      break;
               }
          }
