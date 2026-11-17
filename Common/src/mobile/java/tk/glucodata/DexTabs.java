@@ -4,21 +4,23 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Log.doLog;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.navigation.NavigationBarView;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -34,15 +36,10 @@ import tk.glucodata.settings.Settings;
 public final class DexTabs {
 private static final String LOG_ID="DexTabs";
 public static final int GLUCOSE=0,STATISTICS=1,CONNECTIONS=2,SETTINGS=3;
-private static final int BARCOLOR=0xFF262626;
-private static final int TEXTCOLOR=0xFFE0E0E0;
-private static final int SELECTEDCOLOR=0xFFE0E0E0;
-private static final int SELECTEDTEXT=0xFF1A1A1A;
-
 private static MainActivity activity=null;
 private static FrameLayout content=null;
-private static LinearLayout bar=null;
-private static TextView[] labels=null;
+private static BottomNavigationView bar=null;
+private static boolean selecting=false;
 private static FrameLayout alarmview=null;
 private static boolean visible=false;
 private static int current=GLUCOSE;
@@ -53,7 +50,7 @@ private static int dp(float val) {
     return (int)(val*GlucoseCurve.metrics.density+.5f);
     }
 private static int barHeight() {
-    return dp(64);
+    return dp(80);
     }
 
 public static boolean isShown() {
@@ -68,30 +65,28 @@ static void attach(MainActivity act) {
     activity=act;
     content=act.findViewById(android.R.id.content);
     final int[] names={R.string.tabglucose,R.string.tabstatistics,R.string.connections,R.string.settings};
-    bar=new LinearLayout(act);
-    bar.setOrientation(LinearLayout.HORIZONTAL);
-    bar.setBackgroundColor(BARCOLOR);
+    final int[] icons={R.drawable.ic_show_chart,R.drawable.ic_bar_chart,R.drawable.ic_bluetooth,R.drawable.ic_settings};
+    bar=new BottomNavigationView(act);
+    bar.setLabelVisibilityMode(NavigationBarView.LABEL_VISIBILITY_LABELED);
+    var menu=bar.getMenu();
+    for(int i=0;i<names.length;i++)
+        menu.add(Menu.NONE,i,i,names[i]).setIcon(icons[i]);
+    // Insets are handled below (the bar is placed in android.R.id.content which gets enlarged insets).
+    ViewCompat.setOnApplyWindowInsetsListener(bar,(v,insets)->insets);
+    bar.setOnItemSelectedListener(item-> {
+        if(selecting)
+            return true;
+        select(item.getItemId());
+        return item.getItemId()==current;
+        });
+    bar.setOnItemReselectedListener(item-> {
+        if(!selecting)
+            select(item.getItemId());
+        });
     bar.setClickable(true);
     bar.setVisibility(View.GONE);
     // Z order keeps the bar above screens that call bringToFront().
-    bar.setOutlineProvider(null);
-    bar.setTranslationZ(dp(100));
-    labels=new TextView[names.length];
-    for(int i=0;i<names.length;i++) {
-        final int tab=i;
-        var cell=new FrameLayout(act);
-        cell.setOnClickListener(v->select(tab));
-        var label=new TextView(act);
-        label.setText(names[i]);
-        label.setTextSize(TypedValue.COMPLEX_UNIT_SP,14);
-        label.setSingleLine(true);
-        label.setGravity(Gravity.CENTER);
-        label.setPadding(dp(14),dp(6),dp(14),dp(6));
-        cell.addView(label,new FrameLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT,Gravity.CENTER));
-        labels[i]=label;
-        bar.addView(cell,new LinearLayout.LayoutParams(0,MATCH_PARENT,1.0f));
-        }
-    content.addView(bar,new FrameLayout.LayoutParams(MATCH_PARENT,barHeight(),Gravity.BOTTOM));
+    bar.setTranslationZ(dp(100));    content.addView(bar,new FrameLayout.LayoutParams(MATCH_PARENT,barHeight(),Gravity.BOTTOM));
     current=Menus.on?CONNECTIONS:GLUCOSE;
     showSelected();
     ViewCompat.setOnApplyWindowInsetsListener(content,(v,insets)-> {
@@ -126,7 +121,6 @@ static void detach(MainActivity act) {
     activity=null;
     content=null;
     bar=null;
-    labels=null;
     alarmview=null;
     visible=false;
     }
@@ -154,23 +148,14 @@ static void toFront() {
     }
 
 private static void showSelected() {
-    if(labels==null)
+    if(bar==null||bar.getSelectedItemId()==current)
         return;
-    for(int i=0;i<labels.length;i++) {
-        final var label=labels[i];
-        if(i==current) {
-            var pill=new GradientDrawable();
-            pill.setColor(SELECTEDCOLOR);
-            pill.setCornerRadius(dp(16));
-            label.setBackground(pill);
-            label.setTextColor(SELECTEDTEXT);
-            label.setTypeface(null,Typeface.BOLD);
-            }
-        else {
-            label.setBackground(null);
-            label.setTextColor(TEXTCOLOR);
-            label.setTypeface(null,Typeface.NORMAL);
-            }
+    selecting=true;
+    try {
+        bar.setSelectedItemId(current);
+        }
+    finally {
+        selecting=false;
         }
     }
 
@@ -250,22 +235,20 @@ public static void showAlarm(boolean on) {
         card.setOrientation(LinearLayout.VERTICAL);
         card.setGravity(Gravity.CENTER_HORIZONTAL);
         var cardback=new GradientDrawable();
-        cardback.setColor(BARCOLOR);
-        cardback.setCornerRadius(dp(24));
+        cardback.setColor(M3.color(act,com.google.android.material.R.attr.colorSurfaceContainerHigh,0xFF2B2B2B));
+        cardback.setCornerRadius(dp(28));
         card.setBackground(cardback);
         final int pad=dp(24);
         card.setPadding(pad,pad,pad,pad);
-        var stop=new Button(act);
+        var stop=new MaterialButton(act);
         stop.setText(R.string.stopalarmbutton);
         stop.setAllCaps(false);
         stop.setTextSize(TypedValue.COMPLEX_UNIT_SP,22);
-        stop.setTextColor(Color.WHITE);
-        var red=new GradientDrawable();
-        red.setColor(0xFFD32F2F);
-        red.setCornerRadius(dp(32));
-        stop.setBackground(red);
+        stop.setTextColor(M3.color(act,com.google.android.material.R.attr.colorOnError,Color.WHITE));
+        stop.setBackgroundTintList(ColorStateList.valueOf(M3.color(act,androidx.appcompat.R.attr.colorError,0xFFD32F2F)));
+        stop.setCornerRadius(dp(32));
         stop.setPadding(dp(32),dp(16),dp(32),dp(16));
-        stop.setMinHeight(dp(64));
+        stop.setMinHeight(dp(72));
         stop.setOnClickListener(v->Notify.stopalarm());
         card.addView(stop,new LinearLayout.LayoutParams(dp(260),WRAP_CONTENT));
         scrim.addView(card,new FrameLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT,Gravity.CENTER));
