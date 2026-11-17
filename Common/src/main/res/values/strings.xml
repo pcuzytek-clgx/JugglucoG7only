@@ -299,7 +299,6 @@
 <string name="toomanyhosts">Maximal number of hosts exceeded</string>
 <string name="senthosts">Juggluco sends to maximal 6 hosts</string>
     <string name="hostname">Hostname</string>
-   <string name="clampnow">Now clamp</string>
     <string name="sendfrom">"Send from: "</string>
  <string name="changestartbutton">Change start</string>
  <string name="uploader">Uploader</string>

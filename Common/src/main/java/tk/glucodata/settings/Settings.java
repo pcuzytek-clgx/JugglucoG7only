@@ -1024,9 +1024,6 @@ static private void displaysettings(MainActivity context,Settings settings) {
    var help=getbutton(context,R.string.helpname);
   help.setOnClickListener(v->{help(R.string.displayhelp,context); });
 
-    var fixed=getcheckbox(context,R.string.clampnow,Natives.getcurrentRelative());
-     fixed.setOnCheckedChangeListener( (buttonView,  isChecked) -> Natives.setcurrentRelative(isChecked));
-
 
     TextView scalelabel=getlabel(context,R.string.manuallyscale);
     CheckDirectionBox fixatex =new CheckDirectionBox(context);
@@ -1085,11 +1082,10 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
     Stream.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshowstream(isChecked); });
     Amounts.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshownumbers(isChecked); });
     */
-       fixed.setPaddingRelative(0,0,0,(int)(tk.glucodata.GlucoseCurve.metrics.density*7.0));
         lay = new Layout(context, (l, w, h) -> {
                   int[] ret={w,h};
                  return ret;
-               },new View[]{colbut},graphrow,targetrow,new View[]{scalelabel}, new View[]{fixatex},new View[]{fixatey},new View[]{threslabel,threshold},new View[]{fixed},new View[]{iob}/*,new View[]{Scans},new View[]{History},new View[]{Stream},new View[]{Calibrated},new View[]{Amounts}*/,new View[]{setuseclose},new View[]{close},new View[]{langspin});
+               },new View[]{colbut},graphrow,targetrow,new View[]{scalelabel}, new View[]{fixatex},new View[]{fixatey},new View[]{threslabel,threshold},new View[]{iob}/*,new View[]{Scans},new View[]{History},new View[]{Stream},new View[]{Calibrated},new View[]{Amounts}*/,new View[]{setuseclose},new View[]{close},new View[]{langspin});
          }
       else {    
 //      var iob=getcheckbox(context,"IOB",Natives.getIOB());
@@ -1138,14 +1134,14 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
         lay = new Layout(context, (l, w, h) -> {
                   int[] ret={w,h};
                  return ret;
-               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,reverseorientation},new View[] {langspin,iob,fixed},new View[]{colbut,themebut,help,close})
+               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,reverseorientation},new View[] {langspin,iob},new View[]{colbut,themebut,help,close})
                .portraitLayout(
                     new View[]{graphlabel,glow,line,ghigh},
                     new View[]{scalelabel},new View[]{fixatex,fixatey},
                     new View[]{targetlabel,tlow,line2,thigh},
                     new View[]{threslabel,threshold},new View[]{dexfuture},
                     new View[]{levelleft},
-                    new View[]{fixed},new View[]{langspin,iob},
+                    new View[]{langspin,iob},
                     new View[]{help,themebut},new View[]{colbut,close});
 
        themebut.setOnClickListener(v-> {

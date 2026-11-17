@@ -441,13 +441,6 @@ extern "C" JNIEXPORT void JNICALL fromjava(initopengl)(JNIEnv* env, jclass obj, 
 // appcurve.setdiffcurrent(settings->data()->currentRelative);
 }
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setcurrentRelative)(JNIEnv *env, jclass cl,jboolean val) {
- settings->data()->currentRelative=val;
- appcurve.setdiffcurrent(val);
- }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getcurrentRelative)(JNIEnv *env, jclass cl) {
- return settings->data()->currentRelative;
- }
 
 
 std::string_view libdirname;

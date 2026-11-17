@@ -711,8 +711,6 @@ public static native boolean getIOB( );
 public static native float getIOBvalue(long time);
 public static native String serverError();
 public static native String nightError();
-public static native void setcurrentRelative(boolean val);
-public static native boolean getcurrentRelative( );
 public static native boolean getHostDeactivated(int pos);
 public static native void setHostDeactivated(int pos,boolean val);
 

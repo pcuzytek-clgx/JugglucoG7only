@@ -299,7 +299,6 @@
 <string name="toomanyhosts">Przekroczono maksymalną liczbę hostów</string>
 <string name="senthosts">Juggluco wysyła do maksymalnie 6 hostów</string>
     <string name="hostname">nazwa hosta</string>
-   <string name="clampnow">Zawsze teraz</string>
     <string name="sendfrom">"Wysyłaj od: "</string>
  <string name="changestartbutton">Zmień początek</string>
  <string name="uploader">Przesył do NS</string>
