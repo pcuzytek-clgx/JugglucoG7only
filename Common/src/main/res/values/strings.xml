@@ -1,6 +1,13 @@
 <resources>
     <string name="language">pl</string>
     <string name="app_name">Juggluco</string>
+    <string name="m3_measurement">Pomiary</string>
+    <string name="m3_data">Dane</string>
+    <string name="m3_appearance">Wyświetlanie</string>
+    <string name="m3_other">Inne</string>
+    <string name="m3_connection">Połączenie</string>
+    <string name="m3_general">Ogólne</string>
+    <string name="m3_version">Wersja</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Anuluj</string>

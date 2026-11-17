@@ -1151,9 +1151,68 @@ Runnable closerun= () -> {
 //       graphrange.setLabelBehavior(LabelFormatter.LABEL_WITHIN_BOUNDS);
 //       graphrange.setLabelBehavior(LabelFormatter.LABEL_FLOATING);
  //      graphrange.setHaloRadius((int)(tk.glucodata.GlucoseCurve.metrics.density*15.0f));
+private void mkM3settings(MainActivity context) {
+    var page=new tk.glucodata.M3.Page(context,R.string.settings,false);
+    final View parent=page.root;
+
+    var meas=page.group(R.string.m3_measurement);
+    meas.nav(R.string.alarms,null,v->alarmsettings(context,parent));
+    meas.nav(R.string.calibration,null,v->Calibration.show(context,parent));
+    var glucosenotify=getcheckbox(context,R.string.glucosestatusbar,Natives.getshowalways());
+    glucosenotify.setOnCheckedChangeListener((buttonView,isChecked)->Notify.glucosestatus(isChecked));
+    meas.toggle(glucosenotify);
+    if(MainActivity.hasnfc) {
+        var nfcsound=getcheckbox(context,R.string.nfcsound,Natives.nfcsound());
+        nfcsound.setOnCheckedChangeListener((buttonView,isChecked)-> {
+            Natives.setnfcsound(isChecked);
+            context.setnfc();
+            });
+        meas.toggle(nfcsound);
+        scanenabled=IntentscanEnabled();
+        var globalscan=getcheckbox(context,R.string.startsapp,scanenabled);
+        globalscan.setOnCheckedChangeListener((buttonView,isChecked)->EnableIntentScanning(isChecked));
+        meas.toggle(globalscan);
+        final int diskey=Natives.camerakey();
+        if(diskey>0) {
+            var camera=getcheckbox(context,R.string.disablecamerakey,diskey==1);
+            camera.setOnCheckedChangeListener((buttonView,isChecked)->Natives.setcamerakey(isChecked?1:2));
+            meas.toggle(camera);
+            }
+        }
+    var googlescan=getcheckbox(context,R.string.googlescan,Natives.getGoogleScan());
+    googlescan.setOnCheckedChangeListener((buttonView,isChecked)->Natives.setGoogleScan(isChecked));
+    meas.toggle(googlescan);
+
+    var data=page.group(R.string.m3_data);
+    data.nav(R.string.exchanges,null,v->exchanges(context,parent));
+    if(doLog)
+        data.nav(R.string.logging,null,v->LogConfig.make(context,parent));
+
+    var look=page.group(R.string.m3_appearance);
+    look.nav(R.string.display,null,v->displaysettings(context,this));
+
+    var other=page.group(R.string.m3_other);
+    other.action(R.string.helpname,null,v->help(R.string.settinghelp,context));
+    other.action("Wprowadzenie",null,v->help(R.string.introhelp,context));
+    final String advhelp=Natives.advanced();
+    if(advhelp!=null)
+        other.action(R.string.advanced,null,v-> {
+            EnableControls(parent,false);
+            help(advhelp,context,l->EnableControls(parent,true));
+            });
+    other.value(context.getString(R.string.m3_version),getlabel(context,BuildConfig.VERSION_NAME));
+
+    settinglayout=page.root;
+    page.showOnly();
+    }
 private    void mksettings(MainActivity context) {
 
     if(settinglayout==null) {
+    if(!isWearable) {
+        mkM3settings(context);
+        setvalues();
+        return;
+        }
 
 
         Button changelabels=new Button(context);
