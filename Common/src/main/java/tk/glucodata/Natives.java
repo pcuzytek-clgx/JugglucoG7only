@@ -932,7 +932,6 @@ public static native void setRotate(boolean val);
 public static native boolean getRotate( );
 
 
-public static native void setRotateText(boolean val);
 public static native boolean getRotateText( );
 
 

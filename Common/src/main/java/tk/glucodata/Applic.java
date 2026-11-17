@@ -896,6 +896,8 @@ if(isWearable) {
    if(!Natives.gethour24())
       Natives.sethour24(true);
    setjavahour24(true);
+   if(Natives.getRotate())
+      Natives.setRotate(false);
         }
 
 static public boolean getHeartRate() {

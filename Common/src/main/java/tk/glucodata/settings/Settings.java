@@ -1116,80 +1116,35 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
 
         Layout.getMargins(close).setMarginEnd(amarg);
         var themebut=getbutton(context,R.string.theme);
-        var didautorotate=Natives.getRotate();
-
-        var rotateText=getcheckbox(context,R.string.rotateText,Natives.getRotateText());
-        var autorotate=getcheckbox(context,R.string.autorotate,didautorotate);
-
-        /* A managed/work profile can have its own ACCELEROMETER_ROTATION row,
-         * different from the parent user's physical-display rotation policy.
-         * When Juggluco Auto-rotate is enabled, MainActivity therefore lets
-         * SCREEN_ORIENTATION_FULL_USER defer to WindowManager.  Use the same
-         * rule here, otherwise the Work Profile incorrectly hides Rotate text. */
-        final boolean managedProfile;
-        var userManager=(android.os.UserManager)context.getSystemService(android.content.Context.USER_SERVICE);
-        managedProfile=userManager!=null&&userManager.isManagedProfile();
-
-        /* These controls are local to displaysettings(): whether they have an
-         * effect is a property of the current display/orientation policy, not
-         * persistent Settings object state. */
-        Runnable updateOrientationOptionVisibility=()-> {
+        /* G7 fork: auto-rotate is always off. Rotate 180° only has an effect on
+         * elongated large screens without the Android 16 large-screen restriction;
+         * phones draw the graph directly in portrait (MainActivity.applyScreenOrientation). */
+        {
             final var config=context.getResources().getConfiguration();
             final boolean largeScreen=config.smallestScreenWidthDp>=600;
             final int shortSide=Math.min(config.screenWidthDp,config.screenHeightDp);
             final int longSide=Math.max(config.screenWidthDp,config.screenHeightDp);
             final boolean elongated=shortSide>0&&((float)longSide/shortSide)>=1.45f;
-            final boolean nearlySquare=largeScreen&&!elongated;
-            final boolean systemAutoRotate=managedProfile||android.provider.Settings.System.getInt(
-                    context.getContentResolver(),
-                    android.provider.Settings.System.ACCELEROMETER_ROTATION,1)!=0;
-            final boolean effectiveAutoRotate=Natives.getRotate()&&systemAutoRotate;
             final boolean android16LargeRestriction=context.getApplicationInfo().targetSdkVersion>=36;
-
-            final boolean orientationHasEffect;
-            if(nearlySquare)
-                orientationHasEffect=false;
-            else if(!effectiveAutoRotate&&largeScreen&&elongated&&android16LargeRestriction)
-                orientationHasEffect=false;
-            else if(!effectiveAutoRotate)
-                orientationHasEffect=true;
-            else
-                orientationHasEffect=!Natives.getRotateText();
-
-            final boolean rotateTextHasEffect=effectiveAutoRotate&&!nearlySquare;
-            /* G7 fork: phones draw the graph directly in portrait, so these
-             * options have no effect there (MainActivity.applyScreenOrientation). */
-            reverseorientation.setVisibility(orientationHasEffect&&largeScreen?VISIBLE:INVISIBLE);
-            rotateText.setVisibility(rotateTextHasEffect&&largeScreen?VISIBLE:INVISIBLE);
-            };
+            reverseorientation.setVisibility(largeScreen&&elongated&&!android16LargeRestriction?VISIBLE:GONE);
+        }
 
         reverseorientation.setOnCheckedChangeListener( (buttonView,  isChecked) ->  {
                 int ori= (isChecked?SCREEN_ORIENTATION_REVERSE_LANDSCAPE:SCREEN_ORIENTATION_LANDSCAPE);
                 Natives.setScreenOrientation(ori);
                 context.applyScreenOrientation(context.getResources().getConfiguration());
                 });
-        autorotate.setOnCheckedChangeListener( (buttonView,  isChecked) -> {
-                setAutoRotateOn(context,isChecked);
-                updateOrientationOptionVisibility.run();
-                });
-        rotateText.setOnCheckedChangeListener( (buttonView,  isChecked) -> {
-            Natives.setRotateText(isChecked);
-            context.applyScreenOrientation(context.getResources().getConfiguration());
-            updateOrientationOptionVisibility.run();
-            });
-
-        updateOrientationOptionVisibility.run();
 
         lay = new Layout(context, (l, w, h) -> {
                   int[] ret={w,h};
                  return ret;
-               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,autorotate,rotateText,reverseorientation},new View[] {langspin,iob,fixed},new View[]{colbut,themebut,help,close})
+               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,reverseorientation},new View[] {langspin,iob,fixed},new View[]{colbut,themebut,help,close})
                .portraitLayout(
                     new View[]{graphlabel,glow,line,ghigh},
                     new View[]{scalelabel},new View[]{fixatex,fixatey},
                     new View[]{targetlabel,tlow,line2,thigh},
                     new View[]{threslabel,threshold},new View[]{dexfuture},
-                    new View[]{levelleft},new View[]{reverseorientation},new View[]{autorotate,rotateText},
+                    new View[]{levelleft},
                     new View[]{fixed},new View[]{langspin,iob},
                     new View[]{help,themebut},new View[]{colbut,close});
 
@@ -1607,10 +1562,4 @@ public static void   removeContentView(View view) {
     if(parent!=null)
         parent.removeView(view);
     }
-
-//@Override
-private static void setAutoRotateOn(MainActivity act,boolean isChecked) {
-     Natives.setRotate(isChecked);
-     act.applyScreenOrientation(act.getResources().getConfiguration());
-     }
 }

@@ -1806,9 +1806,6 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getRotate)(JNIEnv *env, jclass
     }
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setRotateText)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->rotateText=val;
-    }
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getRotateText)(JNIEnv *env, jclass cl) {
     return settings->data()->rotateText;
     }

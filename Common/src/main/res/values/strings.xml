@@ -495,8 +495,6 @@
     <string name="webdirectoryempty">This directory is empty</string>
     <string name="webdirectoryentry">[dir] %1$s</string>
 
-    <string name="autorotate">Auto-rotate</string>
-    <string name="rotateText">Rotate text</string>
 
     <string name="mirror_transport">Connection method:</string>
     <string name="transport_automatic">Automatic</string>
