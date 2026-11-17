@@ -58,46 +58,6 @@ and the rules don\'t specifically cover flashing lights.</p>
 </p>
 ]]>
 </string>
-<string name="reminders" >
-<![CDATA[
-<p><a href="https://www.juggluco.nl/Jugglucohelp/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/reminders.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/reminders.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/reminders.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/reminders.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/fr/reminders.html">fr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/reminders.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/reminders.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/reminders.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/reminders.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/reminders.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/reminders.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pt/reminders.html">pt</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/reminders.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/reminders.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/reminders.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/reminders.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/reminders.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/reminders.html?lang=en">en</a>&emsp;&emsp;</p><h1 class="western">Reminders</h1>
-<p style="line-height: 100%; margin-bottom: 0cm">Reminders remind you
-if you haven\'t entered a certain amount within a certain time
-interval.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">By pressing <b>NEW</b>
-you can add a new reminder.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">Specify begin and
-end time of the time period, within which you should enter the
-specified amount under the specified label.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">When the end time is
-reached, the program checks whether you have entered at least this
-amount, under the specified label, since the begin time. If you
-didn\'t register, a notification is shown and a ringtone played.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">For example if you
-specify:</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><i>Levemir 6.0</i></p>
-<p style="line-height: 100%; margin-bottom: 0cm"><i>21:30 - 23:55</i></p>
-<p style="line-height: 100%; margin-bottom: 0cm">You will be reminded
-after 23:55 if you didn\'t specify at least 6 units of Levemir after
-21:30 the same day.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">Already specified
-reminders are shown in a list. Touch to edit.</p>
-<p style="line-height: 100%; margin-bottom: 0cm">If everything goes
-well, reminders also work after reboot of Android without the user
-having to start Juggluco. 
-</p>
-<p style="line-height: 100%; margin-bottom: 0cm"><br/>
-
-</p>
-<p style="line-height: 100%; margin-bottom: 0cm">On some Huawei
-devices, you need to specify that you allow a program to be started
-at boot. This is done under Android Settings -&gt; Battery -&gt; App
-launch. Here you select <i>Manually managed</i> for Juggluco so that
-<i>Auto-Launch</i> and <i>Run in Background</i> are on. This is also
-necessary for loss of signal alarms to work after reboot without the
-user starting Juggluco.</p>
-]]>
-</string>
 <string name="connectionoverview" >
 <![CDATA[
 <p><a href="https://www.juggluco.nl/Jugglucohelp/index.html">index</a></p><p><a href="https://www.juggluco.nl/Jugglucohelp/ar/connectionoverview.html">ar</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/be/connectionoverview.html">be</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/de/connectionoverview.html">de</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/es/connectionoverview.html">es</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/fr/connectionoverview.html">fr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/hi/connectionoverview.html">hi</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/it/connectionoverview.html">it</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ja/connectionoverview.html">ja</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ko/connectionoverview.html">ko</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/nl/connectionoverview.html">nl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pl/connectionoverview.html">pl</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/pt/connectionoverview.html">pt</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/ru/connectionoverview.html">ru</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/sv/connectionoverview.html">sv</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/tr/connectionoverview.html">tr</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uk/connectionoverview.html">uk</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/uz/connectionoverview.html">uz</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/zh/connectionoverview.html">zh</a>&emsp;&emsp;<a href="https://www.juggluco.nl/Jugglucohelp/connectionoverview.html?lang=en">en</a>&emsp;&emsp;</p><h1>Mirror</h1>

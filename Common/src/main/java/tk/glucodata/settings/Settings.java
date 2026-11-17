@@ -1337,7 +1337,6 @@ private    void mksettings(MainActivity context) {
                 hidekeyboard();
                 new LabelsClass(context).mklabellayout(thelayout[0]);});
               }
-    Button numalarm=getbutton(context,R.string.remindersname);
     Button advanced=null;
 
 
@@ -1376,7 +1375,7 @@ private    void mksettings(MainActivity context) {
             }
 
 
-        View[] camornum=new View[] {alarmbut,numalarm};
+        View[] camornum=new View[] {alarmbut};
         if(BuildConfig.minSDK>=26) {
             views = new View[][]{new View[]{displayview}, hasnfc ? (new View[]{globalscan, nfcsound}) : null,new View[]{complications},talkrow, new View[]{exchanges },new View[]{calibration},   camornum, new View[]{close}, new View[]{getlabel(context, tk.glucodata.BuildTime.TIME)}, new View[]{getlabel(context, BuildConfig.VERSION_NAME)}, new View[]{getlabel(context, codestr)}};
             ;
@@ -1422,13 +1421,13 @@ private    void mksettings(MainActivity context) {
                 }
 
         View[] rowglu=new View[]{calibration,glucosenotify};
-        views=new View[][]{hasnfc?new View[]{nfcsound, globalscan,camera}:null,rowglu,new View[]{exchanges,numalarm,alarmbut},numdis, row9};
+        views=new View[][]{hasnfc?new View[]{nfcsound, globalscan,camera}:null,rowglu,new View[]{exchanges,alarmbut},numdis, row9};
 
         if(advhelp!=null) {
             portraitViews=new View[][]{
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
                 new View[]{calibration,glucosenotify},
-                new View[]{exchanges,numalarm},new View[]{alarmbut},
+                new View[]{exchanges,alarmbut},
                 new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2]}:null,
                 new View[]{help,advanced},new View[]{intro,close}};
             }
@@ -1436,7 +1435,7 @@ private    void mksettings(MainActivity context) {
             portraitViews=new View[][]{
                 hasnfc?new View[]{nfcsound}:null,hasnfc?new View[]{globalscan}:null,hasnfc?new View[]{camera}:null,
                 new View[]{calibration,glucosenotify},
-                new View[]{exchanges,numalarm},new View[]{alarmbut},
+                new View[]{exchanges,alarmbut},
                 new View[]{numdis[0],numdis[1]},doLog?new View[]{numdis[2]}:null,
                 new View[]{help,intro,close}};
             }
@@ -1500,9 +1499,6 @@ private    void mksettings(MainActivity context) {
 
     final    int laywidth=MATCH_PARENT;
      context.addMyContentView(settinglayout, new ViewGroup.LayoutParams( laywidth ,MATCH_PARENT));
-    numalarm.setOnClickListener(v-> {
-        new tk.glucodata.setNumAlarm().mkviews(context,settinglayout);
-        });
     displayview.setOnClickListener(v-> {
          displaysettings(context,this);
          });

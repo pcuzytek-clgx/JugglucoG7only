@@ -90,7 +90,6 @@
  <string name="sensorviabluetoothon">W przypadku alarmów w urządzeniach nieobsługujących klonowania należy włączyć opcję „Sensor przez bluetooth”</string>
  <string name="numberlabels">Etykiety wart. liczb.</string>
  <string name="colors">Kolory</string>
- <string name="remindersname">Przypomnienia</string>
  <string name="display">Ekran</string>
  <string name="shutcuts">Skróty</string>
  <string name="advanced">Zaawansowane</string>
@@ -181,8 +180,6 @@
  <string name="duractionsec">Czas trwania (sek):</string>
  <string name="duraction">Czas trwania:</string>
  <string name="sec">sek</string>
- <string name="notentered">" nie wpisano"</string>
- <string name="spacedand">" i "</string>
     <string name="disturb">N. przeszk</string>
     <string name="uselibreview">Wysyłaj do Libreview</string>
     <string name="libreviewname">Libreview</string>
@@ -213,7 +210,6 @@
 
 
  <string name="overlaypermission">Wymaga uprawnienia</string>
- <string name="deletereminder">Usunąć przypomnienie?</string>
  <string name="deletelabel">Usunąć etykietę?</string>
 
  <string name="finish">Rozłącz</string>

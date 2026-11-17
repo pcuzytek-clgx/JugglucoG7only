@@ -90,7 +90,6 @@
  <string name="sensorviabluetoothon">For Alarms in non-Mirror devices \'Sensor via bluetooth\' should be turned on</string>
  <string name="numberlabels">Number Labels</string>
  <string name="colors">Colors</string>
- <string name="remindersname">Reminders</string>
  <string name="display">Display</string>
  <string name="shutcuts">Shortcuts</string>
  <string name="advanced">Advanced</string>
@@ -181,8 +180,6 @@
  <string name="duractionsec">Duration (sec):</string>
  <string name="duraction">Duration:</string>
  <string name="sec">sec</string>
- <string name="notentered">" not entered"</string>
- <string name="spacedand">" and "</string>
     <string name="disturb">Disturb</string>
     <string name="uselibreview">Send to Libreview</string>
     <string name="libreviewname">Libreview</string>
@@ -213,7 +210,6 @@
 
 
  <string name="overlaypermission">Needs permission</string>
- <string name="deletereminder">Delete reminder?</string>
  <string name="deletelabel">Delete label?</string>
 
  <string name="finish">Terminate</string>

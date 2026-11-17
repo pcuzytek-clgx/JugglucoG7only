@@ -29,7 +29,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import java.util.ArrayList;
 
 import static android.app.AlarmManager.RTC_WAKEUP;
 import static android.app.PendingIntent.getBroadcast;
@@ -86,49 +85,10 @@ static void killprogram(int ret) {
 		android.util.Log.i("NumAlarm","closed");
 		System.exit(ret);
 		}
-static private void numalarm(Application mApp) {
-    	int[] nums=Natives.numAlarmEvents();
-    	if(nums==null)
-    		return;
-	final int len= nums.length;
-	if(len==0)
-		return;
-	ArrayList<String> labels=Natives.getLabels();
-
-	int last=len-1;
-	while(nums[last]>=labels.size()) {
-		if(--last<0)
-			return;
-		}
-
-	StringBuilder builder=new StringBuilder();
-	int i=0;
-	for(;i<last;i++) {
-		int index= nums[i];
-		if(index<labels.size()) {
-			builder.append(labels.get(index));
-			builder.append(mApp.getString(R.string.spacedand));
-			}
-		}
-	builder.append(labels.get(nums[i]));
-	builder.append(mApp.getString(R.string.notentered));
-	Notify.init(mApp);
-	Notify.onenot.amountalarm(builder.toString());
-	}
 static public void	   handlealarm(Application context) {
-	numalarm(context);
-	long firstNum=Natives.firstAlarm();
         long  firstProfile=Natives.nextScheduledProfileMSEC();
-	if(firstNum>0L) {
-                if(firstProfile==0L||firstProfile>firstNum) {
-                    setalarm(context,firstNum,false);
-                    return;
-                    }
-               }
-        else {
-                if(firstProfile==0L)
-                        return;
-                }
+        if(firstProfile==0L)
+                return;
         setalarm(context,firstProfile,true);
 	}
 static private final String scheduleProfileAlarm="scheduleProfileAlarm";

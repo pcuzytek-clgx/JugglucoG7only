@@ -1001,15 +1001,6 @@ setDeleteIntent(DeleteReceiver.getDeleteIntent()) .setContentTitle(message);
         NumNotBuilder.setGroup("aa1");
     notificationManager.notify(notid,NumNotBuilder.build());
     }
- public void  amountalarm(String message) {
-     try {
-        mksound(3);
-        notifyer( R.drawable.numalarm ,message,NUMALARM,numalarmid);
-        }
-    catch(Throwable e) {
-        Log.stack(LOG_ID,e);
-        }
-    }
 //final private     int lossalarmid=77332;
  public void  lossalarm(long time) {
      {if(doLog) {Log.i(LOG_ID,"lossalarm");};};

@@ -466,49 +466,6 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getuseflash)(JNIEnv *env, jcla
 extern "C" JNIEXPORT void  JNICALL   fromjava(setuseflash)(JNIEnv *env, jclass cl,jboolean val) {
     settings->data()->flash=val;
     }
-extern "C" JNIEXPORT jintArray  JNICALL   fromjava(numAlarmEvents)(JNIEnv *env, jclass cl) {
-   LOGAR("start numAlarmEvents");
-    vector<int> failures=settings->numAlarmEvents();
-   LOGAR("after failures=numAlarmEvents");
-    const int failnr= failures.size();
-    if(!failnr) {
-      LOGAR("failures.size()==0");
-        return nullptr;
-      }
-    jintArray  uit=env->NewIntArray(failnr) ;
-    env->SetIntArrayRegion(uit, 0,failnr, failures.data());
-    return uit;
-    }
-
-extern "C" JNIEXPORT jlong  JNICALL   fromjava(firstAlarm)(JNIEnv *env, jclass cl) {
-    return settings->firstAlarm()*1000LL;
-    }
-extern "C" JNIEXPORT void  JNICALL   fromjava(setNumAlarm)(JNIEnv *env, jclass cl,jint type,jfloat value,jint start,jint alarm) {
-    settings->setnumalarm(type,value,start,alarm);
-    }
-extern "C" JNIEXPORT void  JNICALL   fromjava(delNumAlarm)(JNIEnv *env, jclass cl,jint pos) {
-    settings->delnumalarm(pos) ;
-    }
-//setNumAlarm(
-extern "C" JNIEXPORT  jobjectArray JNICALL   fromjava(getNumAlarm)(JNIEnv *env, jclass cl,jint pos) {
-    if(pos>=settings->data()->alarmnr)
-        return nullptr;
-    amountalarm &alarm=settings->data()->numalarm[pos];
-    jclass objectclass = env->FindClass( "java/lang/Object");
-    jobjectArray jall = env->NewObjectArray( 2, objectclass, NULL);
-    jclass classFloat = env->FindClass("java/lang/Float");
-    jmethodID floatInit = env->GetMethodID(classFloat, "<init>", "(F)V");
-    jobject jvalue = env->NewObject(classFloat, floatInit,alarm.value);
-    env->SetObjectArrayElement(jall, 0, jvalue);
-    jshortArray  uit=env->NewShortArray(4) ;
-    env->SetShortArrayRegion(uit, 0,4,  reinterpret_cast<int16_t *>(&alarm.start));
-    env->SetObjectArrayElement(jall, 1,uit);
-    return jall;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getNumAlarmCount)(JNIEnv *env, jclass cl) {
-    return settings->data()->alarmnr;
-    }
-
 extern "C" JNIEXPORT jint  JNICALL   fromjava(camerakey)(JNIEnv *env, jclass cl) {
     return settings->data()->camerakey;
     }

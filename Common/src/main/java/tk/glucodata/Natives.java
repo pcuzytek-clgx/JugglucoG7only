@@ -334,13 +334,6 @@ public static native void setpaused(GlucoseCurve val);
 //public static native boolean usemeal();
 public static native boolean staticnum();
 public static native void setstaticnum(boolean val);
-public static native int[] numAlarmEvents( );
-
-public static native long firstAlarm( );
-public static native void setNumAlarm(int type,float value,int start,int end);
-public static native Object[] getNumAlarm(int pos);
-public static native void delNumAlarm(int pos);
-public static native int getNumAlarmCount();
 public static native int camerakey();
 public static native void setcamerakey(int on);
 /*
