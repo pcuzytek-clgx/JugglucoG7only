@@ -426,7 +426,7 @@ class GarminStatus {
 				return;
 			}
 			final AllData.GarminDeviceInfo target=selected;
-			new AlertDialog.Builder(context)
+			new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
 					.setTitle(R.string.garmin_change_numbers_title)
 					.setMessage(context.getString(R.string.garmin_change_numbers_message,
 							alldata.getNumbersDeviceName(),target.name))

@@ -393,7 +393,7 @@ static String makenodename(WatchTarget target) {
 
 
 private static void confirmunsynced(MainActivity act,Runnable save) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
      builder.setTitle(R.string.notsynced).
     setMessage(R.string.lossdata).
            setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

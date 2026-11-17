@@ -242,7 +242,7 @@ public class Backup {
          drawable.setColorFilter(new BlendModeColorFilter(color, BlendMode.SRC_ATOP));
       }
    private void deleteconfirmation(MainActivity act) {
-           AlertDialog.Builder builder = new AlertDialog.Builder(act);
+           AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
    //     setMessage(mess).
       String title=null;
       try {
@@ -293,7 +293,7 @@ static public String changehostError(MainActivity act,int pos) {
             }
 
    private void resentconfirmation(MainActivity act,int hostindex) {
-           AlertDialog.Builder builder = new AlertDialog.Builder(act);
+           AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
            builder.setTitle(act.getString(R.string.resenddata)+"?").
        setMessage(R.string.resendwarning).
               setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

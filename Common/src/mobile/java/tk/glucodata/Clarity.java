@@ -98,7 +98,7 @@ public final class Clarity {
                 chosen.set(year,month,day);
                 final long candidate=chosen.getTimeInMillis()/1000L;
                 if(candidate==since[0])return;
-                new AlertDialog.Builder(act)
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(act)
                     .setTitle(act.getString(R.string.clarity_change_start_title))
                     .setMessage(act.getString(R.string.clarity_change_start_message,format.format(chosen.getTime())))
                     .setNegativeButton(R.string.cancel,null)

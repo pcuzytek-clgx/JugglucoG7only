@@ -105,7 +105,7 @@ final class ClarityAmounts {
             button.setOnClickListener(v->{
                 String[] choices=new String[names.length-1];
                 for(int j=0;j<choices.length;++j)choices[j]=act.getString(names[j+1]);
-                new AlertDialog.Builder(act).setTitle(labels.get(pos))
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(labels.get(pos))
                     .setSingleChoiceItems(choices,kinds[pos]-1,(dialog,which)->{
                         int chosen=which+1;
                         if(chosen==6) {
@@ -122,7 +122,7 @@ final class ClarityAmounts {
                             weight.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
                             float initial=weights[pos];
                             weight.setText(initial>0 && !Float.isInfinite(initial)?Float.toString(initial):"1");
-                            var editor=new AlertDialog.Builder(act).setTitle(act.getString(R.string.clarity_grams_per_unit,labels.get(pos)))
+                            var editor=new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(act.getString(R.string.clarity_grams_per_unit,labels.get(pos)))
                                 .setView(weight).setNegativeButton(R.string.cancel,null)
                                 .setPositiveButton(R.string.save,null).create();
                             editor.setOnShowListener(d->editor.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(w->{

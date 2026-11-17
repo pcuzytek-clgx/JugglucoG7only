@@ -265,7 +265,7 @@ MainActivity activity;
 static private int gattselected=0;
 
 void confirmFinish(SuperGattCallback gat) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(activity);
     String serial= gat.SerialNumber;
     builder.setTitle(serial).setMessage(R.string.finishsensormessage).
       setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

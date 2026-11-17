@@ -485,6 +485,7 @@ dependencies {
   implementation 'androidx.core:core:1.19.1'
   implementation 'androidx.core:core-ktx:1.19.1'
   implementation "androidx.appcompat:appcompat:$APPCOMPAT"
+  implementation 'com.google.android.material:material:1.14.0'
 
 
     implementation 'androidx.activity:activity:1.13.0'

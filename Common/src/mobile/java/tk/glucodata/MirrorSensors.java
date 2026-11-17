@@ -63,7 +63,7 @@ public static native void finishfromSensorptr(long sensorptr);
 
 private static void confirmFinish(MainActivity act,long ptr) {
    var serial=Natives.namefromSensorptr(ptr);
-    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
     builder.setTitle(serial).setMessage(R.string.finishsensormessage).
       setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
          public void onClick(DialogInterface dialog, int id) {

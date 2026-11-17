@@ -816,8 +816,6 @@ public static   void help(String text,ContextThemeWrapper act,Consumer<ViewGroup
          helplayout.requestLayout();
          var activity=getActivity(act);
          activity.addContentView(helplayout, params);
-         DynamicThemeUtils.applyTheme(ok);
-         DynamicThemeUtils.applyTheme(searchButton);
 
          final FrameLayout rootForInsets=root;
          final View buttonsForInsets=buttons;

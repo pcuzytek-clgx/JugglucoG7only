@@ -136,7 +136,7 @@ public class Scan {
             }
             message=sb.toString();
         }
-        new AlertDialog.Builder(context)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
             .setTitle("NovoPen "+serial)
             .setMessage(message)
             .setPositiveButton(R.string.ok,null)

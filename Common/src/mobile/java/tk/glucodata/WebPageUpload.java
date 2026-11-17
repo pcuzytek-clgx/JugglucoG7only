@@ -799,8 +799,6 @@ public final class WebPageUpload {
             TextView empty=new TextView(context);
             empty.setText(R.string.webdirectoryempty);
             fileRows.addView(empty,new LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
-            if(Applic.DynamicTheme)
-                DynamicThemeUtils.applyTheme(empty);
             return;
         }
 
@@ -839,8 +837,6 @@ public final class WebPageUpload {
             delete.setOnClickListener(v->askDelete(context,entry));
             row.addView(delete,new LinearLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT));
             fileRows.addView(row,new LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
-            if(Applic.DynamicTheme)
-                DynamicThemeUtils.applyTheme(row);
         }
     }
 

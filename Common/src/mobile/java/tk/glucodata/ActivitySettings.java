@@ -96,7 +96,7 @@ public final class ActivitySettings {
         else MainActivity.setonback(new ActivityEditGuard(changed,new ActivityEditGuard.BackStack(){
             public void push(Runnable callback){MainActivity.setonback(callback);}
             public void pop(){MainActivity.poponback();}
-        },(discard,dismissed)->new AlertDialog.Builder(act).setTitle(R.string.withoutsaving)
+        },(discard,dismissed)->new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(R.string.withoutsaving)
             .setPositiveButton(R.string.ok,(dialog,which)->discard.run())
             .setNegativeButton(R.string.cancel,null).setOnDismissListener(dialog->dismissed.run()).show(),close));
     }
@@ -311,7 +311,7 @@ public final class ActivitySettings {
             add.setOnClickListener(v->{EditText text=new EditText(act);
                 text.setSingleLine(true);
                 text.setImeOptions(tk.glucodata.settings.Settings.editoptions);
-                AlertDialog dialog=new AlertDialog.Builder(act).setTitle(R.string.activity_new_label).setView(text)
+                AlertDialog dialog=new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(R.string.activity_new_label).setView(text)
                     .setPositiveButton(R.string.save,(d,which)->{
                         String operationCreate="Create activity label: type="+type;
                         Log.i(LOG_ID,operationCreate);
@@ -478,8 +478,8 @@ public final class ActivitySettings {
                 try {
                     int[] ids=ActivityNative.sourceIDs(group);String[] names=new String[ids.length];
                     for(int i=0;i<ids.length;++i)names[i]=ActivityFormat.sourceLabel(ActivityNative.sourceName(ids[i]),true);
-                    new AlertDialog.Builder(act).setTitle(R.string.activity_remove_source).setItems(names,(dialog,index)->
-                        new AlertDialog.Builder(act).setTitle(R.string.activity_remove_source)
+                    new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(R.string.activity_remove_source).setItems(names,(dialog,index)->
+                        new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(R.string.activity_remove_source)
                             .setMessage(act.getString(R.string.activity_remove_source_confirm,names[index]))
                             .setPositiveButton(R.string.delete,(confirmation,which)->{
                                 String operationRemove="Remove activity source: group="+group;
@@ -500,7 +500,7 @@ public final class ActivitySettings {
                     Applic.argToaster(act,message(e),Toast.LENGTH_LONG);
                 }
             });
-            delete.setOnClickListener(v->new AlertDialog.Builder(act).setTitle(R.string.deletequestion)
+            delete.setOnClickListener(v->new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(R.string.deletequestion)
                 .setMessage(R.string.activity_delete_confirm)
                 .setPositiveButton(R.string.delete,(dialog,which)->{
                     String operationDelete="Delete activity: group="+group;
@@ -532,7 +532,7 @@ public final class ActivitySettings {
         ArrayList<String> labels=Natives.getLabels();
         for(int i=0;i<candidates.length;++i){String[] parts=candidates[i].split(":");display[i]=date(Long.parseLong(parts[2]))+"  "+labels.get(Integer.parseInt(parts[3]))+"  "+parts[4];}
         if(display.length==0){Applic.argToaster(act,R.string.activity_no_match,Toast.LENGTH_LONG);return;}
-        new AlertDialog.Builder(act).setTitle(R.string.activity_link).setItems(display,(dialog,pos)->{
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(R.string.activity_link).setItems(display,(dialog,pos)->{
             String operation="Link activity Amount: group="+group;
             Log.i(LOG_ID,operation);
             try {

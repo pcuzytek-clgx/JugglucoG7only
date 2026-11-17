@@ -84,7 +84,7 @@ public class MyConnectIQListener implements ConnectIQ.ConnectIQListener {
                 default: message="Wystąpił błąd";
             };
 	    {if(doLog) {Log.i(LOG_ID,message);};};
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            AlertDialog.Builder dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context);
             dialog.setTitle(errStatus.name());
             dialog.setMessage(message);
             dialog.setPositiveButton(android.R.string.ok, null);

@@ -86,8 +86,9 @@ public static TextView getlabel(Context act, int res) {
 
 	}
 public static Button getbutton(Context act, String text) {
-	Button label=new Button(act);
+	var label=new com.google.android.material.button.MaterialButton(act);
 	label.setText(text);
+	label.setAllCaps(false);
 	return label;
 	}
 

@@ -115,7 +115,6 @@ import java.util.Locale;
 //import androidx.activity.OnBackPressedCallback;
 //import androidx.activity.OnBackPressedDispatcher;
 //import com.google.android.apps.auto.sdk.CarActivity;
-import tk.glucodata.DynamicThemeUtils;
 
 //import static tk.glucodata.Natives.hidescanresults;
 
@@ -727,11 +726,6 @@ if(!isWearable) {
         if(!isWearable && savedInstanceState==null)
             Menus.newTask();
 
-       if(Applic.DynamicTheme)  {
-             DynamicThemeUtils.setTheme(this);
-             isLightTheme=getIsLightTheme();
-             }
-
         updateRtl(getResources().getConfiguration());
         if(!isWearable) {
         //        WindowCompat.enableEdgeToEdge(getWindow());
@@ -1139,7 +1133,7 @@ static boolean hasTech(String[] techs, String want) {
 private void outofStorageSpace() {
     String message= "Za mało miejsca w pamięci!!";
     Applic.argToaster(this,message,Toast.LENGTH_SHORT);
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
     builder.setNegativeButton(R.string.ok, (dialog, id) -> { // User cancelled the dialog
         finish();    
     keeprunning.stop();
@@ -1152,7 +1146,7 @@ File files=getFilesDir();
 String filespath=files.getAbsolutePath();
     String message= "Nie można utworzyć katalogu:\n"+filespath+(files.isFile()?"\nIstnieje zwykły plik o tej nazwie":"\nZa mało miejsca w pamięci?");
     Applic.argToaster(this,message,Toast.LENGTH_SHORT);
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
     Runnable end=()-> {
         finish();    
     keeprunning.stop();
@@ -1177,7 +1171,7 @@ String filespath=files.getAbsolutePath();
 void activateresult(boolean res) {
     String message= "Aktywacja "+(res?"udana":"nieudana");
     Applic.argToaster(this,message,Toast.LENGTH_SHORT);
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
     builder.setNegativeButton(R.string.ok, (dialog, id) -> { // User cancelled the dialog
     requestRender();
     }).setTitle("  ").setMessage(message).show().setCanceledOnTouchOutside(false);
@@ -1781,7 +1775,7 @@ void showindialog(String message,boolean cancel) {
     if(cancel) {
         cancelglucosedialog();
         }
-    final AlertDialog.Builder builder = new AlertDialog.Builder(cont);
+    final AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(cont);
     final var dialog=builder.setNegativeButton(R.string.cancel, (dia, id) -> {
         if(cancel) {
             shownglucosealert=null;
@@ -2051,8 +2045,6 @@ private static void makeTextSelectable(View view) {
                     new RecyclerView.OnChildAttachStateChangeListener() {
                 @Override
                 public void onChildViewAttachedToWindow(View child) {
-                    if(Applic.DynamicTheme)
-                        DynamicThemeUtils.applyTheme(child);
                     makeTextSelectable(child);
                 }
 
@@ -2074,8 +2066,6 @@ public static void addMyContentView(Activity context,View view, ViewGroup.Layout
     context.addContentView(view,params);
     if(!isWearable)
         DexTabs.toFront();
-    if(Applic.DynamicTheme)
-            DynamicThemeUtils.applyTheme(view);
     makeTextSelectable(view);
     }
 

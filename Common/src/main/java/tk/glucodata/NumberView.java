@@ -568,7 +568,7 @@ void deletedialog(View v,int[] mealptr) {
     int type=Natives.hittype(currentnum);
     ArrayList<String> labels= ((Applic)context.getApplication()).getlabels();
     String mess= DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.DEFAULT).format(time)+" "+ labels.get(type)+" "+value;
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context);
         builder.setTitle(R.string.deletequestion).setMessage(mess).
            setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

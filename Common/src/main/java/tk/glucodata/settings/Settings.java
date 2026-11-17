@@ -680,16 +680,8 @@ static public void scheduleProfiles(MainActivity act,View parview) {
             });
     }
 static public void setProfile(MainActivity act,int profile) {
-       int oldtheme=Natives.getTheme();
-       boolean oldisoval=Natives.getisOval();
-       int oldradius=Natives.getradius();
        Natives.setProfile(profile);
        SuperGattCallback.initAlarmTalk();
-       if(DynamicTheme) {
-           if(oldtheme!=Natives.getTheme()||oldisoval!=Natives.getisOval()||oldradius!=Natives.getradius()) {
-                act.recreate();
-                }
-           }
        }
 static private void alarmsettings(MainActivity context,View parview) {
     parview.setVisibility(GONE);
@@ -1071,7 +1063,6 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
         Layout.getMargins(colbut).setMarginStart(amarg);
 
         Layout.getMargins(close).setMarginEnd(amarg);
-        var themebut=getbutton(context,R.string.theme);
         /* G7 fork: auto-rotate is always off. Rotate 180° only has an effect on
          * elongated large screens without the Android 16 large-screen restriction;
          * phones draw the graph directly in portrait (MainActivity.applyScreenOrientation). */
@@ -1094,7 +1085,7 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
         lay = new Layout(context, (l, w, h) -> {
                   int[] ret={w,h};
                  return ret;
-               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,reverseorientation},new View[] {iob},new View[]{colbut,themebut,help,close})
+               },graphrow,new View[]{scalelabel,fixatex, fixatey},targetrow,new View[]{threslabel,threshold,dexfuture},new View[] {levelleft,reverseorientation},new View[] {iob},new View[]{colbut,help,close})
                .portraitLayout(
                     new View[]{graphlabel,glow,line,ghigh},
                     new View[]{scalelabel},new View[]{fixatex,fixatey},
@@ -1102,11 +1093,7 @@ Scans.setOnCheckedChangeListener( (buttonView,  isChecked) -> { Natives.setshows
                     new View[]{threslabel,threshold},new View[]{dexfuture},
                     new View[]{levelleft},
                     new View[]{iob},
-                    new View[]{help,themebut},new View[]{colbut,close});
-
-       themebut.setOnClickListener(v-> {
-            SelectTheme.show(context,lay);
-            });
+                    new View[]{help},new View[]{colbut,close});
          }
 
      lay.setBackgroundColor(Applic.backgroundcolor);
