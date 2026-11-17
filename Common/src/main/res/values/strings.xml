@@ -320,7 +320,6 @@
  <string name="threshold">Threshold</string>
  <string name="untouchablequestion">Make floating glucose untouchable?</string>
 
- <string name="hour12">12h</string>
 <string name="complications">Complications</string>
     <string name="colors_style_setting_description">Watchface color</string>
 

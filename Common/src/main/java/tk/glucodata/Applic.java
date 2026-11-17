@@ -246,7 +246,7 @@ public void onConfigurationChanged(@NonNull Configuration newConfig) {
 
 //        var new24 = DateFormat.is24HourFormat(this);
         hasSystemtimeformat=DateFormat.is24HourFormat(app)==hour24;
-        Notify.timef = java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT);
+        Notify.mkDateformat();
         {if(doLog) {Log.i(LOG_ID,"Applic.onConfigurationChanged "+(Applic.hour24?" 24uur":" 12uur"));};};
  //       was24=new24;
         setlanguage();
@@ -269,10 +269,6 @@ static private void setjavahour24(boolean val) {
             }
        }
 
-static public void sethour24(boolean val) {
-     Natives.sethour24(val);
-    setjavahour24(val);
-    }
 @Override
 public void onTerminate () {
     super.onTerminate();
@@ -894,12 +890,12 @@ if(isWearable) {
           if(initversion<29) {
              if(initversion<22) {
                 }
-             sethour24(DateFormat.is24HourFormat(app));
              }
           Natives.setinitVersion(39);
           }
-
-   setjavahour24(Natives.gethour24());
+   if(!Natives.gethour24())
+      Natives.sethour24(true);
+   setjavahour24(true);
         }
 
 static public boolean getHeartRate() {

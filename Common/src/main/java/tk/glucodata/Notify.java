@@ -967,9 +967,9 @@ private  void  arrowplacelargenotification(int kind,float glvalue,String message
 final private     int numalarmid=81432;
 
 
-static DateFormat timef = DateFormat.getTimeInstance(DateFormat.SHORT);
+static DateFormat timef = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
 public static void mkDateformat() {
-    timef = DateFormat.getTimeInstance(DateFormat.SHORT);
+    timef = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
     };
 
 Notification.Builder  NumNotBuilder=null;
