@@ -106,7 +106,7 @@ class GarminStatus {
 			layout.postDelayed(this,1000L);
 		}
 	};
-	Layout layout;
+	View layout;
 	private static final String LOG_ID = "GarminStatus";
 
 	static String displaystr(Context context,AllData.GarminDeviceInfo device) {
@@ -226,22 +226,13 @@ class GarminStatus {
 		var Save = getbutton(context, R.string.save);
 		var Cancel = getbutton(context, R.string.cancel);
 
-		var layout = new Layout(context, (l, w, h) -> {
-			return new int[]{w, h};
-		}, new View[]{idlabel, defaultapp}, new View[]{editid}, new View[]{Cancel, Save});
-
-		float density = GlucoseCurve.metrics.density;
-		int laypad = (int) (density * 4.0);
-		layout.setPadding(laypad * 2, laypad * 2, laypad * 2, laypad);
-        layout.systembarMargins();
-
-//	layout.setBackgroundResource(R.drawable.dialogbackground);
-   layout.setBackgroundResource(R.drawable.dialogbackground);
-
-    var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
-
-    context.addMyContentView(layout, params);
-//		context.addMyContentView(layout, new ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+		var page = new M3.Page(context, R.string.m3_watch_garmin_appid, true);
+		final View layout = page.root;
+		var gid = page.group(idlabel.getText().toString().replace(":", "").trim());
+		gid.toggle(defaultapp);
+		gid.item(editid);
+		page.buttons(Save);
+		page.showOnly();
 		context.setonback(() -> {
 			EnableControls(parent,true);
 			removeContentView(layout);
@@ -322,7 +313,6 @@ class GarminStatus {
 		sdkreadyview.setPadding(0,0,(int)(density*10.0f),0);
 
 		restview = new TextView(context);
-        restview.setMovementMethod(new ScrollingMovementMethod());
 
         restview.setSingleLine(false);
         restview.setHorizontallyScrolling(false);
@@ -334,8 +324,6 @@ class GarminStatus {
 		sync = new Button(context);
 		sync.setText(R.string.sync);
 		sync.setOnClickListener(v -> alldata.sync(selectedPeerId));
-		Button ok = new Button(context);
-		ok.setText(R.string.closename);
 		Button help = getbutton(context, R.string.helpname);
 		help.setOnClickListener(v -> help(R.string.kerfstok, context));
 		glucose = new CheckDirectionBox(context);
@@ -462,7 +450,6 @@ class GarminStatus {
 		directTransport=new RadioButton(context);
 		directTransport.setText(R.string.transport_bluetooth);
       RadioButton[] transportRadios={automaticTransport, garminConnectTransport,directTransport};
-        transport.addView(method,new ViewGroup.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
         for(var b: transportRadios)
             transport.addView(b,new ViewGroup.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
         transport.addView(l3connection);
@@ -492,28 +479,25 @@ class GarminStatus {
                         }
                         );
 
-//		restview.setPadding(0,0,0,0);
-		layout = new Layout(context, (l, w, h) -> {
-			return new int[]{w, h};
-		}, new View[]{spinner,sync,next,reinit,sdkreadyview}, new View[]{restview,transport},new View[]{help,config,active,glucose,numbersDevice,ok}
-		).portraitLayout(new View[]{spinner}, new View[]{sync,reinit,next},new View[]{sdkreadyview},new View[]{transport},new View[]{restview},new View[]{active,glucose,numbersDevice}, new View[]{config,help, ok});
-      layout.setBackgroundColor(backgroundcolor);
- //  layout.setBackgroundResource(R.drawable.dialogbackground);
-		int laypad = (int) (density * 8.0);
-//		layout.setPadding(laypad * 2, laypad * 2, laypad * 2, laypad*2);
-
-       layout.systembarPadding((left,top,right,bottom)->new int[]{left+laypad,top,right+laypad,bottom});
-//    var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
-//    var  params =    new FrameLayout.LayoutParams( MATCH_PARENT, MATCH_PARENT, 0);
-
-    context.addMyContentView(layout,new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT));
-
-		ok.setOnClickListener(
-				v -> {
-				 context.doonback();
-				}
-			);
+		var page=new M3.Page(context,R.string.m3_watch_garmin_title,true);
+		layout=page.root;
+		var gdev=page.group(R.string.m3_watch_garmin_device);
+		gdev.item(spinner);
+		gdev.item(sdkreadyview);
+		gdev.toggle(active);
+		gdev.toggle(glucose);
+		gdev.toggle(numbersDevice);
+		var gtrans=page.group(context.getString(R.string.mirror_transport).replace(":","").trim());
+		gtrans.item(transport);
+		var gstate=page.group(R.string.status);
+		gstate.item(restview);
+		gstate.buttons(sync,reinit,next);
+		var gconf=page.group(R.string.m3_watch_garmin_more);
+		gconf.nav(config);
+		page.buttons(help);
+		page.showOnly();
 		context.setonback(() ->  {
+
                         closed=true;
                         layout.removeCallbacks(refreshStatus);
                        // EnableControls(parentlayout,true);
@@ -664,24 +648,20 @@ class GarminStatus {
         alarms.setVisibility(alldata.canConfigureGarminAlarms(peerId)?VISIBLE:GONE);
 		var Help = getbutton(context, R.string.helpname);
 		Help.setOnClickListener(v-> help(tk.glucodata.R.string.garminconfig,context));
-		var Close = getbutton(context, R.string.closename);
-		var layout = new Layout(context, (l, w, h) -> {
-			return new int[]{w, h};
-		},new View[]{apppresent,setid}, new View[]{shortcuts, blackmode}, new View[]{alarms, Help, Close});
-
-		float density = GlucoseCurve.metrics.density;
-		int laypad = (int) (density * 4.0);
-		layout.setPadding(laypad * 2, laypad * 2, laypad * 2, laypad);
+		var page = new M3.Page(context, R.string.m3_watch_garmin_config, true);
+		final View layout = page.root;
 		setid.setOnClickListener(v -> setidview(context, alldata,layout,parentlayout));
         alarms.setOnClickListener(v -> GarminAlarms.show(context,alldata,layout,peerId));
-
-//		layout.setBackgroundColor(Applic.backgroundcolor);
-   layout.setBackgroundResource(R.drawable.dialogbackground);
-
-    var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT,  Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
-
-    context.addMyContentView(layout, params);
-	//	context.addMyContentView(layout, new ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+		var gapp = page.group(R.string.m3_watch_garmin_app);
+		gapp.action(apppresent.getText(), null, v -> apppresent.performClick());
+		gapp.nav(R.string.m3_watch_garmin_appid, null, v -> setid.performClick());
+		var gwatch = page.group(R.string.m3_watch_garmin_watchset);
+		blackmode.setText(R.string.m3_watch_garmin_dark);
+		gwatch.toggle(blackmode);
+		gwatch.nav(shortcuts);
+		gwatch.nav(alarms);
+		page.buttons(Help);
+		page.showOnly();
 		context.setonback(() -> {
 			EnableControls(parent,true);
             closed=false;
@@ -690,7 +670,5 @@ class GarminStatus {
 			context.hideSystemUI();
 			hidekeyboard(context);
 		});
-		Close.setOnClickListener(
-				v -> context.doonback());
 	}
 }

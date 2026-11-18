@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="m3_bk_device">To urządzenie</string>
+    <string name="m3_bk_options">Opcje</string>
+    <string name="m3_bk_noconnections">Brak połączeń</string>
+    <string name="m3_bk_sync">Synchronizuj</string>
+    <string name="m3_bk_reinit">Zainicjuj ponownie</string>
+    <string name="m3_bk_error">Błąd serwera</string>
+    <string name="m3_bk_transport">Sposób połączenia</string>
+    <string name="m3_bk_network">Sieć</string>
+    <string name="m3_bk_iceside">Strona ICE</string>
+    <string name="m3_bk_direction">Kierunek połączenia</string>
+    <string name="m3_bk_identity">Etykieta i hasło</string>
+    <string name="m3_bk_data">Dane</string>
+    <string name="m3_bk_actions">Działania</string>
+    <string name="m3_bk_deactivated">Połączenie wyłączone</string>
+    <string name="m3_bk_modify">Zmień ustawienia</string>
+    <string name="m3_bk_showqr">Pokaż kod QR</string>
+    <string name="m3_bk_status">Stan</string>
+    <string name="m3_bk_qr">Kod QR</string>
+    <string name="m3_bk_server">Serwer</string>
+    <string name="m3_bk_login">Logowanie</string>
+</resources>

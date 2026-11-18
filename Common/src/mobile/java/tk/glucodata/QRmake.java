@@ -87,29 +87,11 @@ public static void show(MainActivity act, String code) {
         });
    final var help=getbutton(act,R.string.helpname);
    help.setOnClickListener(v-> help(R.string.QRmirror,act));
-   /*
-   var buttonlayout=new Layout(act,(x, w, h)->{
-         return new int[] {w,h};
-           },new View[]{help},new View[]{close});
-
-     buttonlayout.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT , MATCH_PARENT));
-     Layout.getMargins(close).bottomMargin=(int)(height*.35f);
-     Layout.getMargins(help).topMargin=(int)(height*.15f);
-     */
-     var layout=new Layout(act,(x, w, h)->{
-         return new int[] {w,h};
-           },new View[]{image},new View[] {help,close});
-   // layout.usebaseline=false;
-    ///  var hor=(int)((height-qrHeight)*.5f);
-     // var ver =(int)((width-qrWidth)*.4f);
-
- //     layout.setPadding(MainActivity.systembarLeft+ver,MainActivity.systembarTop+hor,MainActivity.systembarRight+ver,MainActivity.systembarBottom+hor);
-      var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL|Gravity.CENTER);
-      var frame=new FrameLayout (act);
-      frame.addView(layout,params);
-      frame.setBackgroundColor( Applic.backgroundcolor);
-      act.addMyContentView(frame, new FrameLayout.LayoutParams( MATCH_PARENT, MATCH_PARENT));
-      MainActivity.setonback(()-> removeContentView(frame));
-      }
+     image.setAdjustViewBounds(true);
+     image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+     var page=new M3.Page(act,R.string.m3_bk_qr,true);
+     page.group(null).item(image);
+     page.buttons(help);
+     page.show(null);      }
 
    }

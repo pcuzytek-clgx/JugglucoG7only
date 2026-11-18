@@ -37,11 +37,8 @@ import android.text.style.StyleSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,11 +76,12 @@ public final class ActivitySettings {
     }
     private static void presentrun(MainActivity act,View parent,ViewGroup layout,Runnable extra,BooleanSupplier changed) {
         if(parent!=null)RingTones.EnableControls(parent,false);
-        layout.setBackgroundColor(Applic.backgroundcolor);
-        final int sidepad=GlucoseCurve.dpToPx(8);
-        final int pad=GlucoseCurve.dpToPx(2);
-        if(layout instanceof Layout)
+        if(layout instanceof Layout) {
+            layout.setBackgroundColor(Applic.backgroundcolor);
+            final int sidepad=GlucoseCurve.dpToPx(8);
+            final int pad=GlucoseCurve.dpToPx(2);
             ((Layout)layout).systembarPadding((l,t,r,b)->new int[]{l+sidepad,t+pad,r+sidepad,b+pad});
+        }
         act.addMyContentView(layout,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         Runnable close=()->{
             if(extra!=null)
@@ -121,39 +119,26 @@ public final class ActivitySettings {
             CheckDirectionBox amounts=util.getcheckbox(act,R.string.activity_create_amounts,(config[5]&ActivityNative.CREATE_AMOUNTS)!=0);
             Spinner units=spinner(act,act.getResources().getStringArray(R.array.activity_units));
             units.setSelection((config[5]&ActivityNative.USE_MILES)!=0?1:0);
-            TextView status=getlabel(act,"");
             Button retrieve=getbutton(act,R.string.activity_retrieve),labels=getbutton(act,R.string.activity_labels);
             var help=getbutton(act,R.string.helpname);
             help.setOnClickListener(v-> tk.glucodata.help.help(R.string.activities,act));
             retrieve.setEnabled(!Natives.staticnum());
-            Button list=getbutton(act,R.string.activity_saved),save=getbutton(act,R.string.save),close=getbutton(act,R.string.closename);
-            Layout form=new Layout(act,
-                new View[]{getlabel(act,R.string.activity_from),since,getlabel(act,R.string.activity_interval),interval},
-                new View[]{amounts,labels},
-                new View[]{list,getlabel(act,R.string.activity_units),units},
-                new View[]{status},
-                new View[]{save,retrieve,help,close}).
-            portraitLayout(
-                new View[]{getlabel(act,R.string.activity_from),since},
-                new View[]{getlabel(act,R.string.activity_interval),interval},
-                new View[]{amounts},
-                new View[]{getlabel(act,R.string.activity_units),units},
-                new View[]{retrieve},
-                new View[]{labels,list},
-                new View[]{status},
-                new View[]{save,help,close});
-            status.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            final int sidepad=GlucoseCurve.dpToPx(8);
-            final int pad=GlucoseCurve.dpToPx(2);
-            form.systembarPadding((l,t,r,b)->new int[]{l+sidepad,t+pad,r+sidepad,b+pad});
-            ScrollView scroll=new ScrollView(act);
-            scroll.setFillViewport(true);
-            scroll.setSmoothScrollingEnabled(true);
-            scroll.setVerticalScrollBarEnabled(Applic.scrollbar);
-            scroll.setScrollbarFadingEnabled(true);
-            scroll.addView(form,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-            ViewGroup layout=scroll;
+            Button list=getbutton(act,R.string.activity_saved),save=getbutton(act,R.string.save);
+            var page=new M3.Page(act,R.string.activity_import,true);
+            var gimport=page.group(R.string.m3_share_act_import);
+            gimport.value(R.string.activity_from,since);
+            gimport.value(R.string.activity_interval,interval);
+            gimport.toggle(amounts);
+            gimport.value(R.string.activity_units,units);
+            var gdata=page.group(R.string.m3_share_act_data);
+            View retrieverow=gdata.action(retrieve.getText(),null,v->retrieve.performClick());
+            retrieverow.setEnabled(retrieve.isEnabled());
+            retrieverow.setAlpha(retrieve.isEnabled()?1f:.38f);
+            gdata.nav(labels);
+            gdata.nav(list);
+            TextView status=page.group(R.string.m3_share_act_status).text("");
+            page.buttons(help,save);
+            ViewGroup layout=page.root;
             long[] savedSettings={from[0],intervals[interval.getSelectedItemPosition()],config[5]&(ActivityNative.CREATE_AMOUNTS|ActivityNative.USE_MILES)};
             Runnable apply=()->{
                 long[] current=ActivityNative.config();
@@ -206,7 +191,6 @@ public final class ActivitySettings {
                     Applic.argToaster(act,message(e),Toast.LENGTH_LONG);
                 }
             });
-            close.setOnClickListener(v->MainActivity.doonback());
             layout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener(){
                 public void onViewAttachedToWindow(View view){}
                 public void onViewDetachedFromWindow(View view){datePicker.close();}
@@ -233,25 +217,20 @@ public final class ActivitySettings {
         }
     }
     private static void mappings(MainActivity act,View parent) {
-        int[] types=ActivityHealth.typeCodes();ArrayList<String> rows=new ArrayList<>();
+        int[] types=ActivityHealth.typeCodes();
         String[] measures=act.getResources().getStringArray(R.array.activity_measures);
-        ArrayAdapter<String> adapter=new ArrayAdapter<>(act,android.R.layout.simple_list_item_1,rows);
-        Runnable refresh=()->{
-            ArrayList<String> labels=Natives.getLabels();rows.clear();
+        var page=new M3.Page(act,R.string.activity_labels,true);
+        var group=page.group(null);
+        ViewGroup layout=page.root;
+        Runnable[] refresh={null};
+        refresh[0]=()->{
+            ArrayList<String> labels=Natives.getLabels();group.removeAllViews();
             int defaultLabel=(int)ActivityNative.config()[3];
-            rows.add(act.getString(R.string.activity_default)+" → "+(defaultLabel>=0&&defaultLabel<labels.size()?labels.get(defaultLabel):"Activity"));
+            group.nav(act.getString(R.string.activity_default),defaultLabel>=0&&defaultLabel<labels.size()?labels.get(defaultLabel):"Activity",v->mapping(act,layout,-1,refresh[0]));
             for(int type:types) {int[] rule=ActivityNative.rule(type);String name=rule[0]>=0&&rule[0]<labels.size()?labels.get(rule[0]):act.getString(R.string.activity_default);
-                rows.add(ActivityHealth.typeName(type)+" → "+name+" · "+measures[rule[1]]);}
-            adapter.notifyDataSetChanged();
-        };refresh.run();
-        ListView list=new ListView(act);list.setAdapter(adapter);
-        Button close=getbutton(act,R.string.closename);
-        Layout layout=listLayout(act,list,close);
-        list.setOnItemClickListener((a,v,pos,id)->mapping(act,layout,pos==0?-1:types[pos-1],refresh));
-        close.setOnClickListener(v->MainActivity.doonback());present(act,parent,layout);
-    }
-    private static Layout listLayout(MainActivity act,ListView list,Button close) {
-        return new Layout(act,new View[]{list},new View[]{close});
+                group.nav(ActivityHealth.typeName(type),name+" · "+measures[rule[1]],v->mapping(act,layout,type,refresh[0]));}
+        };refresh[0].run();
+        present(act,parent,layout);
     }
    
     private static void mapping(MainActivity act,View parent,int type,Runnable refreshed) {
@@ -278,35 +257,22 @@ public final class ActivitySettings {
             CheckDirectionBox existing=util.getcheckbox(act,R.string.activity_update_existing,initialExisting);
             Button add=getbutton(act,R.string.activity_new_label),
                 save=getbutton(act,R.string.save),
-                close=getbutton(act,R.string.closename),
                 help=getbutton(act,R.string.helpname);
 
             help.setOnClickListener(v-> tk.glucodata.help.help(R.string.assignActivity,act));
-            Layout form=new Layout(act,
-                new View[]{getlabel(act,type<0?act.getString(R.string.activity_default):ActivityHealth.typeName(type)),label,add},
-                type<0?null:new View[]{measure,getlabel(act,R.string.activity_round_to),roundTo},
-                type<0?null:new View[]{existing},
-                new View[]{save,help,close}
-                ).portraitLayout(
-                    new View[]{getlabel(act,type<0?act.getString(R.string.activity_default):ActivityHealth.typeName(type))},
-                    new View[]{label,add},
-                    type<0?null:new View[]{measure},
-                    type<0?null:new View[]{getlabel(act,R.string.activity_round_to),roundTo},
-                    type<0?null:new View[]{existing},
-                    new View[]{save,help,close}
-                    );
-            final int sidepad=GlucoseCurve.dpToPx(8);
-            final int pad=GlucoseCurve.dpToPx(2);
-            form.systembarPadding((l,t,r,b)->new int[]{l+sidepad,t+pad,r+sidepad,b+pad});
-            ScrollView scroll=new ScrollView(act);
-            scroll.setFillViewport(true);
-            scroll.setSmoothScrollingEnabled(true);
-            scroll.setVerticalScrollBarEnabled(Applic.scrollbar);
-            scroll.setScrollbarFadingEnabled(true);
-            scroll.addView(form,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+            var page=new M3.Page(act,type<0?act.getString(R.string.activity_default):ActivityHealth.typeName(type),true);
+            var glabel=page.group(null);
+            glabel.value(R.string.m3_share_act_label,label);
+            glabel.action(add.getText(),null,v->add.performClick());
+            if(type>=0) {
+                var gmeasure=page.group(null);
+                gmeasure.value(R.string.m3_share_act_measure,measure);
+                gmeasure.value(R.string.activity_round_to,roundTo);
+                gmeasure.toggle(existing);
+            }
+            page.buttons(help,save);
 
-
-            ViewGroup layout=scroll;
+            ViewGroup layout=page.root;
 
             add.setOnClickListener(v->{EditText text=new EditText(act);
                 text.setSingleLine(true);
@@ -355,7 +321,6 @@ public final class ActivitySettings {
                     Applic.argToaster(act,message(e),Toast.LENGTH_LONG);
                 }
             });
-            close.setOnClickListener(v->MainActivity.doonback());
             presentrun(act,parent,layout,null,()->!saved[0]&&(label.getSelectedItemPosition()!=initialLabel||type>=0&&
                 (measure.getSelectedItemPosition()!=rule[1]||existing.isChecked()!=initialExisting||ActivityFormat.roundingChanged(roundTo.getText().toString(),initialRoundTo))));
         } catch(Exception e) {
@@ -364,21 +329,20 @@ public final class ActivitySettings {
         }
     }
     private static void activities(MainActivity act,View parent) {
-        ArrayList<Integer> ids=new ArrayList<>();ArrayList<String> rows=new ArrayList<>();
-        ArrayAdapter<String> adapter=new ArrayAdapter<>(act,android.R.layout.simple_list_item_1,rows);
-        Runnable refresh=()->{
-            ids.clear();rows.clear();
+        ArrayList<Integer> ids=new ArrayList<>();
+        var page=new M3.Page(act,R.string.activity_saved,true);
+        var group=page.group(null);
+        ViewGroup layout=page.root;
+        Runnable[] refresh={null};
+        refresh[0]=()->{
+            ids.clear();group.removeAllViews();
             for(int id:ActivityNative.indices(false)){int source=ActivityNative.representative(id);double[] r=ActivityNative.record(source);String[] t=ActivityNative.texts(source);
                 if(r==null||t==null)continue;
                 ids.add(id);
-                rows.add(date((long)r[3])+" · "+ActivityHealth.typeName((int)r[2])+(t[2].isEmpty()?"":" · "+t[2]));}
-            adapter.notifyDataSetChanged();
-        };refresh.run();
+                group.nav(ActivityHealth.typeName((int)r[2]),date((long)r[3])+(t[2].isEmpty()?"":" · "+t[2]),v->details(act,layout,id,null,refresh[0]));}
+        };refresh[0].run();
         if(ids.isEmpty()){Applic.argToaster(act,R.string.activity_none,Toast.LENGTH_LONG);return;}
-        ListView list=new ListView(act);list.setAdapter(adapter);
-        Button close=getbutton(act,R.string.closename);Layout layout=listLayout(act,list,close);
-        list.setOnItemClickListener((a,v,pos,id)->details(act,layout,ids.get(pos),null,refresh));
-        close.setOnClickListener(v->MainActivity.doonback());present(act,parent,layout);
+        present(act,parent,layout);
     }
     public static void details(MainActivity act,View parent,int group) {
         details(act,parent,group,null,null);
@@ -456,14 +420,19 @@ public final class ActivitySettings {
             }
             TextView body=getlabel(act,"");body.setText(out);body.setTextIsSelectable(true);
             body.setLineSpacing(GlucoseCurve.dpToPx(3),1.0f);
-            ScrollView scroll=new ScrollView(act);
-            scroll.addView(body);
-            scroll.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            Button mapping=getbutton(act,R.string.activity_labels),link=getbutton(act,R.string.activity_link),sourceDelete=getbutton(act,R.string.activity_remove_source),delete=getbutton(act,R.string.delete),close=getbutton(act,R.string.closename);
-            Layout layout=new Layout(act,new View[]{scroll},new View[]{mapping,link,sourceDelete,delete,close})
-                .portraitLayout(new View[]{scroll},new View[]{link,sourceDelete},new View[]{mapping,delete,close});
+            body.setTextColor(M3.onSurface(act));
+            Button mapping=getbutton(act,R.string.activity_labels),link=getbutton(act,R.string.activity_link),sourceDelete=getbutton(act,R.string.activity_remove_source),delete=getbutton(act,R.string.delete);
+            var page=new M3.Page(act,R.string.activity_details,true);
+            page.group(R.string.m3_share_act_details).item(body);
+            var gactions=page.group(R.string.m3_share_act_actions);
+            gactions.nav(mapping);
+            View linkrow=gactions.action(link.getText(),null,v->link.performClick());
+            gactions.action(sourceDelete.getText(),null,v->sourceDelete.performClick());
+            gactions.action(delete.getText(),null,v->delete.performClick());
+            ViewGroup layout=page.root;
             mapping.setOnClickListener(v->mapping(act,layout,(int)summary[2],amountsChanged));
             link.setVisibility((((int)root[1])&2)!=0?View.GONE:View.VISIBLE);
+            linkrow.setVisibility(link.getVisibility());
             link.setOnClickListener(v->{
                 String operationLink="Choose activity Amount: group="+group;
                 Log.i(LOG_ID,operationLink);
@@ -516,7 +485,6 @@ public final class ActivitySettings {
                         Applic.argToaster(act,message(e),Toast.LENGTH_LONG);
                     }
                 }).setNegativeButton(R.string.cancel,null).show());
-            close.setOnClickListener(v->MainActivity.doonback());
             presentrun(act,parent,layout,()-> {
                         if(amountsChanged!=null)
                                         act.lightBars(!Natives.getInvertColors( ));

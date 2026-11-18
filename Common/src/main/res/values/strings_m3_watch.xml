@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="m3_watch_title">Zegarki</string>
+    <string name="m3_watch_notifications">Powiadomienia</string>
+    <string name="m3_watch_notify">Powiadomienia na zegarku</string>
+    <string name="m3_watch_separate">Oddzielne powiadomienie</string>
+    <string name="m3_watch_wearos_config">Konfiguracja Wear OS</string>
+    <string name="m3_watch_garmin">Garmin</string>
+    <string name="m3_watch_garmin_status">Stan Kerfstok</string>
+    <string name="m3_watch_other">Inne</string>
+    <string name="m3_watch_server_config">Konfiguracja serwera sieciowego</string>
+    <string name="m3_watch_wear_device">Zegarek</string>
+    <string name="m3_watch_wear_settings">Ustawienia zegarka</string>
+    <string name="m3_watch_wear_nums">Wpisuj wartości na</string>
+    <string name="m3_watch_wear_direct">Sensor łączy się z</string>
+    <string name="m3_watch_wear_notsynced">Zegarek nie jest jeszcze zsynchronizowany – zmiany nie zostały zapisane</string>
+    <string name="m3_watch_garmin_title">Garmin</string>
+    <string name="m3_watch_garmin_device">Zegarek</string>
+    <string name="m3_watch_garmin_more">Więcej</string>
+    <string name="m3_watch_garmin_config">Konfiguracja Kerfstok</string>
+    <string name="m3_watch_garmin_app">Aplikacja na zegarku</string>
+    <string name="m3_watch_garmin_appid">ID aplikacji</string>
+    <string name="m3_watch_garmin_watchset">Zegarek</string>
+    <string name="m3_watch_garmin_dark">Tryb ciemny</string>
+    <string name="m3_watch_galarm_title">Alarmy na zegarku</string>
+    <string name="m3_watch_galarm_low">Niska glukoza</string>
+    <string name="m3_watch_galarm_high">Wysoka glukoza</string>
+    <string name="m3_watch_galarm_loss">Alarm utraty sygnału</string>
+    <string name="m3_watch_galarm_threshold">Próg</string>
+    <string name="m3_watch_galarm_after">Po czasie</string>
+    <string name="m3_watch_mirror_title">Sensory</string>
+    <string name="m3_watch_mirror_sensor">Sensor</string>
+    <string name="m3_watch_mirror_conn">Połączenie</string>
+</resources>

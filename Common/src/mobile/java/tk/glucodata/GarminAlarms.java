@@ -132,13 +132,13 @@ public final class GarminAlarms {
         final int[] vibrations={original.vibrationFlags};
         final int[] tones={original.lowTone,original.highTone,original.lossTone};
         CheckDirectionBox low=new CheckDirectionBox(context),high=new CheckDirectionBox(context),loss=new CheckDirectionBox(context);
-        low.setText(R.string.lowglucosealarm); high.setText(R.string.highglucosealarm); loss.setText(R.string.lossofsignalalarm);
+        low.setText(R.string.lowglucosealarm); high.setText(R.string.highglucosealarm); loss.setText(R.string.m3_watch_galarm_loss);
         low.setChecked((original.flags&1)!=0); high.setChecked((original.flags&2)!=0); loss.setChecked((original.flags&4)!=0);
         EditText lowValue=number(context,shown(original.low,mmol),true);
         EditText highValue=number(context,shown(original.high,mmol),true);
         EditText lossWait=number(context,Integer.toString(original.lossMinutes),false);
         Button lowVibe=getbutton(context,R.string.garmin_alarm_alert),highVibe=getbutton(context,R.string.garmin_alarm_alert),lossVibe=getbutton(context,R.string.garmin_alarm_alert);
-        Button save=getbutton(context,R.string.save),cancel=getbutton(context,R.string.closename);
+        Button save=getbutton(context,R.string.save);
         TextView status=getlabel(context,all.garminAlarmStatus(peerId));
         statusPeer=peerId; statusView=new WeakReference<>(status);
     //    TextView note=getlabel(context,R.string.garmin_alarm_explanation);
@@ -147,36 +147,32 @@ public final class GarminAlarms {
 
        // note.setMaxWidth((int)(GlucoseCurve.metrics.density*420));
         //note.setLayoutParams(new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        Layout layout=new Layout(context,(l,w,h)->new int[]{w,h},
-               // new View[]{getlabel(context,R.string.alarms)}, 
-                new View[]{low,lowValue,getlabel(context,mmol?R.string.mmolL:R.string.mgdL),lowVibe},
-                new View[]{high,highValue,getlabel(context,mmol?R.string.mmolL:R.string.mgdL),highVibe},
-                new View[]{loss,lossWait,getlabel(context,R.string.minutes),lossVibe},
-                new View[]{status},new View[]{cancel,help,save})
-                .portraitLayout(new View[]{getlabel(context,R.string.alarms)},
-                    new View[]{low},new View[]{lowValue,getlabel(context,mmol?R.string.mmolL:R.string.mgdL),lowVibe},
-                    new View[]{high},new View[]{highValue,getlabel(context,mmol?R.string.mmolL:R.string.mgdL),highVibe},
-                    new View[]{loss},new View[]{lossWait,getlabel(context,R.string.minutes),lossVibe},
-                    new View[]{status},new View[]{cancel,help,save});
-        int pad=(int)(GlucoseCurve.metrics.density*8);
-//        layout.setPadding(pad,pad,pad,pad);
-        layout.systembarPadding((left,top,right,bottom)->new int[]{left+pad,top,right+pad,bottom});
-        ScrollView scroll=new ScrollView(context);
-        scroll.addView(layout); scroll.setFillViewport(true); scroll.setBackgroundColor(Applic.backgroundcolor);
+        var page=new M3.Page(context,R.string.m3_watch_galarm_title,true);
+        final View scroll=page.root;
+        int unit=mmol?R.string.mmolL:R.string.mgdL;
+        var glow=page.group(R.string.m3_watch_galarm_low);
+        glow.toggle(low);
+        glow.value(R.string.m3_watch_galarm_threshold,lowValue,getlabel(context,unit),lowVibe);
+        var ghigh=page.group(R.string.m3_watch_galarm_high);
+        ghigh.toggle(high);
+        ghigh.value(R.string.m3_watch_galarm_threshold,highValue,getlabel(context,unit),highVibe);
+        var gloss=page.group(R.string.lossofsignal);
+        gloss.toggle(loss);
+        gloss.value(R.string.m3_watch_galarm_after,lossWait,getlabel(context,R.string.minutes),lossVibe);
+        var gstatus=page.group(R.string.status);
+        gstatus.item(status);
+        page.buttons(help,save);
         parent.setVisibility(View.GONE);
         //EnableControls(parent,false);
-        context.addMyContentView(scroll,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-        context.setonback(()->{
+        page.show(()->{
             if(statusView.get()==status) { 
                 statusView.clear(); 
                 statusPeer=Long.MIN_VALUE; }
-            tk.glucodata.settings.Settings.removeContentView(scroll); 
            // EnableControls(parent,true);
             parent.setVisibility(View.VISIBLE); 
             context.hideSystemUI(); 
             hidekeyboard(context);
         });
-        cancel.setOnClickListener(v->context.doonback());
         low.setOnCheckedChangeListener((b,c)->{lowValue.setEnabled(c);lowVibe.setEnabled(c);});
         high.setOnCheckedChangeListener((b,c)->{highValue.setEnabled(c);highVibe.setEnabled(c);});
         loss.setOnCheckedChangeListener((b,c)->{lossWait.setEnabled(c);lossVibe.setEnabled(c);});
@@ -242,42 +238,24 @@ public final class GarminAlarms {
         */
 		Button help = getbutton(context, R.string.helpname);
 		help.setOnClickListener(v -> help(R.string.garmin_alert, context));
-        Button save=getbutton(context,R.string.save),cancel=getbutton(context,R.string.cancel);
-        TextView error=getlabel(context,"");
-        Layout layout=new Layout(context,(l,w,h)->new int[]{w,h},
-         //       new View[]{soundNote},new View[]{vibrationNote},
-                new View[]{getlabel(context,R.string.duraction),duration,getlabel(context,R.string.sec)},
-                new View[]{getlabel(context, R.string.minuteddeactivated),repeat},
-          //      new View[]{repeatNote},
-                new View[]{error},
-                new View[]{sound,vibration},
-                new View[]{getlabel(context,R.string.garmin_alarm_tone),tone},
-                new View[]{cancel,help,save},
-                new View[]{getlabel(context,new int[]{R.string.lowglucosealarm,R.string.highglucosealarm,R.string.lossofsignal}[kind])}
-                );
-        int pad=(int)(GlucoseCurve.metrics.density*10);
-
-
-//        layout.systembarMargins((left,top,right,bottom)->new int[]{left+pad,top+pad,right+pad,bottom+pad});
-        layout.setPadding(pad,pad,pad,pad);
-//        layout.systembarMargins();
-        layout.setBackgroundResource(R.drawable.dialogbackground);
-        //parent.setVisibility(View.GONE);
+        Button save=getbutton(context,R.string.save);
+        var page=new M3.Page(context,context.getString(new int[]{R.string.lowglucosealarm,R.string.highglucosealarm,R.string.lossofsignal}[kind]),true);
+        var galert=page.group(R.string.garmin_alarm_alert);
+        galert.value(context.getString(R.string.duraction).replace(":","").trim(),duration,getlabel(context,R.string.sec));
+        galert.value(context.getString(R.string.minuteddeactivated).replace(":","").trim(),repeat);
+        galert.toggle(sound);
+        galert.value(R.string.garmin_alarm_tone,tone);
+        galert.toggle(vibration);
+        TextView error=page.note("");
+        page.buttons(help,save);
 
         EnableControls(parent,false);
-        var  params =    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT,  Gravity.TOP|Gravity.CENTER_HORIZONTAL);
-        layout.systembarMargins((left,top,right,bottom)->new int[]{0,top*2/3,0,0});
-        ScrollView scroll=new ScrollView(context);
-        scroll.addView(layout);
-        context.addMyContentView(scroll,params);
-        context.setonback(()->{
-            tk.glucodata.settings.Settings.removeContentView(scroll);
+        page.show(()->{
             EnableControls(parent,true);
            // parent.setVisibility(View.VISIBLE);
             hidekeyboard(context);
             context.hideSystemUI();
             });
-        cancel.setOnClickListener(v->context.doonback());
         save.setOnClickListener(v->{try {
             int r=integer(repeat,0,4095),d=integer(duration,0,65535);
             repeats[kind]=r;durations[kind]=d;

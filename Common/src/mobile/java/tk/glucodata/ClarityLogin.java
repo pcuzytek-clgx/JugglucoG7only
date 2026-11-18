@@ -178,44 +178,33 @@ static void show(MainActivity act,View parent,Runnable refreshed) {
         show(act,parent,refreshed,tk.glucodata.util.getCountry(),act.getString(R.string.clarity_login_instructions),false);
         }
 static private void show(MainActivity act,View parent,Runnable refreshed,String savedCountry,String text,boolean finishPending) {
-        var message=getlabel(act,text);
-        var label=getlabel(act,act.getString(R.string.clarity_login_country));
         var country=new EditText(act);
         country.setSingleLine(true);
+        country.setMinEms(3);
         country.setText(savedCountry);
         var begin=getbutton(act,R.string.clarity_sign_in);
-        var cancel=getbutton(act,R.string.cancel);
         // Retry belongs to the setup/error screen, never above the web page.
         var retry=finishPending?getbutton(act,R.string.clarity_login_finish_pending):null;
-        final Layout root;
-        message.setLayoutParams(new ViewGroup.LayoutParams(  MATCH_PARENT, WRAP_CONTENT));
-        if(retry==null)
-            root=new Layout(act,new View[]{message},new View[]{label,country},new View[]{begin,cancel})
-                .portraitLayout(new View[]{message},new View[]{label},new View[]{country},new View[]{begin}, new View[]{cancel});
-        else
-            root=new Layout(act,new View[]{message},new View[]{label,country},new View[]{begin,cancel},new View[]{retry})
-                .portraitLayout(new View[]{message},new View[]{label},new View[]{country},new View[]{begin,cancel},new View[]{retry});
+        var page=new M3.Page(act,R.string.clarity_sign_in,true);
+        final View root=page.root;
+        var g=page.group(null);
+        g.text(text);
+        g.value(R.string.clarity_login_country,country);
+        page.buttons(retry,begin);
 
         begin.setOnClickListener(v->startFromSetup(act,root,parent,refreshed,country.getText().toString(),false));
         if(retry!=null)
             retry.setOnClickListener(v->startFromSetup(act,root,parent,refreshed,country.getText().toString(),true));
 
-        root.setBackgroundColor(Applic.backgroundcolor);
-
-        final int sidepad=(int)(GlucoseCurve.metrics.density*30);
-        root.systembarPadding((left,top,right,bottom)-> {
-              return   new int[]{left+sidepad,top+sidepad,sidepad+right,bottom+sidepad};
-              });
         parent.setVisibility(View.GONE);
-        act.addMyContentView(root,new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT));
+        page.showOnly();
         MainActivity.setonback(()->{
             removeContentView(root);
             parent.setVisibility(View.VISIBLE);
             if(!act.isFinishing() && !act.isDestroyed())refreshed.run();
            });
-        cancel.setOnClickListener(v->MainActivity.doonback());
     }
-static private void startFromSetup(MainActivity act,Layout root,View parent,Runnable refreshed,String country,boolean finishPending) {
+static private void startFromSetup(MainActivity act,View root,View parent,Runnable refreshed,String country,boolean finishPending) {
         if(root.getParent()==null || act.isFinishing() || act.isDestroyed())return;
         if(finishing.get()) {
             Applic.Toaster(act.getString(R.string.clarity_login_in_progress));

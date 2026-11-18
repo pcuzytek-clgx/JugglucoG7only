@@ -80,7 +80,7 @@ public static void show(MainActivity context,View parent) {
         }
         );
    if(absent) {
-        delete.setVisibility(INVISIBLE);
+        delete.setVisibility(View.GONE);
         }
     save.setOnClickListener(
             v -> {
@@ -110,18 +110,19 @@ public static void show(MainActivity context,View parent) {
             help.help(R.string.turnservers,context);
     });
 
-    var layout=new Layout(context,(l,w,h)-> {
-        return new int[] {w,h};
-        },new View[]{hostname,hostedit,portname,portedit},new View[]{username,useredit,password,passedit} ,new View[]{cancel,Help,delete,save} ).portraitLayout(new View[]{hostname,hostedit},new View[]{portname,portedit},new View[]{username,useredit},new View[]{password,passedit} ,new View[]{Help,delete},new View[]{cancel,save} ).systembarMargins((left,top,right,bottom)->new int[]{left,5*top/6,right,bottom});
-
-    var params =new ViewGroup.MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT);
-
-   layout.setPadding(laypad*2,0,laypad*2,0);
-    layout.setBackgroundResource(R.drawable.dialogbackground);
-    context.addMyContentView(layout, params);
-     MainActivity.setonback( () -> {
+    useredit.setMinEms(8);
+    passedit.setMinEms(8);
+    hostedit.setMinEms(8);
+    var page=new M3.Page(context,R.string.turnserver,true);
+    var server=page.group(R.string.m3_bk_server);
+    server.value(hostname.getText(),hostedit);
+    server.value(portname.getText(),portedit);
+    var login=page.group(R.string.m3_bk_login);
+    login.value(username.getText(),useredit);
+    login.value(password.getText(),passedit);
+    page.buttons(Help,delete,save);
+    page.show(() -> {
         EnableControls(parent,true);
-        removeContentView(layout); 
         hidekeyboard(context);
         });
     cancel.setOnClickListener( v -> { MainActivity.doonback(); });

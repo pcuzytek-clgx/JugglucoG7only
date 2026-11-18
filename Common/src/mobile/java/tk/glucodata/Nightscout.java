@@ -78,7 +78,6 @@ public static void show(MainActivity context,View parent) {
    	EnableControls(parent,false);
 
 	var save=getbutton(context,R.string.save);
-	var secret=getlabel(context,R.string.secret);
 
 	String key=Natives.getApiSecret();
 	String[] oldkey={key};
@@ -86,7 +85,7 @@ public static void show(MainActivity context,View parent) {
         editkey.setImeOptions(editoptions);
         editkey.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
         editkey.setTransformationMethod(new PasswordTransformationMethod());
-	 editkey.setMinEms(12);
+	 editkey.setMinEms(8);
 	editkey.setText(key);
 
        var visible = new CheckDirectionBox(context);
@@ -102,17 +101,12 @@ public static void show(MainActivity context,View parent) {
                                         editkey.setTransformationMethod(new PasswordTransformationMethod());
                         editkey.setSelection(sel);
                         });
-	 var labport=getlabel(context,"SSL "+context.getString(R.string.port));
 	var oldport=Natives.getsslport();
   	var portview=getnumedit(context, ""+oldport);
 
-	 var labhttpport=getlabel(context,"HTTP "+context.getString(R.string.port));
 	int oldhttpport=Natives.gethttpport();
   	var httpportview=getnumedit(context, ""+oldhttpport);
                         
-	 var labinterval=getlabel(context,R.string.interval);
-	float density=GlucoseCurve.metrics.density;
-     Layout.getMargins(labinterval).leftMargin=(int)(density*5.0f);
 	int interval=Natives.getinterval();
   	var intervalview=getnumedit(context, ""+interval);
    
@@ -205,7 +199,6 @@ public static void show(MainActivity context,View parent) {
 		});
 
 	var local=getcheckbox(context,R.string.localonly,Natives.getXdripServerLocal( ));
-	int laypad=(int)(density*4.0);
 	local.setOnCheckedChangeListener(
 			 (buttonView,  isChecked) -> {
 				Natives.setXdripServerLocal(isChecked);
@@ -230,8 +223,6 @@ public static void show(MainActivity context,View parent) {
 	UploadWeb.setText(R.string.webuploadpages);
 	UploadWeb.setOnClickListener(v->WebPageUpload.show(context));
 
-
-	var Close=getbutton(context,R.string.closename);
 
 	var usexdripserver=Natives.getusexdripwebserver();
 	var server=getcheckbox(context,R.string.active,usexdripserver);
@@ -261,10 +252,27 @@ public static void show(MainActivity context,View parent) {
 	int[] nochangeamounts={0};
 
 	var errstr=Natives.nightError();
-	var errorrow=errstr.length()>0?new View[]{getlabel(context,errstr)}:null;
-	var layout=new Layout(context,(l,w,h)-> {
-		return new int[] {w,h};
-		},new View[]{secret,visible},new View[]{editkey},new View[]{labhttpport,httpportview,labport,portview},new View[]{local,save,labinterval,intervalview},new View[]{sslbox,privkey,chain},new View[]{treatments,UploadWeb},errorrow,new View[]{Help,server,Close} );
+	var page=new M3.Page(context,R.string.webserver,true);
+	final View layout=page.root;
+	var gserver=page.group(R.string.m3_share_web_server);
+	gserver.toggle(server);
+	gserver.toggle(local);
+	gserver.value(R.string.interval,intervalview);
+	var gaccess=page.group(R.string.m3_share_web_access);
+	gaccess.value(context.getString(R.string.secret),editkey,visible);
+	var gports=page.group(R.string.m3_share_web_ports);
+	gports.value("HTTP "+context.getString(R.string.port),httpportview);
+	gports.value("SSL "+context.getString(R.string.port),portview);
+	var gssl=page.group(R.string.m3_share_web_ssl);
+	gssl.toggle(sslbox);
+	gssl.action(privkey.getText(),null,v->privkey.performClick());
+	gssl.action(chain.getText(),null,v->chain.performClick());
+	var gdata=page.group(R.string.m3_share_web_data);
+	gdata.toggle(treatments);
+	gdata.nav(UploadWeb);
+	if(errstr.length()>0)
+		page.group(R.string.m3_share_web_error).text(errstr);
+	page.buttons(Help,save);
 
 	treatments.setOnCheckedChangeListener( (buttonView,  isChecked) -> {
 		switch(nochangeamounts[0])  {
@@ -277,19 +285,7 @@ public static void show(MainActivity context,View parent) {
 
 			};
 		});
-	layout.setPadding(laypad*2,laypad,laypad*2,laypad);
-
-	layout.setBackgroundResource(R.drawable.dialogbackground);
-    layout.systembarMargins();
-
-    var  params =    
-            new FrameLayout.LayoutParams(
-                    WRAP_CONTENT,
-                    WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL);
-
-    context.addMyContentView(layout, params);
-//	context.addMyContentView(layout, new ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+	page.showOnly();
 	Runnable[] closeproc={null};
 
         closeproc[0]=()-> {
@@ -339,11 +335,6 @@ public static void show(MainActivity context,View parent) {
                         };
 
 	setonback( closeproc[0]);
-	Close.setOnClickListener(
-		v -> {
-              doonback();
-
-			});
 
 
 

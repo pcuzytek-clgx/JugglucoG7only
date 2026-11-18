@@ -21,7 +21,7 @@
 
 package tk.glucodata;
 
-import static android.view.View.INVISIBLE;
+import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Applic.mgdLmult;
@@ -118,16 +118,15 @@ static public void show(MainActivity context) {
     var usexdripserver=Natives.getusexdripwebserver();
     var server=getcheckbox(context,R.string.webserver,usexdripserver);
     server.setOnCheckedChangeListener( (buttonView,  isChecked) -> Natives.setusexdripwebserver(isChecked));
-    var serverconfig=getbutton(context,R.string.config);
     var usegarmin=Natives.getusegarmin();
     var kerfstok=getcheckbox(context,"Kerfstok",usegarmin); 
-    var status=getbutton(context,R.string.status);
-    status.setVisibility(usegarmin?VISIBLE:INVISIBLE);
+    final View[] statusRow={null};
+    final View[] wearRow={null};
     kerfstok.setOnCheckedChangeListener(
              (buttonView,  isChecked) -> {
              if(isChecked&&!usegarmin)
                 Applic.app.numdata.reinit(context);
-            status.setVisibility(isChecked?VISIBLE:INVISIBLE);
+            if(statusRow[0]!=null) statusRow[0].setVisibility(isChecked?VISIBLE:GONE);
              });
     var useWearos=Applic.useWearos();
     if(useWearos) {
@@ -137,8 +136,6 @@ static public void show(MainActivity context) {
         }
 
     var wearbox=getcheckbox( context, "WearOS", useWearos);
-    var wearossettings=getbutton(context,R.string.config);
-    wearossettings.setVisibility(useWearos?VISIBLE:INVISIBLE);
     wearbox.setOnCheckedChangeListener(
              (buttonView,  isChecked) -> {
             setuseWearos(isChecked);
@@ -153,46 +150,44 @@ static public void show(MainActivity context) {
                // Natives.networkpresent();
                 Natives.switchSync();
                 }
-            wearossettings.setVisibility(isChecked?VISIBLE:INVISIBLE);
+            if(wearRow[0]!=null) wearRow[0].setVisibility(isChecked?VISIBLE:GONE);
              });
 
 
-    var Ok=getbutton(context,R.string.ok);
     var Help=getbutton(context,R.string.helpname);
     Help.setOnClickListener(v-> {
         context.themeLightBars();
         help.help(R.string.watchinfo,context,l->context.lightBars(!Natives.getInvertColors( ))); 
         });
 
-    var layout=new Layout(context,(l,w,h)-> {
-    /*
-        var width= GlucoseCurve.getwidth();
-        if(width>w)
-            l.setX((width-w)/2);
-      l.setY(MainActivity.systembarTop);
-*/
-        return new int[] {w,h};
-        },mibandrow,new View[] {notify,separate},new View[]{wearbox,wearossettings},new View[]{server,serverconfig},new View[]{kerfstok,status},new View[]{Help,Ok} );
-    float density=GlucoseCurve.metrics.density;
-    int laypad=(int)(density*4.0);
-    layout.setPadding(laypad*2,laypad*2,laypad*2,laypad);
+    notify.setText(R.string.m3_watch_notify);
+    separate.setText(R.string.m3_watch_separate);
+    var page=new M3.Page(context,R.string.m3_watch_title,true);
+    final View layout=page.root;
 
-    layout.setBackgroundColor( Applic.backgroundcolor);
-    var  params =    
-            new FrameLayout.LayoutParams(
-                    WRAP_CONTENT,
-                    WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL| Gravity.CENTER);
+    var gnotify=page.group(R.string.m3_watch_notifications);
+    gnotify.toggle(notify);
+    gnotify.toggle(separate);
 
-    context.addMyContentView(layout, params);
-    status.setOnClickListener(v->{
-            new GarminStatus(context,Applic.app.numdata,layout);
-            });
-    wearossettings.setOnClickListener(v->{
-            Wearos.show(context,layout);
-            });
-    Ok.setOnClickListener(
-        v -> {
+    var gwear=page.group("Wear OS");
+    gwear.toggle(wearbox);
+    wearRow[0]=gwear.nav(R.string.m3_watch_wearos_config,null,v->Wearos.show(context,layout));
+    wearRow[0].setVisibility(useWearos?VISIBLE:GONE);
+
+    var ggarmin=page.group(R.string.m3_watch_garmin);
+    ggarmin.toggle(kerfstok);
+    statusRow[0]=ggarmin.nav(R.string.m3_watch_garmin_status,null,v->new GarminStatus(context,Applic.app.numdata,layout));
+    statusRow[0].setVisibility(usegarmin?VISIBLE:GONE);
+
+    var gother=page.group(R.string.m3_watch_other);
+    gother.toggle(gadget);
+    if(test!=null)
+        gother.action("Test",null,v->test.performClick());
+    gother.toggle(server);
+    gother.nav(R.string.m3_watch_server_config,null,v->Nightscout.show(context,layout));
+
+    page.buttons(Help);
+    page.show(()-> {
            if(usegarmin!=kerfstok.isChecked()) {
                Natives.setusegarmin(!usegarmin);
             if(usegarmin) {
@@ -200,25 +195,12 @@ static public void show(MainActivity context) {
                 Applic.app.numdata.stop();
                 }
                }
-        context.poponback();
-        removeContentView(layout);
         context.hideSystemUI(); 
         if(Menus.on) {
             Menus.show(context);
             }
         });
-
-
-
-    context.setonback(()-> { removeContentView(layout);
-        context.hideSystemUI(); });
-
-    serverconfig.setOnClickListener(v->{
-            Nightscout.show(context,layout);
-            });
     }
-    
-
 }
 
 
