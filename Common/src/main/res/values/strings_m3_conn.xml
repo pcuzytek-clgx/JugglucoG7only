@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="m3_conn_devices">Urządzenia</string>
+    <string name="m3_conn_sensor_sum">Sensor Dexcom G7, Bluetooth, parowanie</string>
+    <string name="m3_conn_mirror_sum">Przesyłanie danych między telefonami</string>
+    <string name="m3_conn_watch_sum">Wear OS, Garmin i inne zegarki</string>
+    <string name="m3_bd_sensor">Sensor</string>
+    <string name="m3_bd_selected">Wybrany sensor</string>
+    <string name="m3_bd_address">Adres</string>
+    <string name="m3_bd_diagnostics">Diagnostyka</string>
+    <string name="m3_bd_system">System</string>
+</resources>

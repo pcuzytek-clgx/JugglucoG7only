@@ -24,14 +24,12 @@
 
 package tk.glucodata;
 
-import android.view.LayoutInflater;
 import android.content.res.Configuration;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.ViewCompat;
 
-import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -212,22 +210,15 @@ static public void show(MainActivity act) {
 static private void showNow(MainActivity act) {
     waitingForLandscape=false;
     resetStableWindow();
-    LayoutInflater flater= LayoutInflater.from(act);
-    View view = flater.inflate(R.layout.menus, null, false);
+    var page=new M3.Page(act,R.string.connections,false);
+    View view = page.root;
     currentView=view;
-      view.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
- //       view.setTextDirection(View.TEXT_DIRECTION_LTR);
-
-
-	view.setAccessibilityDelegate(Layout.accessDeli);
-        view.setBackgroundColor( Applic.backgroundcolor);
+    var devices=page.group(R.string.m3_conn_devices);
+    var sensorrow=devices.nav(R.string.sensor,act.getString(R.string.m3_conn_sensor_sum),null);
+    var mirrorrow=devices.nav(R.string.mirror,act.getString(R.string.m3_conn_mirror_sum),null);
+    var watchrow=devices.nav(R.string.watches,act.getString(R.string.m3_conn_watch_sum),null);
 
     if(!isWearable) {
-        setOnApplyWindowInsetsListener(view,(v,windowInsets) -> {
-            Insets bars=windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
-            return windowInsets;
-            });
         view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) { }
@@ -287,8 +278,7 @@ static private void showNow(MainActivity act) {
 				act.requestRender();
 			});
 
-    var menusviewview=view.findViewById(R.id.menusview);menusviewview.setOnClickListener(v ->{}); 
-        var watchview=view.findViewById(R.id.watch);watchview.setOnClickListener(v ->{
+        watchrow.setOnClickListener(v ->{
 				if(!isWearable) {
 				act.poponback();
    		   act.lightBars(!getInvertColors( ));
@@ -296,22 +286,18 @@ static private void showNow(MainActivity act) {
 					tk.glucodata.Watch.show(act);
 					}
 	}); 
-        var sensorview=view.findViewById(R.id.sensor);sensorview.setOnClickListener(v ->{
+        sensorrow.setOnClickListener(v ->{
 				act.poponback();
    		   act.lightBars(!getInvertColors( ));
 				removeContentView(view);
 			       bluediag.start(act);
 		}); 
-        var mirrorview=view.findViewById(R.id.mirror);mirrorview.setOnClickListener(v ->{
+        mirrorrow.setOnClickListener(v ->{
 				act.poponback();
 		     removeContentView(view);
 			(new Backup()).mkbackupview(act);
 	}); 
    
-	  // view.setPadding(0,MainActivity.systembarTop,0,0);
-    // systembarBottom includes the bottom tab bar (DexTabs) when it is shown.
-    view.setPadding(MainActivity.systembarLeft,MainActivity.systembarTop*3/4,MainActivity.systembarRight,MainActivity.systembarBottom);
-
 	act.addMyContentView(view, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
     if(!isWearable)
         view.requestApplyInsets();

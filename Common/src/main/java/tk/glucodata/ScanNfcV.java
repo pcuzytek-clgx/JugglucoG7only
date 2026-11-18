@@ -146,7 +146,11 @@ static private void newsensor(MainActivity act,String text,String name) {
                    askcalendar=false;
                 });
         lay.setPadding(pad,pad,pad,pad);
-        lay.setBackgroundColor(Applic.backgroundcolor);
+        var bg=new android.graphics.drawable.GradientDrawable();
+        bg.setCornerRadius(M3.dp(act,28));
+        bg.setColor(M3.color(act,com.google.android.material.R.attr.colorSurfaceContainerHigh,0xFF2B2B2B));
+        lay.setBackground(bg);
+        M3.style(ok);
        var params = new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL| Gravity.CENTER);
         act.addMyContentView(lay, params);
     });

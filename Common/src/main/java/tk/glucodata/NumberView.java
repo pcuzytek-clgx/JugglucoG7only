@@ -434,7 +434,7 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
     else  {
         newnumview=layout;
         } 
-    newnumview.setBackgroundColor( Applic.backgroundcolor);
+    if(isWearable) newnumview.setBackgroundColor( Applic.backgroundcolor); else M3.card(newnumview);
   savebutton.setOnClickListener(v -> {
         MainActivity act=(MainActivity)v.getContext();
         GlucoseCurve.reopener();
@@ -803,7 +803,7 @@ public Layout getdateviewal(MainActivity activity, long date, Dater erdate) {
         datparams =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
         }
 
-    datepicker.setBackgroundColor( Applic.app.backgroundcolor);
+    if(isWearable) datepicker.setBackgroundColor( Applic.app.backgroundcolor); else M3.card(datepicker);
     activity.addMyContentView(datepicker, datparams);
     }
     else {
@@ -969,7 +969,7 @@ else {
             }
         return new int[]{w,h};
         }, views);
-    layout.setBackgroundColor( Applic.backgroundcolor);
+    if(isWearable) layout.setBackgroundColor( Applic.backgroundcolor); else M3.card(layout);
     var params=new FrameLayout.LayoutParams(layparwidth,layparheight,Gravity.TOP|Gravity.LEFT);
    if(isWearable)
           layout.setPaddingRelative(0,(int)(GlucoseCurve.metrics.density*5.0),0,(int)(GlucoseCurve.metrics.density*2.0));
@@ -1313,7 +1313,7 @@ Layout getkeyboard(Context context,View anchor,int keyboardMode) {
                     return new int[] {w,h};
         }, views) ;
         
-    layout.setBackgroundColor( Applic.backgroundcolor);
+    if(isWearable) layout.setBackgroundColor( Applic.backgroundcolor); else M3.card(layout);
     layout.post(layout::requestLayout);
     return layout;
     }

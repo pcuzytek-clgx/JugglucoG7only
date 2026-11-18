@@ -119,6 +119,15 @@ public final class M3 {
             g.removeView(v);
     }
 
+    /** Rounded M3 surface (dialog/card look) for floating panels. */
+    public static void card(View v) {
+        Context c=v.getContext();
+        var bg=new GradientDrawable();
+        bg.setCornerRadius(dp(c,28));
+        bg.setColor(color(c, com.google.android.material.R.attr.colorSurfaceContainerHigh, 0xFF2B2B2B));
+        v.setBackground(bg);
+    }
+
     /** A full screen settings page. */
     public static final class Page {
         public final MainActivity act;

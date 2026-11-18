@@ -715,7 +715,8 @@ private static final class HelpSearch {
        layouttmp.setLayoutParams(params);
           layouttmp.systembarMargins((left,top,right,bottom)->new int[]{left,top*3/4,right,DexTabs.bottomPart(bottom)});
        layouttmp.requestLayout();
-        layouttmp.setBackgroundResource(R.drawable.helpbackground);
+        layouttmp.setBackgroundColor(M3.surface(act));
+        M3.style(ok);
            addMyContentView(getActivity(act),layouttmp, params);
 
           }
@@ -792,7 +793,11 @@ public static   void help(String text,ContextThemeWrapper act,Consumer<ViewGroup
          LinearLayout buttons = new LinearLayout(act);
          buttons.setOrientation(LinearLayout.HORIZONTAL);
          buttons.setGravity(MainActivity.rtl ? Gravity.LEFT : Gravity.RIGHT);
-         buttons.addView(searchButton, new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+         final int bpad=M3.dp(act,8);
+         buttons.setPadding(bpad*2,bpad,bpad*2,bpad);
+         var searchParams=new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+         searchParams.setMarginEnd(bpad);
+         buttons.addView(searchButton, searchParams);
          buttons.addView(ok, new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
 
          helpSearch = new HelpSearch(act, helpscroll, helpview, searchButton, buttons);
@@ -807,7 +812,9 @@ public static   void help(String text,ContextThemeWrapper act,Consumer<ViewGroup
          content.addView(helpscroll, new LinearLayout.LayoutParams(MATCH_PARENT, 0, 1.0f));
 
          FrameLayout root = new FrameLayout(act);
-         root.setBackgroundResource(R.drawable.helpbackground);
+         root.setBackgroundColor(M3.surface(act));
+         M3.style(ok);
+         M3.style(searchButton);
          root.addView(content, new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
          root.addView(buttons, new FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, Gravity.TOP));
 
@@ -946,7 +953,8 @@ private static void setHelpInsets(ViewGroup helplayout, TextView helpview,
     if (helplayout.getPaddingTop() != 0)
         helplayout.setPadding(0, 0, 0, 0);
 
-    helpview.setPadding(pad, pad + top, pad, pad + bottom);
+    final int buttonsHeight = M3.dp(helpview.getContext(),72);
+    helpview.setPadding(pad, pad + top + buttonsHeight, pad, pad + bottom);
 
     // The floating Search/OK controls themselves should remain below the
     // status bar even though the help ScrollView extends underneath it.

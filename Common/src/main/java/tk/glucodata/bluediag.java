@@ -55,6 +55,7 @@ import java.util.concurrent.TimeUnit;
 import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_BALANCED;
 import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
 import static android.graphics.Color.BLACK;
+import android.widget.LinearLayout;
 //import static android.graphics.Color.BLUE;
 //import static android.graphics.Color.GREEN;
 import static android.graphics.Color.LTGRAY;
@@ -139,6 +140,23 @@ static void showsensormessage(String text,MainActivity act) {
     final boolean wasused= Natives.getusebluetooth();
     final var messview=getlabel(act,text);
     final var usebluetooth=getcheckbox(act, R.string.use_bluetooth,wasused);
+    usebluetooth.setOnCheckedChangeListener(
+         (buttonView,  isChecked) -> {
+             {if(doLog) {Log.i(LOG_ID,"usebluetooth "+isChecked);};};
+             if(isChecked!=wasused) {
+                 act.setbluetoothmain( isChecked);
+                 act.requestRender();
+                 bluediag.restart(act);
+             }
+         });
+    if(!isWearable) {
+        var page=new M3.Page(act,R.string.sensor,true);
+        var g=page.group("Bluetooth");
+        g.text(text);
+        g.toggle(usebluetooth);
+        page.show(()->{ if(Menus.on) Menus.show(act); });
+        return;
+        }
     var layout=new Layout(act,(l,w,h)->{
     /*
          l.setX((width-w)*.5f);
@@ -156,16 +174,6 @@ static void showsensormessage(String text,MainActivity act) {
     close.setOnClickListener(v-> {
         MainActivity.doonback();
         });
-    usebluetooth.setOnCheckedChangeListener(
-         (buttonView,  isChecked) -> {
-             {if(doLog) {Log.i(LOG_ID,"usebluetooth "+isChecked);};};
-             if(isChecked!=wasused) {
-                 act.setbluetoothmain( isChecked);
-                 act.requestRender();
-                 MainActivity.doonback();
-                 bluediag.start(act);
-             }
-         });
 
     var  params = new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER| Gravity.CENTER_HORIZONTAL);
     act.addMyContentView(layout, params);
@@ -217,8 +225,7 @@ void showinfo(final SuperGattCallback gatt,MainActivity act) {
                 gatt.searchforDeviceAddress();
                 gatt.close();
                 SensorBluetooth.startscan();
-                 act.doonback();
-                 bluediag.start(act);
+                 bluediag.restart(act);
 
                 });
             }
@@ -273,8 +280,7 @@ void confirmFinish(SuperGattCallback gat) {
                 gat.finishSensor();
                 SensorBluetooth.sensorEnded(serial);
                 activity.requestRender();
-                activity.doonback();
-                bluediag.start(activity);
+                bluediag.restart(activity);
                 }
                 }).
         setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -314,8 +320,7 @@ static void nosensors(MainActivity act) {
              if(isChecked!=wasused) {
                  act.setbluetoothmain( isChecked);
                  act.requestRender();
-                 act.doonback();
-                 bluediag.start(act);
+                 bluediag.restart(act);
              }
          });
     var close=getbutton(act,R.string.closename);
@@ -331,6 +336,16 @@ static void nosensors(MainActivity act) {
     if(!Natives.optionStreamHistory(0L)||!wasused)
         streamhistory.setVisibility(GONE);
 help.setOnClickListener(v-> helplight(R.string.sensorhelp,act));
+  if(!isWearable) {
+      var page=new M3.Page(act,R.string.sensor,true);
+      var g=page.group("Bluetooth");
+      g.text(bluestate.getText());
+      g.toggle(usebluetooth);
+      g.toggle(streamhistory);
+      page.buttons(help);
+      page.show(()->{ if(Menus.on) Menus.show(act); });
+      return;
+      }
   Layout layout = new Layout(act, (l, w, h) -> {
   /*
       l.setX((width-w)/2);
@@ -566,7 +581,6 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
     }
     else {
         locationpermission=getbutton(act,R.string.scan_permission);
-        address.setBackgroundColor(BLACK);
 
         HorizontalScrollView diagnosticScroll=new HorizontalScrollView(act);
         diagnosticScroll.setFillViewport(false);
@@ -574,37 +588,41 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
         diagnosticScroll.setHorizontalScrollBarEnabled(Applic.horiScrollbar);
         diagnosticScroll.setScrollBarFadeDuration(0);
         diagnosticScroll.addView(diagnosticGrid,new ViewGroup.MarginLayoutParams(WRAP_CONTENT,WRAP_CONTENT));
-        diagnosticScroll.setLayoutParams( new ViewGroup.MarginLayoutParams(MATCH_PARENT,WRAP_CONTENT));
 
-        content=new Layout(act,
-                new View[]{bluestate,info,finish,sensorAction,locationpermission},
-                new View[]{scanview},
-                new View[]{spin,address,forget,streaming},
-                new View[]{diagnosticScroll},
-                new View[]{help,usebluetooth,background,companion},
-                new View[]{priority,android13,rssiview,close})
-                .portraitLayout(
-                new View[]{bluestate},
-                new View[]{info,finish},
-                new View[]{sensorAction},
-                new View[]{locationpermission},
-                new View[]{scanview},
-                new View[]{spin,address},
-                new View[]{forget,rssiview},
-                new View[]{streaming},
-                new View[]{diagnosticScroll},
-                new View[]{help,usebluetooth},
-                new View[]{background,priority},
-                new View[]{companion},
-                new View[]{android13,close});
-        content.setPadding(dp(15),dp(9),dp(2),dp(9));
-
-         content.setBackgroundColor(Applic.backgroundcolor);
-        android.widget.ScrollView vertical=new android.widget.ScrollView(act);
-        vertical.setFillViewport(false); 
-        content.systembarMargins();
-        vertical.addView(content,new android.widget.ScrollView.LayoutParams( MATCH_PARENT,WRAP_CONTENT));
-        showview=vertical;
+        content=null;
+        var page=new M3.Page(act,R.string.sensor,true);
+        var sensor=page.group(R.string.m3_bd_sensor);
+        sensor.value(R.string.m3_bd_selected,spin);
+        sensor.value(R.string.m3_bd_address,address);
+        var state=new LinearLayout(act);
+        state.setOrientation(LinearLayout.VERTICAL);
+        streaming.setTextColor(M3.onSurface(act));
+        rssiview.setTextColor(M3.onSurfaceVariant(act));
+        state.addView(streaming);
+        state.addView(rssiview);
+        sensor.item(state);
+        sensor.buttons(info,finish,forget);
+        var status=page.group(R.string.m3_bd_diagnostics);
+        bluestate.setTextColor(M3.onSurface(act));
+        scanview.setTextColor(M3.onSurfaceVariant(act));
+        var statecol=new LinearLayout(act);
+        statecol.setOrientation(LinearLayout.VERTICAL);
+        statecol.addView(bluestate);
+        statecol.addView(scanview);
+        statecol.addView(locationpermission);
+        status.item(statecol);
+        status.item(diagnosticScroll);
+        var blue=page.group("Bluetooth");
+        blue.toggle(usebluetooth);
+        blue.toggle(streamhistory);
+        blue.toggle(alarmclock);
+        blue.toggle(priority);
+        blue.toggle(android13);
+        var system=page.group(R.string.m3_bd_system);
+        system.nav(background);
+        system.action(companion.getText(),null,v->companion.performClick());
+        page.buttons(help);
+        showview=page.root;
        }
 
     final int addressrand=dp(5);
@@ -639,8 +657,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
              if (blueused != usebluetooth.isChecked()) {
                  act.setbluetoothmain( !blueused);
                  act.requestRender();
-                 act.doonback();
-                 bluediag.start(act);
+                 bluediag.restart(act);
              }
              else {
                  if (isChecked != wasuse)
@@ -740,7 +757,7 @@ bluediag(MainActivity act,final ArrayList<SuperGattCallback> gatts) {
 
 
 //    var  params = new FrameLayout.LayoutParams( MATCH_PARENT, MATCH_PARENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
-    var  params = new FrameLayout.LayoutParams(isWearable?WRAP_CONTENT:MATCH_PARENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
+    var  params = new FrameLayout.LayoutParams(isWearable?WRAP_CONTENT:MATCH_PARENT, isWearable?WRAP_CONTENT:MATCH_PARENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
     if(isWearable) {
         params.topMargin=(int)(MainActivity.systembarTop*.3f);
         params.bottomMargin=DexTabs.isShown()?MainActivity.systembarBottom:(int)(MainActivity.systembarBottom*.3f);
@@ -912,6 +929,13 @@ private void show(MainActivity act,View view) {
       }
 
   }
+static void restart(MainActivity act) {
+    final boolean menus=Menus.on;
+    Menus.on=false;
+    MainActivity.doonback();
+    Menus.on=menus;
+    start(act);
+    }
 static void start(MainActivity act) {
        boolean use=Natives.getusebluetooth();
        ArrayList<SuperGattCallback> gatts=SensorBluetooth.mygatts();

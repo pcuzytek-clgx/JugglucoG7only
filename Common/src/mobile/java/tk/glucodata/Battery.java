@@ -71,15 +71,11 @@ if(!isWearable) {
 	boolean isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(context.getPackageName());
 	battery.setChecked(isIgnoringBatteryOptimizations);
 	context.themeLightBars();
-               final var hormarg=(int)(GlucoseCurve.metrics.density*32.0);
-
-               getMargins(battery).setMarginStart(hormarg);
-               getMargins(Close).setMarginEnd(hormarg);
-              final Layout lay=new Layout(context, (l, w, h) -> {
-		return new int[] {w,h}; } , new View[]{info}
-		,isWearable?new View[]{Close}:new View[]{battery,Close}). systembarPadding();
-
-
+	info.setTextColor(M3.onSurface(context));
+	var page=new M3.Page(context,R.string.dozemode,true);
+	page.group(null).item(info);
+	page.group(null).toggle(battery);
+	final View lay=page.root;
 
 	Runnable closerun=()-> {
 		if(parent!=null)
@@ -99,14 +95,7 @@ if(!isWearable) {
 				Log.stack(LOG_ID,"ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS",th);
 				}
 		});
-	Close.setOnClickListener(v-> context.doonback());
-      lay.setBackgroundResource(R.drawable.dialogbackground);
-	ScrollView scroll=new ScrollView(context);
-  	scroll.setFillViewport(true);
-
-	scroll.addView(lay);
-//		context.addMyContentView(scroll, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
-	context.addMyContentView(scroll, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+	page.showOnly();
 		}
 	}
 
