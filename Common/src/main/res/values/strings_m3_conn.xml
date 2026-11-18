@@ -9,4 +9,5 @@
     <string name="m3_bd_address">Adres</string>
     <string name="m3_bd_diagnostics">Diagnostyka</string>
     <string name="m3_bd_system">System</string>
+    <string name="nostatsdata">Brak danych do statystyk. Statystyki pojawią się po zebraniu pomiarów z sensora.</string>
 </resources>

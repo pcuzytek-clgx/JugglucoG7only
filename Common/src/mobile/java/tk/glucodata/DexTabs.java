@@ -71,6 +71,8 @@ static void attach(MainActivity act) {
     var menu=bar.getMenu();
     for(int i=0;i<names.length;i++)
         menu.add(Menu.NONE,i,i,names[i]).setIcon(icons[i]);
+    // The app-wide textViewStyle adds paddingRight, which shifts the labels off the icons.
+    clearPadding(bar);
     // Insets are handled below (the bar is placed in android.R.id.content which gets enlarged insets).
     ViewCompat.setOnApplyWindowInsetsListener(bar,(v,insets)->insets);
     bar.setOnItemSelectedListener(item-> {
@@ -113,6 +115,14 @@ static void attach(MainActivity act) {
     ViewCompat.requestApplyInsets(content);
     if(Natives.getisalarm())
         showAlarm(true);
+    }
+
+private static void clearPadding(View v) {
+    if(v instanceof android.widget.TextView)
+        v.setPadding(0,v.getPaddingTop(),0,v.getPaddingBottom());
+    else if(v instanceof android.view.ViewGroup g)
+        for(int i=0;i<g.getChildCount();i++)
+            clearPadding(g.getChildAt(i));
     }
 
 static void detach(MainActivity act) {
@@ -191,8 +201,9 @@ static void select(int tab) {
     switch(tab) {
         case STATISTICS:
             if(!Natives.makepercentages()) {
-                tab=GLUCOSE;
-                act.requestRender();
+                var page=new M3.Page(act,R.string.tabstatistics,false);
+                page.group(null).text(act.getString(R.string.nostatsdata));
+                page.show(null);
                 break;
                 }
             Stats.mkstats(act);
