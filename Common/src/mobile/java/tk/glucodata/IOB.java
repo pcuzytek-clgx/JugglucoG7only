@@ -71,10 +71,11 @@ static public class InsulinTypeAdapter extends RecyclerView.Adapter<InsulinTypeH
         Button view=new Button( act);
 
         view.setTransformationMethod(null);
-   //     view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
-       if(!isWearable)
-               view.setTextSize(TypedValue.COMPLEX_UNIT_PX,Applic.largefontsize);
-        view.setLayoutParams(new ViewGroup.LayoutParams(  ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        M3.style(view);
+        var lp=new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int m=M3.dp(act,4);
+        lp.setMargins(m,m,m,m);
+        view.setLayoutParams(lp);
 
         return new InsulinTypeHolder(view,act,this,labels);
     }
@@ -96,26 +97,20 @@ static public class InsulinTypeAdapter extends RecyclerView.Adapter<InsulinTypeH
 
 public static void mkview(MainActivity act) {
     RecyclerView recycle = new RecyclerView(act);
-    recycle.setHasFixedSize(true);
     GridLayoutManager lin=new GridLayoutManager(act,3);
     recycle.setLayoutManager(lin);
-    recycle.setLayoutParams(new ViewGroup.LayoutParams(   ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    recycle.setLayoutParams(new ViewGroup.LayoutParams(   ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    recycle.setNestedScrollingEnabled(false);
     var adapt = new InsulinTypeAdapter(act);
     recycle.setAdapter(adapt);
     var iob=getcheckbox(act,"IOB",Natives.getIOB());
     var help=getbutton(act, R.string.helpname);
    help.setOnClickListener(v-> help(R.string.IOBhelp,act));
-    var ok=getbutton(act, R.string.ok);
-   var lay=new Layout(act,(x,w,h)->{
-         return new int[] {w,h};
-           },new View[]{recycle},new View[]{help,iob,ok});
-   lay.setBackgroundColor(Applic.backgroundcolor);
-   final var density= tk.glucodata.GlucoseCurve.metrics.density;
-   var hormarg=(int)(0.15f*GlucoseCurve.getwidth());
-
-   getMargins(help).setMarginStart(hormarg);
-   getMargins(ok).setMarginEnd(hormarg);   
-   lay.setPadding(MainActivity.systembarLeft+(int)(density*10.0f),MainActivity.systembarTop,MainActivity.systembarRight+(int)(density*10.0f),MainActivity.systembarBottom);
+    var page=new M3.Page(act,"IOB",true);
+    page.group(null).toggle(iob);
+    page.group(R.string.m3_insulin_types).item(recycle);
+    page.buttons(help);
+    final View lay=page.root;
     iob.setOnCheckedChangeListener( (buttonView,  isChecked) -> {
             if(!Natives.setIOB(isChecked)) {
                 iob.setChecked(false);
@@ -124,11 +119,6 @@ public static void mkview(MainActivity act) {
                 }
             }
         ); 
-    act.addMyContentView(lay, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-   ok.setOnClickListener(v-> {
-        MainActivity.doonback();
-        });
-    MainActivity.setonback(()-> removeContentView(lay));
+    page.show(null);
     }
-
 }

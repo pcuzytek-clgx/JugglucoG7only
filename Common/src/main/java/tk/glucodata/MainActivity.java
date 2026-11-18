@@ -1976,6 +1976,17 @@ private static final Set<RecyclerView> selectableRecyclerViews =
  * remains entirely with TextView's native selection implementation.
  */
 private static void keepNormalClick(TextView text) {
+    keepNormalClick(text,text);
+}
+/* Short taps on a selectable label inside a clickable row (M3 settings rows)
+ * go to that row instead of being swallowed by the label. */
+private static View clickableAncestor(View view,View top) {
+    for(var p=view.getParent();p instanceof View v&&v!=top;p=v.getParent())
+        if(v.isClickable())
+            return v;
+    return null;
+}
+private static void keepNormalClick(TextView text,View target) {
     final int touchSlop =
             ViewConfiguration.get(text.getContext()).getScaledTouchSlop();
     final int longPressTimeout = ViewConfiguration.getLongPressTimeout();
@@ -2006,8 +2017,8 @@ private static void keepNormalClick(TextView text) {
                         event.getEventTime() - event.getDownTime() < longPressTimeout) {
                         v.cancelLongPress();
                         v.setPressed(false);
-                        if (v.isEnabled())
-                            v.performClick();
+                        if (target.isEnabled())
+                            target.performClick();
                         return true;
                     }
                     return false;
@@ -2022,6 +2033,9 @@ private static void keepNormalClick(TextView text) {
 }
 
 private static void makeTextSelectable(View view) {
+    makeTextSelectable(view,view);
+}
+private static void makeTextSelectable(View view,View top) {
     if (view instanceof TextView && !(view instanceof EditText)) {
         TextView text = (TextView) view;
 
@@ -2034,6 +2048,11 @@ private static void makeTextSelectable(View view) {
 
             if (wasClickable)
                 keepNormalClick(text);
+            else {
+                View row=clickableAncestor(text,top);
+                if(row!=null)
+                    keepNormalClick(text,row);
+            }
         }
         return;
     }
@@ -2045,7 +2064,7 @@ private static void makeTextSelectable(View view) {
                     new RecyclerView.OnChildAttachStateChangeListener() {
                 @Override
                 public void onChildViewAttachedToWindow(View child) {
-                    makeTextSelectable(child);
+                    makeTextSelectable(child,recycler);
                 }
 
                 @Override
@@ -2058,7 +2077,7 @@ private static void makeTextSelectable(View view) {
     if (view instanceof ViewGroup) {
         ViewGroup group = (ViewGroup) view;
         for (int i = 0; i < group.getChildCount(); ++i)
-            makeTextSelectable(group.getChildAt(i));
+            makeTextSelectable(group.getChildAt(i),top);
     }
 }
 

@@ -88,37 +88,10 @@ private static void settype(MainActivity act, IOB.InsulinTypeAdapter adapter, in
     group.setOnCheckedChangeListener( (g,i)-> {
         setInsulinType(index,i);
          });
-//    onCheckedChanged (RadioGroup group, int checkedId)
-  var nameview=getlabel(act,name);
-   nameview.setTextSize(TypedValue.COMPLEX_UNIT_PX,Applic.headfontsize*.3f);
-   var ok=getbutton(act, R.string.ok);
-   var butlay=new Layout(act,(x,w,h)->{
-      /*  x.setX(0);
-        x.setY(0); */
-         return new int[] {w,h};
-           },new View[]{nameview},new View[]{ok});
-    var mar=getMargins(ok);
-   var density= tk.glucodata.GlucoseCurve.metrics.density;
-    mar.topMargin=(int)(getheight()*.3f);
-    mar.bottomMargin=(int)(density*30.0f);
-    butlay.usebaseline=false;
-   var lay=new Layout(act,(x,w,h)->{
-         return new int[] {w,h};
-           },new View[]{butlay,group});
-    lay.usebaseline=false;
-    lay.setBackgroundColor(Applic.backgroundcolor);
-   MainActivity.setonback(() -> {
-      removeContentView(lay);
-      adapter.notifyItemChanged(index);
-      });
-   ok.setOnClickListener(v-> {
-        MainActivity.doonback();
-        });
-   lay.setPadding(MainActivity.systembarLeft+(int)(15.0*density),MainActivity.systembarTop+(int)(4.0*density),MainActivity.systembarRight+(int)(18.0*density),(int)(4.0*density)+MainActivity.systembarBottom);
-
-    act.addMyContentView(lay, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+    var page=new M3.Page(act,name,true);
+    page.group(null).item(group);
+    page.show(()->adapter.notifyItemChanged(index));
     }
-
 
     public InsulinTypeHolder(View labelview, MainActivity act, IOB.InsulinTypeAdapter adapter, ArrayList<String > labels) {
     super(labelview);

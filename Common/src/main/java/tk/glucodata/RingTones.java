@@ -34,6 +34,8 @@ import android.widget.Button;
 
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.util.TypedValue;
 import android.widget.ScrollView;
 import android.widget.Space;
 import android.widget.TextView;
@@ -315,35 +317,46 @@ View[] durviews;
       views[start+3]=new View[]{flashview,vibration};
    }
 	
-	View lay;
+	final View lay;
+	if(isWearable)  {
 	ScrollView scroll=new ScrollView(context);
 	lay=scroll;
         Layout layout = new Layout(context, (l, w, h) -> {
 			return new int[]{w,h};}, views);
         scroll.addView(layout);
-        ViewGroup.LayoutParams params;
-	if(isWearable)  {
 		lay.setBackgroundColor(tk.glucodata.Applic.backgroundcolor);
-//		 int laypad=(int)(GlucoseCurve.metrics.density*(hasname==1?20.0f:35.0f));
 		 int laypad=(int)(GlucoseCurve.metrics.density*14);
-		final int sidepad=(int)(GlucoseCurve.metrics.density*10.0f);
 		 layout.setPadding((int)(GlucoseCurve.metrics.density*13.0f),(int)(GlucoseCurve.metrics.density*7.0f),(int)(GlucoseCurve.metrics.density*13.0f),laypad);
-        params=new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT);
+	 context.addMyContentView(lay, new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT));
 		 }
 	else {
-		layout.setBackgroundResource(R.drawable.dialogbackground);
-		 int laypad=(int)(GlucoseCurve.metrics.density*4.0f);
-		 lay.setPadding(laypad,0,laypad,laypad);
-//                Layout.getMargins(lay).topMargin=MainActivity.systembarTop*5/6;
-                 //layout.systembarMargins();
-                 params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
-
-                // fparams.topMargin=MainActivity.systembarTop*5/6;
-                 //params =fparams;
-            layout.systembarMargins((left,top,right,bottom)->new int[]{0,top*5/6,0,0});
-		 }
-	 context.addMyContentView(lay, params);
-		Save.setOnClickListener(v->{
+		var page=new M3.Page(context,label!=null?label:context.getString(R.string.ringtonename),true);
+		var snd=page.group(R.string.m3_ringtone_sound);
+		snd.toggle(sound);
+		snd.toggle(def);
+		var namerow=new LinearLayout(context);
+		namerow.setOrientation(LinearLayout.HORIZONTAL);
+		namerow.setGravity(Gravity.CENTER_VERTICAL);
+		name.setTextSize(TypedValue.COMPLEX_UNIT_SP,17);
+		name.setTextColor(M3.onSurface(context));
+		name.setPadding(0,0,0,0);
+		namerow.addView(name,new LinearLayout.LayoutParams(0,WRAP_CONTENT,1f));
+		M3.style(Select);
+		namerow.addView(Select,new LinearLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT));
+		snd.item(namerow);
+		var al=page.group(R.string.m3_ringtone_alarm);
+		al.value(R.string.m3_duration,duredit,durviews[3]);
+		if(glucosealarm)
+			al.value(R.string.m3_suspension,waitedit);
+		al.toggle(vibration);
+		if(hasflash)
+			al.toggle(flashview);
+		al.toggle(disturb);
+		page.buttons(play,Cancel,Save);
+		page.buttons(help);
+		page.showOnly();
+		lay=page.root;
+		}		Save.setOnClickListener(v->{
 			Notify.stopalarm();
 			try {
 			String str=duredit.getText().toString();
