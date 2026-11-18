@@ -21,7 +21,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -737,10 +736,7 @@ final class DirectGarminIQ {
         if(stopped || device==null || gatt!=null) return;
         try {
             log((linkProbeOnly?"recovery probe ":"")+"connectGatt " + safeName(device) + " " + device.getAddress());
-            if (Build.VERSION.SDK_INT >= 23)
-                gatt = device.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE);
-            else
-                gatt = device.connectGatt(context, false, callback);
+            gatt = device.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE);
             connectionSetupStage="connect";
             connectionSetupDeadlineElapsed=SystemClock.elapsedRealtime()+TIMEOUT_MS;
             armTimeout("connect");

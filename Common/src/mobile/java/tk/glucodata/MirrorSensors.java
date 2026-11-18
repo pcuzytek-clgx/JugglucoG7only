@@ -63,7 +63,7 @@ public static native void finishfromSensorptr(long sensorptr);
 
 private static void confirmFinish(MainActivity act,long ptr) {
    var serial=Natives.namefromSensorptr(ptr);
-    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
     builder.setTitle(serial).setMessage(R.string.finishsensormessage).
       setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
          public void onClick(DialogInterface dialog, int id) {
@@ -71,8 +71,7 @@ private static void confirmFinish(MainActivity act,long ptr) {
                 Natives.finishfromSensorptr(ptr);
                 SensorBluetooth.sensorEnded(serial);
                 act.requestRender();
-                MainActivity.doonback();
-                bluediag.start(act);
+                bluediag.restart(act);
                 }
                 }).
         setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -126,8 +125,7 @@ static void show(MainActivity act) {
              if(isChecked!=wasused) {
                  act.setbluetoothmain( isChecked);
                  act.requestRender();
-                 MainActivity.doonback();
-                 bluediag.start(act);
+                 bluediag.restart(act);
              }
          });
     spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -148,42 +146,21 @@ static void show(MainActivity act) {
         public  void onNothingSelected (AdapterView<?> parent) {
 
         } });
-    int pads=(int)(GlucoseCurve.metrics.density*20);
-/*     getMargins(usebluetooth).topMargin=(int)(GlucoseCurve.metrics.density*15);
-     var spinmar= getMargins(spin);
-     spinmar.topMargin=pads;
-     spinmar.bottomMargin=pads;
-     */
-
-    var buttons=new Layout(act, (x,w,h)->{ 
-         return new int[] {w,h};
-           } 
-                   , new View[]{finish},new View[]{help},new View[]{usebluetooth},new View[]{spin}
-          ).portraitLayout();
-//     buttons.usebaseline=false;
-    var width=GlucoseCurve.getwidth(); 
-    var height=GlucoseCurve.getheight(); 
- //   getMargins(finish).topMargin=(int)(MainActivity.systembarTop);
-    buttons.setLayoutParams( new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT));
-    var layout=new Layout(act, (x,w,h)->{ 
-//        x.setX((width-w+MainActivity.systembarLeft-MainActivity.systembarRight)*.5f);
-         return new int[] {w,h};
-           },
-          new View[]{sensors.viewgroup,buttons}).portraitLayout(new View[]{spin,usebluetooth},new View[]{help,finish},new View[]{sensors.viewgroup});
- //    layout.usebaseline=false;
-    layout.setBackgroundResource(R.drawable.dialogbackground);
-    //layout.setPadding((int)(GlucoseCurve.metrics.density*10),0,(int)(GlucoseCurve.metrics.density*5),0);
-    layout.setPadding(0,0,(int)(GlucoseCurve.metrics.density*5),0);
-
-    var  params =  new FrameLayout.LayoutParams(
-                    WRAP_CONTENT,
-                    WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL|Gravity.CENTER);
-
-    act.addMyContentView(layout, params);
+    var page=new M3.Page(act,R.string.m3_watch_mirror_title,true);
+    final View layout=page.root;
+    var gsensor=page.group(R.string.m3_watch_mirror_sensor);
+    gsensor.item(spin);
+    gsensor.item(sensors.viewgroup);
+    gsensor.action(finish.getText(),null,v->finish.performClick());
+    var gconn=page.group(R.string.m3_watch_mirror_conn);
+    gconn.toggle(usebluetooth);
+    page.buttons(help);
+    page.showOnly();
     MainActivity.setonback(() -> {
             isVisible=false;
             removeContentView(layout);
+            if(Menus.on)
+                Menus.show(act);
             });
 
     }

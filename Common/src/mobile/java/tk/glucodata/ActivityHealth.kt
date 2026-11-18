@@ -29,7 +29,6 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.health.connect.client.HealthConnectClient
@@ -72,8 +71,7 @@ object ActivityHealth {
     @JvmStatic fun status():String=if(ready()&&Natives.staticnum())
         Applic.app?.getString(R.string.activity_mirrored)?:"Activities are received with mirrored Amounts. Health Connect retrieval is disabled."
         else listOf(message,historyMessage).filter{it.isNotEmpty()}.joinToString("\n")
-    @JvmStatic fun available():Boolean=Build.VERSION.SDK_INT>=28
-    private fun ready()=available()&&Applic.Nativesloaded&&Applic.initproccalled&&Applic.stopprogram==0
+    private fun ready()=Applic.Nativesloaded&&Applic.initproccalled&&Applic.stopprogram==0
     @JvmStatic fun typeCodes():IntArray=ActivityTypes.codes().also {Log.i(tag,"Exercise types: ${it.size}")}
     @JvmStatic fun typeName(type:Int):String=ActivityTypes.name(type)
 
@@ -83,7 +81,7 @@ object ActivityHealth {
     }
 
     private fun client(context:Context):HealthConnectClient {
-        check(available()&&HealthConnectClient.getSdkStatus(context)==HealthConnectClient.SDK_AVAILABLE) {
+        check(HealthConnectClient.getSdkStatus(context)==HealthConnectClient.SDK_AVAILABLE) {
             "Health Connect is unavailable or needs updating"
         }
         return HealthConnectClient.getOrCreate(context)
@@ -263,7 +261,7 @@ object ActivityHealth {
         val retry=ActivityReadRetry(
             // Use the available quota at full speed; wait only after a rejection.
             isQuota={error->ActivityReadRetry.isQuota(error) {cause->
-                if(Build.VERSION.SDK_INT>=34&&cause is android.health.connect.HealthConnectException)
+                if(cause is android.health.connect.HealthConnectException)
                     cause.errorCode==android.health.connect.HealthConnectException.ERROR_RATE_LIMIT_EXCEEDED
                 else null
             }},

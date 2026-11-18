@@ -201,7 +201,7 @@ private void    dodeletelast(Spinner spinner,    LabelAdapter<String> numspinada
 
 private void    askdeletelast(Spinner spinner,    LabelAdapter<String> numspinadapt, Button addnew,int nr) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(activity);
         builder.setTitle(R.string.deletelabel).
      setMessage(labels.get(nr)).
         setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

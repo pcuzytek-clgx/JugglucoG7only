@@ -19,7 +19,7 @@ struct Status {
 #include "auth.hpp"
 #include "client.hpp"
 #include "certificate.hpp"
-#include "net/libreview/numcategories.hpp"
+#include "net/clarity/numcategories.hpp"
 #include "nums/numdata.hpp"
 #include "outbox.hpp"
 #include "account_store.hpp"

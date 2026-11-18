@@ -24,20 +24,15 @@
 
 package tk.glucodata;
 
-import android.view.LayoutInflater;
 import android.content.res.Configuration;
-import android.os.Build;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.ViewCompat;
 
-import static androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.CheckBox;
 
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -45,13 +40,9 @@ import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.MainActivity.REQUEST_BARCODE;
 import static tk.glucodata.Natives.getInvertColors;
-import static tk.glucodata.Natives.getshowscans;
-import static tk.glucodata.Natives.getsystemui;
-import static tk.glucodata.Natives.setsystemui;
 import static tk.glucodata.NumberView.smallScreen;
 import static tk.glucodata.settings.Settings.removeContentView;
 
-import tk.glucodata.settings.Settings;
 
 public class Menus {
 static public boolean on=false;
@@ -219,28 +210,15 @@ static public void show(MainActivity act) {
 static private void showNow(MainActivity act) {
     waitingForLandscape=false;
     resetStableWindow();
-    LayoutInflater flater= LayoutInflater.from(act);
-    View view = flater.inflate(R.layout.menus, null, false);
+    var page=new M3.Page(act,R.string.connections,false);
+    View view = page.root;
     currentView=view;
-      view.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
- //       view.setTextDirection(View.TEXT_DIRECTION_LTR);
-
-
-	view.setAccessibilityDelegate(Layout.accessDeli);
-        view.setBackgroundColor( Applic.backgroundcolor);
+    var devices=page.group(R.string.m3_conn_devices);
+    var sensorrow=devices.nav(R.string.sensor,act.getString(R.string.m3_conn_sensor_sum),null);
+    var mirrorrow=devices.nav(R.string.mirror,act.getString(R.string.m3_conn_mirror_sum),null);
+    var watchrow=devices.nav(R.string.watches,act.getString(R.string.m3_conn_watch_sum),null);
 
     if(!isWearable) {
-        /* MainActivity enables edge-to-edge only on Android 11/API 30+.
-         * On older Android versions the decor/content area already excludes
-         * visible status/navigation bars. Padding with systemBars() there
-         * would therefore count the navigation bar a second time. */
-        if(Build.VERSION.SDK_INT >= 30) {
-            setOnApplyWindowInsetsListener(view,(v,windowInsets) -> {
-                Insets bars=windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-                v.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
-                return windowInsets;
-                });
-            }
         view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) { }
@@ -300,259 +278,26 @@ static private void showNow(MainActivity act) {
 				act.requestRender();
 			});
 
-    var menusviewview=view.findViewById(R.id.menusview);menusviewview.setOnClickListener(v ->{}); 
-        CheckBox systemuiview=view.findViewById(R.id.systemui);
-	systemuiview.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
-				setsystemui(isChecked);
-			    	act.selectionSystemUI(); 
-				});
-	systemuiview.setChecked(getsystemui( ));
-        var menusview=view.findViewById(R.id.menus);menusview.setOnClickListener(v ->{
-				act.poponback();
-			   on=false;
-               waitingForLandscape=false;
-               cancelWindowWait();
-
-   		act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-				act.requestRender();
-		}); 
-        var watchview=view.findViewById(R.id.watch);watchview.setOnClickListener(v ->{
-
+        watchrow.setOnClickListener(v ->{
 				if(!isWearable) {
+				act.poponback();
    		   act.lightBars(!getInvertColors( ));
 					removeContentView(view);
 					tk.glucodata.Watch.show(act);
 					}
-
 	}); 
-        var sensorview=view.findViewById(R.id.sensor);sensorview.setOnClickListener(v ->{
-
+        sensorrow.setOnClickListener(v ->{
+				act.poponback();
    		   act.lightBars(!getInvertColors( ));
 				removeContentView(view);
 			       bluediag.start(act);
 		}); 
-        var settingsview=view.findViewById(R.id.settings);settingsview.setOnClickListener(v ->{
-					removeContentView(view);
-					Settings.set(act);
-	}); 
-        Button aboutview=view.findViewById(R.id.about);
-        if(tk.glucodata.BuildConfig.SiBionics==1) {
-         aboutview.setText(R.string.photo);
-        aboutview.setOnClickListener(v ->
-              PhotoScan.scan(act,REQUEST_BARCODE));
-            }
-        else  {
-           aboutview.setOnClickListener(v ->{
-                       var c=Applic.app.curve;
-                       if(c!=null)
-                        c.doabout(act);
-                  }); 
-                 }
-        var closeview=view.findViewById(R.id.close);closeview.setOnClickListener(v ->{
-		act.moveTaskToBack(true);
-	}); 
-        var exportview=view.findViewById(R.id.export);exportview.setOnClickListener(v ->{
-		var c=Applic.app.curve;
-		  if(c!=null) {
-			  {if(doLog) {Log.i(LOG_ID,"EXPORT");};};
-   		   act.lightBars(!getInvertColors( ));
-		     removeContentView(view);
-		     c.dialogs.showexport(act,c.getWidth(),c.getHeight(),null); 
-		     }
-
-	}); 
-        var mirrorview=view.findViewById(R.id.mirror);mirrorview.setOnClickListener(v ->{
+        mirrorrow.setOnClickListener(v ->{
+				act.poponback();
 		     removeContentView(view);
 			(new Backup()).mkbackupview(act);
-
 	}); 
-        var newamountview=view.findViewById(R.id.newamount);newamountview.setOnClickListener(v ->{
-					if(Natives.staticnum()) {
-        					help.help(R.string.staticnum,act);
-						}
-					else {
-						var c=Applic.app.curve;
-						if (c != null) {
-   		         act.lightBars(!getInvertColors( ));
-							removeContentView(view);
-							c.numberview.addnumberview(act);
-							if (!smallScreen)
-								c.showkeyboard(act);
-						}
-					}
-
-	}); 
-        var listview=view.findViewById(R.id.list);listview.setOnClickListener(v -> {
-				var c = Applic.app.curve;
-				if (c != null) {
-   		         act.lightBars(!getInvertColors( ));
-					removeContentView(view);
-					Natives.makenumbers();
-					act.requestRender();
-					c.getnumcontrol(act);
-				}
-			}
-						);
-        var statisticsview=view.findViewById(R.id.statistics);statisticsview.setOnClickListener(v ->{
-
-			if(Natives.makepercentages()) {
-   		         act.lightBars(!getInvertColors( ));
-				removeContentView(view);
-				act.requestRender();
-				Stats.mkstats(act);
-				}
-
-		}
-
-			);
-        var talkview=view.findViewById(R.id.talk);talkview.setOnClickListener(v ->{
-		removeContentView(view);
-		tk.glucodata.Talker.config(act);}); 
-        CheckBox glucosefloatview=view.findViewById(R.id.glucosefloat);glucosefloatview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Floating.setfloatglucose(act,isChecked);
-	}); 
-	glucosefloatview.setChecked(Natives.getfloatglucose());
-
-        var chatgptview=view.findViewById(R.id.chatgpt);
-        chatgptview.setOnClickListener(v ->{
-            removeContentView(view);
-            JugglucoChat.show(act);
-
-	        }); 
-
-        CheckBox scansview=view.findViewById(R.id.scans);scansview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowscans(isChecked);
-				act.requestRender();
-		}); 
- 	scansview.setChecked(getshowscans()) ;
-
-    CheckBox streamview=view.findViewById(R.id.stream);streamview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowstream(isChecked);
-				act.requestRender();
-		}); 
-	streamview.setChecked(Natives.getshowstream() );
-
-    CheckBox calibratedscansview=view.findViewById(R.id.calibratedscans);calibratedscansview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowcalibratedscans(isChecked);
-				act.requestRender();
-		}); 
-	calibratedscansview.setChecked(Natives.getshowcalibratedscans() );
-
-
-    CheckBox calibratedstreamview=view.findViewById(R.id.calibratedstream);calibratedstreamview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowcalibratedstream(isChecked);
-				act.requestRender();
-		}); 
-	calibratedstreamview.setChecked(Natives.getshowcalibratedstream() );
-
-     CheckBox calibratedhistoryview=view.findViewById(R.id.calibratedhistory);
-     calibratedhistoryview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-             Natives.setshowcalibratedhistories(isChecked); 
-			act.requestRender();
-	        }); 
-	calibratedhistoryview.setChecked(Natives.getshowcalibratedhistories()) ;
-
-     CheckBox historyview=view.findViewById(R.id.history);
-     historyview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		 Natives.setshowhistories(isChecked); 
-				act.requestRender();
-	}); 
-	historyview.setChecked(Natives.getshowhistories()) ;
-
-        CheckBox amountsview=view.findViewById(R.id.amounts);amountsview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-	 Natives.setshownumbers(isChecked); 
-				act.requestRender();
-
-	}); 
-	amountsview.setChecked(Natives. getshownumbers()) ;
-
-
-        CheckBox mealsview=view.findViewById(R.id.meals);mealsview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-		Natives.setshowmeals(isChecked);
-				act.requestRender();
-		}); 
- 	mealsview.setChecked(Natives.getshowmeals()) ;
-
-
-
-        CheckBox darkmodeview=view.findViewById(R.id.darkmode);darkmodeview.setOnCheckedChangeListener( (buttonView,  isChecked)->{
-
-	Natives.setInvertColors(isChecked);
-	});
-	darkmodeview.setChecked( getInvertColors());
-        var nowview=view.findViewById(R.id.now);nowview.setOnClickListener(v ->{
-
-               act.lightBars(!getInvertColors( ));
-		removeContentView(view);
-	Natives.settonow();
-				act.requestRender();
-
-	});
-        var searchview=view.findViewById(R.id.search);searchview.setOnClickListener(v ->{
-		  var c=Applic.app.curve;
-		  if(c!=null) {
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-			c.startsearch();
-			}
-		}); 
-
-        var dateview=view.findViewById(R.id.date);dateview.setOnClickListener(v ->{
-		  var c=Applic.app.curve;
-		  if(c!=null) {
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-			  c.startdatepick(Natives.getstarttime());
-			  }
-		
-		}); 
-        var daybackview=view.findViewById(R.id.dayback);daybackview.setOnClickListener(v ->{
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.prevday(1);
-				act.requestRender();
-		}); 
-        var daylaterview=view.findViewById(R.id.daylater);daylaterview.setOnClickListener(v ->{
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.nextday(1);
-				act.requestRender();
-		}); 
-        var weekbackview=view.findViewById(R.id.weekback);weekbackview.setOnClickListener(v ->{
-
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.prevday(7);
-				act.requestRender();
-	}); 
-        var weeklaterview=view.findViewById(R.id.weeklater);weeklaterview.setOnClickListener(v ->{
-
-               act.lightBars(!getInvertColors( ));
-			removeContentView(view);
-		Natives.nextday(7);
-				act.requestRender();
-		}); 
    
-	  // view.setPadding(0,MainActivity.systembarTop,0,0);
-    if(!isWearable) {
-        if(Build.VERSION.SDK_INT >= 30) {
-            /* Edge-to-edge: the overlay occupies the whole window, so keep
-             * its controls out of the system bars explicitly. */
-            WindowInsetsCompat wi=ViewCompat.getRootWindowInsets(act.getWindow().getDecorView());
-            if(wi!=null) {
-                Insets bars=wi.getInsets(WindowInsetsCompat.Type.systemBars());
-                view.setPadding(bars.left,bars.top*3/4,bars.right,bars.bottom);
-                }
-            }
-        else {
-            /* Pre edge-to-edge: Android has already inset the content view. */
-            view.setPadding(0,0,0,0);
-            }
-        }
-    else
-        view.setPadding(MainActivity.systembarLeft,MainActivity.systembarTop*3/4,MainActivity.systembarRight,MainActivity.systembarBottom);
-
 	act.addMyContentView(view, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
     if(!isWearable)
         view.requestApplyInsets();

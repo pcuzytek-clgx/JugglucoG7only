@@ -329,9 +329,9 @@ static void show(MainActivity act, long sensorptr,View parent) {
      if(parent!=null) parent.setVisibility(GONE);
       act.themeLightBars();
       RecyclerView recycle = new RecyclerView(act);
-      recycle.setHasFixedSize(true);
-      recycle.setLayoutParams(new ViewGroup.LayoutParams(   ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      var lin=isWearable?new LinearLayoutManager(act):new GridLayoutManager(act,4);
+      recycle.setHasFixedSize(isWearable);
+      recycle.setLayoutParams(new ViewGroup.LayoutParams(   ViewGroup.LayoutParams.MATCH_PARENT, isWearable?ViewGroup.LayoutParams.MATCH_PARENT:ViewGroup.LayoutParams.WRAP_CONTENT));
+      var lin=isWearable?new LinearLayoutManager(act):new GridLayoutManager(act,act.getResources().getConfiguration().screenWidthDp>=600?4:2);
       recycle.setLayoutManager(lin);
       boolean[] render={false};
       var caliadapt = new CaliListViewAdapter(sensorptr,render,0);
@@ -339,20 +339,19 @@ static void show(MainActivity act, long sensorptr,View parent) {
 
       View layout;
     if(isWearable) {
-    /*
-        View[] firstrow=new View[]{close};
-      layout=new Layout(act,(x,w,h)->{
-             return new int[] {w,h};
-               },firstrow,new View[]{recycle}); 
-               */
           layout=recycle;
+       layout.setBackgroundColor(backgroundcolor);
+        float density=GlucoseCurve.metrics.density;
+    layout.setPaddingRelative((int)(density*5.0)+MainActivity.systembarStart,MainActivity.systembarTop,MainActivity.systembarEnd+(int)(density*8.0),MainActivity.systembarBottom);
+
+     act.addMyContentView(layout, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
           }
      else {
-      var close=getbutton(act,R.string.closename);
      var   stream=getradiobutton(act,R.string.streamname);
      stream.setChecked(true);
      var   history=getradiobutton(act,R.string.historyname);
-     if(hasHistory(sensorptr)) {
+     final boolean hashistory=hasHistory(sensorptr);
+     if(hashistory) {
             stream.setOnCheckedChangeListener( (buttonView,  isChecked) -> {
                 Log.i(LOG_ID,"stream "+isChecked);
                 history.setChecked(!isChecked);
@@ -368,32 +367,40 @@ static void show(MainActivity act, long sensorptr,View parent) {
                     }
                 });
               }
-       else {
-        history.setVisibility(INVISIBLE);
-          }
-      close.setOnClickListener( v -> { 
-            MainActivity.doonback();
-            });
        var help=getbutton(act,R.string.helpname);
-       var settings=getbutton(act,R.string.settings);
-        View[] firstrow=new View[]{help,settings,stream, history,close};
-      layout=new Layout(act,(x,w,h)->{
-             return new int[] {w,h};
-               },firstrow,new View[]{recycle}); 
-        settings.setOnClickListener( v -> { 
-            tk.glucodata.settings.Calibration.show(act,layout);
+       var page=new M3.Page(act,R.string.m3_calibrations,true);
+       layout=page.root;
+       var g=page.group(null);
+       g.nav(R.string.settings,null,v->tk.glucodata.settings.Calibration.show(act,layout));
+       if(hashistory) {
+            var which=new LinearLayout(act);
+            which.setOrientation(HORIZONTAL);
+            which.addView(stream);
+            which.addView(history);
+            g.item(which);
+            }
+       var list=page.group(null);
+       recycle.setNestedScrollingEnabled(false);
+       var listrow=list.item(recycle);
+       var empty=list.text(act.getString(R.string.m3_no_calibrations));
+       Runnable showempty=()-> {
+            boolean none=caliadapt.getItemCount()==0;
+            listrow.setVisibility(none?GONE:VISIBLE);
+            ((View)empty.getParent()).setVisibility(none?VISIBLE:GONE);
+            };
+       showempty.run();
+       caliadapt.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override public void onChanged() { showempty.run(); }
+            @Override public void onItemRangeRemoved(int positionStart, int itemCount) { showempty.run(); }
             });
         help.setOnClickListener(v-> tk.glucodata.help.help(R.string.calibrationslist,act));
+        page.buttons(help);
+        page.showOnly();
         }
-       layout.setBackgroundColor(backgroundcolor);
-        float density=GlucoseCurve.metrics.density;
-    layout.setPaddingRelative((int)(density*5.0)+MainActivity.systembarStart,MainActivity.systembarTop,MainActivity.systembarEnd+(int)(density*8.0),MainActivity.systembarBottom);
-
-     act.addMyContentView(layout, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-//      act.addMyContentView(layout, new ViewGroup.LayoutParams( WRAP_CONTENT, WRAP_CONTENT));
+      final View flayout=layout;
       MainActivity.setonback(()-> {
            act.lightBars(!getInvertColors( ));
-           removeContentView(layout);
+           removeContentView(flayout);
            if(render[0]) {
               act.requestRender();
               }
@@ -401,5 +408,4 @@ static void show(MainActivity act, long sensorptr,View parent) {
 
         });
       }
-
 }

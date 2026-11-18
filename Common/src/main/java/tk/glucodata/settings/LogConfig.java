@@ -24,6 +24,7 @@ import tk.glucodata.Applic;
 import tk.glucodata.GlucoseCurve;
 import tk.glucodata.Layout;
 import tk.glucodata.Log;
+import tk.glucodata.M3;
 import tk.glucodata.MainActivity;
 import tk.glucodata.Natives;
 import tk.glucodata.R;
@@ -115,27 +116,19 @@ static void make(MainActivity act,View parent) {
             help.setOnClickListener(v-> {
                 tk.glucodata.help.help(R.string.loghelp,act);
             });
-            closerow=new View[]{help,close};
-             var width= GlucoseCurve.getwidth();
-             var height=GlucoseCurve.getheight();
-            Layout layout = new Layout(act, (l, w, h) -> {
-            /*
-                 l.setX((width-w)*.5f);
-                 l.setY((height-h)*.33f);
-                 */
-                int[] ret={w,h};
-                return ret;
-                },new View[]{trace,delete,save},new View[] {log,sizelabel,size},
-                new View[]{logcat,deletelogcat,savelogcat},new View[] {logcaton,sizelabel2,logcatsize},
-                closerow);
-            alllayout=layout;
-            layout.setBackgroundResource(R.drawable.dialogbackground);
-           final   int pad=(int)(tk.glucodata.GlucoseCurve.metrics.density*9.0);
-           layout.setPadding(pad,pad,pad,pad);
-
-          params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
+            var page=new M3.Page(act,R.string.logging,true);
+            var g=page.group("trace.log");
+            g.toggle(log);
+            g.value(R.string.filesize,size);
+            g.buttons(delete,save);
+            var g2=page.group("logcat");
+            g2.toggle(logcaton);
+            g2.value(R.string.filesize,logcatsize);
+            g2.buttons(deletelogcat,savelogcat);
+            page.buttons(help);
+            alllayout=page.root;
+            params=new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT);
             }
-
 
    // params.topMargin=MainActivity.systembarTop;
         act.addMyContentView(alllayout, params);

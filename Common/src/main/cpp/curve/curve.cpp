@@ -84,12 +84,12 @@ static bool getLevelLeft() {
     return settings->data()->levelleft;
 #endif
     }
+extern std::vector<shownglucose_t> shownglucose;
+std::vector<shownglucose_t> shownglucose;
 #ifdef DONTTALK
 extern const bool speakout;
 const bool speakout=false;
 #else
-extern std::vector<shownglucose_t> shownglucose;
-std::vector<shownglucose_t> shownglucose;
 extern bool speakout;
 bool speakout=false;
 #endif
@@ -170,10 +170,6 @@ bool hebrew() ;
 #else
 #define fontpath "/home/jka/Android/Sdk/platforms/android-29/data/fonts/"
 #endif
-extern jugglucotext zhtext; 
-extern jugglucotext jatext; 
-extern jugglucotext artext; 
-extern jugglucotext kotext; 
 
 
 #ifdef JUGGLUCO_APP
@@ -370,7 +366,6 @@ static int getHangulMenu(NVGcontext* avg) {
 
 bool usedScript[SCR_COUNT]{};
 
-extern const jugglucotext hitext;
 
 
 static bool didinitScriptFonts=false;
@@ -409,89 +404,7 @@ thevg=avg;
 #endif
 const FontUse fontuse{.vg=avg,.whitefont=whitefont,.blackfont=blackfont,.scriptEnabled=usedScript};
 
-if(usedtext==&kotext) {
-     enableScript(fontuse,SCR_HANGUL);
-#ifdef JUGGLUCO_APP
-    menufont=nvgCreateFontMem(avg, "regular", (unsigned char *)fontfile, sizeof(fontfile), 0);
-    int fallback2 =getHangulMenu(avg);
-    nvgAddFallbackFontId(avg,menufont, getMenuFont(avg));
-    nvgAddFallbackFontId(avg, menufont,fallback2);
-#endif
-     chfontset=HANGUL;
-      }
-else
-if(usedtext==&hitext) {
-     enableScript(fontuse,SCR_DEVANAGARI);
-#ifdef JUGGLUCO_APP
-    menufont=nvgCreateFontMem(avg, "regular", (unsigned char *)fontfile, sizeof(fontfile), 0);
-    int fallback2 =getHindiMenu(avg);
-
-    nvgAddFallbackFontId(avg,menufont, getMenuFont(avg));
-    nvgAddFallbackFontId(avg, menufont,fallback2);
-#endif
-     chfontset=HINDI;
-      }
-else
-if(usedtext==&artext) {
-
-//    nvgAddFallbackFontId(avg, blackfont,getArabicBold(avg)); 
-
-
- //   nvgAddFallbackFontId(avg, whitefont,getArabicRegular(avg));
-     enableScript(fontuse, SCR_ARABIC);
-
-#ifdef JUGGLUCO_APP
-    menufont=nvgCreateFontMem(avg, "regular", (unsigned char *)fontfile, sizeof(fontfile), 0);
-    int fallback2 =getArabicMenu(avg);
-    nvgAddFallbackFontId(avg,menufont, getMenuFont(avg));
-    nvgAddFallbackFontId(avg, menufont,fallback2);
-#endif
-
-   chfontset=ARABIC;
-
-
-}
-else
-if(usedtext==&zhtext||usedtext==&jatext) {
-     enableScript(fontuse, SCR_CJK);
-#ifdef JUGGLUCO_APP
-    if(-1==(menufont = nvgCreateFont(avg, "regular",
-
-#ifdef JUGGLUCO_APP
-    fontpath "NotoSerifCJK-Regular.ttc"
-#else
-"/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc"
-#endif
-
-
-    ))) {
-      CURVELOGAR("menufont NotoSerifCJK-Regular failed");
-       if(-1==(menufont = nvgCreateFont(avg, "regular",
-
-#ifdef JUGGLUCO_APP
-       fontpath "NotoSansCJK-Regular.ttc"
-#else
-"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
-#endif
-       ))) {
-         CURVELOGAR("menufont NotoSansCJK-Regular failed");
-         if(-1==(menufont = nvgCreateFont(avg, "regular",
-#ifdef JUGGLUCO_APP
-         fontpath "DroidSansFallback.ttf"
-#else
-        "/usr/share/fonts-droid-fallback/truetype/DroidSansFallback.ttf"
-#endif
-         )))  {
-               CURVELOGAR("font DroidSansFallback failed");
-               }
-         }
-
-      }
-#endif
-//TODO free font ???
-    chfontset=CJK;
-    }
-else  {
+{
 
 #ifdef USE_HEBREW
      enableScript(fontuse, SCR_HEBREW);
@@ -1469,7 +1382,7 @@ template <class LT> void    JCurve::glucoselines(NVGcontext* avg,const float las
     nvgStrokeWidth(avg, glucoseLinesStrokeWidth);
     nvgStrokeColor(avg, *getgray());
     const double yscale=transy(1)-transy(0);
-    const float mindisunit=smallsize*1.5;
+    const float mindisunit=smallsize*(dexdrawing?3.0f:1.5f);
     const float minst=abs(mindisunit/yscale);
     const bool ismmolL=glunit==1;//settings->usemmolL();
     const double unit=ismmolL?0.5*convfactor:100;
@@ -1479,7 +1392,10 @@ template <class LT> void    JCurve::glucoselines(NVGcontext* avg,const float las
     float startld;
     nvgTextAlign(avg,NVG_ALIGN_CENTER|NVG_ALIGN_MIDDLE);
 
-    if(getLevelLeft()) {
+    if(dexdrawing) {
+        startld = dwidth+dexLabelWidth()*.5f;
+        }
+    else if(getLevelLeft()) {
         startld = timelen*.4;
         }
     else  {
@@ -1542,6 +1458,13 @@ template <class LT> const displaytime JCurve::getdisplaytime(const uint32_t nu,c
     uint32_t last=uint32_t(floorf(endhier/double(tstep)))*tstep;    
     if((last>nu)&&(2*(last-nu))>tstep)
         last=nu;
+#ifndef WEAROS
+    // Dexcom-like phone layout: keep time lines out of the glucose label column.
+    if(dexdrawing) {
+        while(last>first&&transx(last)>dleft+dwidth)
+            last-=tstep;
+        }
+#endif
 
     CURVELOGGER("getdisplaytime xscale=%f %u %u %u\n",xscale,tstep,first,last);
     return {tstep,first,last};
@@ -2251,7 +2174,7 @@ int    JCurve::displaycurve(NVGcontext* avg,time_t nu) {
     int  gmax = gmin+grange;
     const auto [transx,transy]= gettrans(starttime2, endtime);
 displaytime disp=getdisplaytime(nu,starttime2,endtime, transx);
-    const float dlast=nu<endtime?transx(disp.last):dleft+dwidth;
+    const float dlast=(nu<endtime&&!dexdrawing)?transx(disp.last):dleft+dwidth;
     CURVELOGAR("before showsaverange");
     showsaverange(avg,dlast,transy(settings->targetlow()),transy(settings->targethigh()));
 
@@ -2352,7 +2275,7 @@ displaytime disp=getdisplaytime(nu,starttime2,endtime, transx);
             el->showNums(*this, transx,  transy,was) ;
         }
 
-    if(nu<endtime&&(dwidth-smallfontlineheight)>nupos) {
+    if(!dexdrawing&&nu<endtime&&(dwidth-smallfontlineheight)>nupos) {
         showbluevalue(avg,nu, nupos,usedsensors);
         CURVELOGAR("end display curve value");
         }
@@ -2495,22 +2418,6 @@ void     JCurve::setlocale(NVGcontext* avg,const char *localestrbuf,const size_t
                 }
             return;
 #endif
-        case mklanguagenum("AR"):
-        case mklanguagenum("ar"):
-            if(chfontset!=ARABIC) {
-                initfont(avg);
-                }
-            return; 
-        case mklanguagenum("ZH"):
-        case mklanguagenum("zh"):
-        case mklanguagenum("JA"):
-        case mklanguagenum("ja"):
-        case mklanguagenum("KO"):
-        case mklanguagenum("ko"):
-            if(chfontset!=CJK) {
-                initfont(avg);
-                }
-            return;
         };
     if(chfontset!=REST) {
         initfont(avg);

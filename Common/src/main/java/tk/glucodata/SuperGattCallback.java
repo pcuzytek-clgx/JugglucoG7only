@@ -44,7 +44,6 @@ import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
 import static android.bluetooth.BluetoothGattDescriptor.ENABLE_INDICATION_VALUE;
 import static android.bluetooth.BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE;
 import static java.util.Objects.isNull;
-import static tk.glucodata.Applic.DontTalk;
 import static tk.glucodata.Applic.app;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.mgdLmult;
@@ -58,7 +57,6 @@ import androidx.annotation.NonNull;
 
 public abstract class SuperGattCallback extends BluetoothGattCallback {
 volatile protected    boolean stop=false;
-public static boolean doWearInt=false;
 public static boolean doGadgetbridge=false;
     private static final String LOG_ID="SuperGattCallback";
     static final private int  use_priority=CONNECTION_PRIORITY_HIGH;
@@ -130,7 +128,7 @@ public boolean reconnect(long now,long delay) {
         final long generation;
         try {
             if(doLog) {Log.i(LOG_ID,"reconnect "+SerialNumber);};
-            constatstatusstr = "Loss of signal";
+            constatstatusstr = "Utrata sygnału";
             constatchange[1] = now;
             synchronized(gattLock) {
                 thegatt=mBluetoothGatt;
@@ -271,29 +269,6 @@ static float previousglucosevalue=0.0f;
 
 static public void initAlarmTalk() {
     if(glucosealarms==null) glucosealarms=new tk.glucodata.GlucoseAlarms(Applic.app);
-    if(!DontTalk) {
-        Talker.getvalues();
-        if(Talker.shouldtalk())
-            newtalker(null);
-        }
-    }
-static Talker talker;
-static boolean dotalk=false;
-static void newtalker(Context context) {
-    if(!DontTalk) {
-        if (talker != null)
-            talker.destruct();
-        talker = new Talker(context);
-    }
-    }
-static void endtalk() {
-    if(!DontTalk) {
-        dotalk = false;
-        if (talker != null) {
-            talker.destruct();
-            talker = null;
-        } 
-        }
     }
 static private int veryhigh(long tim,notGlucose sglucose,float gl,float rate,int alarm,boolean[] alarmspeak) {
              final boolean alarmtime = tim > nextalarm[6];
@@ -301,9 +276,6 @@ static private int veryhigh(long tim,notGlucose sglucose,float gl,float rate,int
              if(alarmtime) {
                     nextalarm[8]=nextalarm[6] = nextalarm[1] = tim + Natives.readalarmsuspension(6) * 60;
                     alarm |= 8;
-                    if(!DontTalk) {
-                        if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-                    }
                    }
               return alarm;
              }
@@ -313,9 +285,6 @@ static private int high(long tim,notGlucose    sglucose,float gl,float rate,int 
         if (alarmtime) {
             nextalarm[8] = nextalarm[1] = tim + Natives.readalarmsuspension(1) * 60;
             alarm |= 8;
-            if(!DontTalk) {
-                if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-            }
         }
         return alarm;
        }
@@ -327,9 +296,6 @@ static private int verylow(long tim,notGlucose    sglucose,float gl,float rate,i
             nextalarm[7] =nextalarm[5] =nextalarm[0]= tim + Natives.readalarmsuspension(5) * 60;
             {if(doLog) {Log.i(LOG_ID,"next alarm at "+ nextalarm[5] +" "+bluediag.datestr( nextalarm[5]*1000L ));};};
             alarm |= 8;
-            if(!DontTalk) {
-                if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-            }
         }
        return alarm;
       }
@@ -340,9 +306,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
             nextalarm[7] =nextalarm[0] = tim + Natives.readalarmsuspension(0) * 60;
             {if(doLog) {Log.i(LOG_ID,"next alarm at "+ nextalarm[0] +" "+bluediag.datestr( nextalarm[0]*1000L ));};};
             alarm |= 8;
-            if(!DontTalk) {
-                if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-            }
         }
        return alarm;
       }
@@ -361,11 +324,8 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
         var sglucose=new notGlucose(timmsec, String.format(Applic.usedlocale,Notify.pureglucoseformat, gl),  rate,sensorgen);
         previousglucose=sglucose;
         previousglucosevalue=gl;
-        final var fview=Floating.floatview;
 //        MainActivity.showmessage=null;
         boolean[] alarmspeak={false};
-        if(fview!=null) 
-            fview.postInvalidate();
 
         try {
 
@@ -387,9 +347,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
                  if(alarmtime) {
                         nextalarm[8]= tim + Natives.readalarmsuspension(8) * 60;
                         alarm |= 8;
-                        if(!DontTalk) {
-                            if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-                        }
                        }
                     break;
                     }
@@ -424,9 +381,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
                  if(alarmtime) {
                         nextalarm[7]= tim + Natives.readalarmsuspension(7) * 60;
                         alarm |= 8;
-                        if(!DontTalk) {
-                            if((alarmspeak[0]=Natives.speakalarms())) Talker.nexttime = 0L;
-                        }
                        }
                     break;
                     }
@@ -442,18 +396,11 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
         {if(doLog) {Log.v(LOG_ID, SerialNumber + " "+tim+" glucose=" + gl + " " + rate);};};
         Applic.updatescreen();
 
-        if(!DontTalk) {
-            if(dotalk&&!alarmspeak[0])  {
-                talker.selspeak(sglucose.value);
-                }
-            }
         if(isWearable) {
          tk.glucodata.glucosecomplication.GlucoseValue.updateall();
          }
 
 
-        if(Natives.getJugglucobroadcast())
-            JugglucoSend.broadcastglucose(SerialNumber,mgdl,gl,rate,alarm,timmsec);
         if(!isWearable) {
             app.numdata.sendglucose(SerialNumber, tim, gl, thresholdchange(rate), alarm|0x10);
             GlucoseWidget.update();
@@ -461,16 +408,6 @@ static private int low(long tim,notGlucose    sglucose,float gl,float rate,int a
         if(tim>nexttime) {
             nexttime=tim+mininterval;
             if(!isWearable) {
-                if(Natives.getlibrelinkused()) XInfuus.sendGlucoseBroadcast(SerialNumber, mgdl, rate, timmsec);
-                if(Natives.geteverSensebroadcast()) EverSense.broadcastglucose(mgdl, rate, timmsec);
-                //SendNSClient.broadcastglucose(mgdl, rate, timmsec);
-                }
-            if(Natives.getxbroadcast())
-                SendLikexDrip.broadcastglucose(mgdl,rate,timmsec,sensorstartmsec,sensorgen);
-            if(!isWearable) {
-                if(doWearInt)
-                    tk.glucodata.WearInt.sendglucose(mgdl, rate, alarm, timmsec);
-
                 if(doGadgetbridge)
                     Gadgetbridge.sendglucose(sglucose.value,mgdl,gl,rate,timmsec);
                 } 
@@ -516,12 +453,10 @@ protected void handleGlucoseResult(long res,long timmsec) {
             charcha[0] = timmsec;
             if(!isWearable) {
                 if(Natives.gethealthConnect( )) {
-                    if(Build.VERSION.SDK_INT >= 28) {
                     if(dohealth(this)) {
                             final long sensorptr = Natives.getsensorptr(dataptr);//TODO: set sensorptr in SuperGattCallback?
                             HealthConnection.Companion.writeAll(sensorptr,SerialNumber);
                             }
-                        }
                     }
                 }
             SensorBluetooth.othersworking(this,timmsec);
@@ -602,9 +537,7 @@ public void searchforDeviceAddress() {
                 tmpgatt.disconnect();
                 tmpgatt.close();
             } catch (Throwable se) {
-                var mess = se.getMessage();
-                mess = mess == null ? "" : mess;
-                String uit = ((Build.VERSION.SDK_INT > 30) ? Applic.getContext().getString(R.string.turn_on_nearby_devices_permission)  : mess) ;
+                String uit = Applic.getContext().getString(R.string.turn_on_nearby_devices_permission);
                 Applic.Toaster(uit);
                 Log.stack(LOG_ID, SerialNumber +" "+ "BluetoothGatt.close()", se);
             }
@@ -660,11 +593,7 @@ public void searchforDeviceAddress() {
                         cb.setGattOptions(newGatt);
                         }
                     else {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            newGatt = device.connectGatt(Applic.app, autoconnect, cb, BluetoothDevice.TRANSPORT_LE);
-                        } else {
-                            newGatt = device.connectGatt(Applic.app, autoconnect, cb);
-                            }
+                        newGatt = device.connectGatt(Applic.app, autoconnect, cb, BluetoothDevice.TRANSPORT_LE);
                         }
                     cb.mBluetoothGatt=newGatt;
                     reconnectWaitingGatt=null;
@@ -673,9 +602,7 @@ public void searchforDeviceAddress() {
                     connectTime= System.currentTimeMillis();
                     }
                 } catch (SecurityException se) {
-                    var mess = se.getMessage();
-                    mess = mess == null ? "" : mess;
-                    String uit = ((Build.VERSION.SDK_INT > 30) ? Applic.getContext().getString(R.string.turn_on_nearby_devices_permission)  : mess) ;
+                    String uit = Applic.getContext().getString(R.string.turn_on_nearby_devices_permission);
                     Applic.Toaster(uit);
 
                     Log.stack(LOG_ID, SerialNumber +" "+ "connectGatt", se);
@@ -704,20 +631,18 @@ private boolean used_priority=false;
     @SuppressLint("MissingPermission")
     void setpriority(BluetoothGatt bluegatt) {
         if(bluegatt!=null) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if(Natives.getpriority()) {
-                   bluegatt.requestConnectionPriority(use_priority);
-                   {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority HIGH");};};
-                   used_priority=true;
-               }
-                else {
-               if(used_priority) {
-                  bluegatt.requestConnectionPriority(CONNECTION_PRIORITY_BALANCED);
-                  {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority LOW");};};
-                  used_priority=false;
-                  }
-               }
-            }
+            if(Natives.getpriority()) {
+               bluegatt.requestConnectionPriority(use_priority);
+               {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority HIGH");};};
+               used_priority=true;
+           }
+            else {
+           if(used_priority) {
+              bluegatt.requestConnectionPriority(CONNECTION_PRIORITY_BALANCED);
+              {if(doLog) {Log.i(LOG_ID,"requestConnectionPriority LOW");};};
+              used_priority=false;
+              }
+           }
             }
         else {
             Log.e(LOG_ID, SerialNumber +" "+"setpriority BluetoothGatt==null");
@@ -726,16 +651,7 @@ private boolean used_priority=false;
 boolean disableNoCheck(BluetoothGatt gatt, BluetoothGattCharacteristic ch) {
         gatt.setCharacteristicNotification(ch, false);
         BluetoothGattDescriptor descriptor = ch.getDescriptor(mCharacteristicConfigDescriptor);
-        if(Build.VERSION.SDK_INT >= 33) {
-              return gatt.writeDescriptor(descriptor,BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)==BluetoothStatusCodes.SUCCESS;
-             }
-         else {
-            if(!descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)) {
-                Log.e(LOG_ID, SerialNumber + " " + "descriptor.setValue())  failed");
-                return false;
-            }
-            return gatt.writeDescriptor(descriptor);
-            }
+        return gatt.writeDescriptor(descriptor,BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)==BluetoothStatusCodes.SUCCESS;
         }
     boolean    disablenotification(BluetoothGatt gatt, BluetoothGattCharacteristic ch) {
         if(isNull(gatt)) {
@@ -788,22 +704,10 @@ static boolean enableGattDescriptornote(String note, BluetoothGatt gatt, Bluetoo
             return false;
             }
 
-        if(Build.VERSION.SDK_INT >= 33) {
-            int res = gatt.writeDescriptor(descriptor, value);
-            if(res != BluetoothStatusCodes.SUCCESS) {
-                Log.e(LOG_ID, note + " writeDescriptor failed " + res);
-                return false;
-                }
-            } 
-        else {
-            if(!descriptor.setValue(value)) {
-                Log.e(LOG_ID, note + " descriptor.setValue failed");
-                return false;
-                }
-            if (!gatt.writeDescriptor(descriptor)) {
-                Log.e(LOG_ID, note + " writeDescriptor failed");
-                return false;
-               }
+        int res = gatt.writeDescriptor(descriptor, value);
+        if(res != BluetoothStatusCodes.SUCCESS) {
+            Log.e(LOG_ID, note + " writeDescriptor failed " + res);
+            return false;
             }
         if(doLog) {
             showbytes(LOG_ID + " " + note + " enableNotification ", value);

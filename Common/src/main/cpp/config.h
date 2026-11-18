@@ -75,7 +75,6 @@
 //#define SIHISTORY 1
 //#endif
 #ifndef WEAROS
-#define OLDEVERSENSE 1
 #ifdef JUGGLUCO_APP
 #define DOESSEARCH 1
 #endif
@@ -94,9 +93,7 @@
 #define PERCENTILES 1
 
 #define USE_RUSSIAN 1 
-#ifndef JUGGLUCO_APP
-#define DONTTALK  
-#endif
+#define DONTTALK
 #define LOGALL
 #ifndef NOLOG
 //#define DOTESTS

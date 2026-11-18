@@ -28,9 +28,7 @@ import android.content.res.TypedArray;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -40,7 +38,9 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -100,8 +100,70 @@ import tk.glucodata.nums.numio;
 //import org.w3c.dom.Text;
 
 public class Backup {
-    static final int hide=isWearable?GONE:INVISIBLE;
+    // M3 pages: hidden controls must be GONE so that their rows disappear.
+    static final int hide=GONE;
    static final private String LOG_ID="Backup";
+
+   /** Keeps the visibility of an M3 row (or header) in sync with the controls it contains. */
+   static void follow(View root,View row,BooleanSupplier shown) {
+      ViewTreeObserver.OnPreDrawListener pre=()-> {
+         final int want=shown.getAsBoolean()?VISIBLE:GONE;
+         if(row.getVisibility()!=want) {
+            row.setVisibility(want);
+            return false;
+            }
+         return true;
+         };
+      final ViewTreeObserver[] obs={null};
+      View.OnAttachStateChangeListener att=new View.OnAttachStateChangeListener() {
+         @Override public void onViewAttachedToWindow(View v) {
+            obs[0]=v.getViewTreeObserver();
+            obs[0].addOnPreDrawListener(pre);
+            }
+         @Override public void onViewDetachedFromWindow(View v) {
+            if(obs[0]!=null&&obs[0].isAlive())
+               obs[0].removeOnPreDrawListener(pre);
+            obs[0]=null;
+            }
+         };
+      root.addOnAttachStateChangeListener(att);
+      if(root.isAttachedToWindow())
+         att.onViewAttachedToWindow(root);
+      row.setVisibility(shown.getAsBoolean()?VISIBLE:GONE);
+      }
+   static void follow(View root,View row,View... controls) {
+      follow(root,row,()-> {
+         for(var c:controls)
+            if(c.getVisibility()==VISIBLE)
+               return true;
+         return false;
+         });
+      }
+   /** Hides the header of a group when none of its rows is visible. */
+   static void followHeader(M3.Page page,M3.Group g) {
+      final int idx=page.list.indexOfChild(g);
+      if(idx<=0)
+         return;
+      follow(page.root,page.list.getChildAt(idx-1),()-> {
+         for(int i=0;i<g.getChildCount();i++)
+            if(g.getChildAt(i).getVisibility()==VISIBLE)
+               return true;
+         return false;
+         });
+      }
+   /** Vertical stack: title followed by full width controls. */
+   static LinearLayout stack(Context act,TextView title,View... controls) {
+      var lay=new LinearLayout(act);
+      lay.setOrientation(LinearLayout.VERTICAL);
+      if(title!=null) {
+         title.setTextSize(TypedValue.COMPLEX_UNIT_SP,17);
+         title.setTextColor(M3.onSurface(act));
+         lay.addView(title,new LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
+         }
+      for(var c:controls)
+         lay.addView(c,new LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
+      return lay;
+      }
    static class changer implements TextWatcher {
       View view;
       changer(View v) {
@@ -197,7 +259,7 @@ public class Backup {
       private final EditText[] editIPs={null,null,null,null};
       private EditText editpass=null;
       private EditText portedit=null;
-      private ScrollView hostview=null;
+      private View hostview=null;
       private CheckDirectionBox Password;
       private Button reset=null;
         private CheckDirectionBox testip,haslabel;
@@ -237,23 +299,14 @@ public class Backup {
         }
       @SuppressWarnings("deprecation")
       public static int agetColor(Context context, int id) {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getColor(id);
-         } else {
-            //noinspection deprecation
-            return context.getResources().getColor(id);
-         }
+         return context.getColor(id);
       }
       @SuppressWarnings("deprecation")
       public static void setColorFilter(@NonNull Drawable drawable, @ColorInt int color) {
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            drawable.setColorFilter(new BlendModeColorFilter(color, BlendMode.SRC_ATOP));
-         } else {
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-         }
+         drawable.setColorFilter(new BlendModeColorFilter(color, BlendMode.SRC_ATOP));
       }
    private void deleteconfirmation(MainActivity act) {
-           AlertDialog.Builder builder = new AlertDialog.Builder(act);
+           AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
    //     setMessage(mess).
       String title=null;
       try {
@@ -295,16 +348,16 @@ static public String changehostError(MainActivity act,int pos) {
                case -2 : yield act.getString(R.string.parseip);
                case -3 : yield act.getString(R.string.toomanyhosts);
                case -4 : yield act.getString(R.string.senthosts);
-               case -5 : yield "Hostname too long";
-            case -6 : yield "Database busy, try again";
-               case -7 : yield "Invalid mirror transport or missing connection label";
-               default : yield "Error";
+               case -5 : yield "Nazwa hosta jest za długa";
+            case -6 : yield "Baza danych zajęta, spróbuj ponownie";
+               case -7 : yield "Nieprawidłowy transport klonowania lub brak etykiety połączenia";
+               default : yield "Błąd";
             };
             return mess;
             }
 
    private void resentconfirmation(MainActivity act,int hostindex) {
-           AlertDialog.Builder builder = new AlertDialog.Builder(act);
+           AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
            builder.setTitle(act.getString(R.string.resenddata)+"?").
        setMessage(R.string.resendwarning).
               setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -353,16 +406,16 @@ void makeAutoQR(MainActivity act,View parent) {
       help.setOnClickListener(v-> {
             help(R.string.autoqrmessage,act);
         });
-      var layout=new Layout(act, new View[]{send},new View[]{homenetS,internetS},new View[]{receive},new View[]{homenetR,internetR},new View[] {help,cancel});
-      layout.setPadding((int)(GlucoseCurve.metrics.density*4.0),(int)(GlucoseCurve.metrics.density*4.0),(int)(GlucoseCurve.metrics.density*4.0),(int)(GlucoseCurve.metrics.density*4));
-      layout.setBackgroundColor(backgroundcolor);
-    //  layout.measure(WRAP_CONTENT, WRAP_CONTENT);
-     // layout.setX((GlucoseCurve.getwidth()-layout.getMeasuredWidth()+MainActivity.systembarLeft-MainActivity.systembarRight)*.5f);
-     // layout.setY( (GlucoseCurve.getheight()-layout.getMeasuredHeight() +MainActivity.systembarTop-MainActivity.systembarBottom)*.5f);
-    var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
-
-      act.addMyContentView(layout, params);
-      layout.setBackgroundResource(R.drawable.dialogbackground);
+      var page=new M3.Page(act,R.string.autoqr,true);
+      var sendgroup=page.group(send.getText());
+      sendgroup.action(homenetS.getText(),null,v->homenetS.performClick());
+      sendgroup.action(internetS.getText(),null,v->internetS.performClick());
+      var receivegroup=page.group(receive.getText());
+      receivegroup.action(homenetR.getText(),null,v->homenetR.performClick());
+      receivegroup.action(internetR.getText(),null,v->internetR.performClick());
+      page.buttons(help);
+      final View layout=page.root;
+      page.showOnly();
       Runnable closerun=()->{
          removeContentView(layout);
          EnableControls(parent,true);
@@ -467,7 +520,7 @@ CheckDirectionBox ICE;
 
        checkhostname.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
          if(isChecked) {
-            Applic.argToaster(act,"hostname is slow",Toast.LENGTH_LONG);
+            Applic.argToaster(act,"Nazwa hosta spowalnia działanie",Toast.LENGTH_LONG);
             doHasName.run();
             }
          else {
@@ -552,7 +605,7 @@ CheckDirectionBox ICE;
        fromrow=new View[]{startlabel, alldata,fromnow,screenpos};
 
       setradio(sendfrom);
-      CheckDirectionBox restore=new CheckDirectionBox(act);restore.setText("Restore");
+      CheckDirectionBox restore=new CheckDirectionBox(act);restore.setText("Przywróć");
       if(!Natives.backuphasrestore( ))
          restore.setVisibility(GONE);
 
@@ -765,42 +818,74 @@ CheckDirectionBox ICE;
       layout.setPaddingRelative((int)(GlucoseCurve.metrics.density*4.0),0,(int)(GlucoseCurve.metrics.density*10.0),(int)(GlucoseCurve.metrics.density*4));
          }
       else {
-        var hormargin=(int)(GlucoseCurve.metrics.density*20.0f);
-
-         getMargins(delete).setMarginStart(hormargin);
-         getMargins(save).setMarginEnd(hormargin);;
-        var withqr=BuildConfig.minSDK>=20?new View[]{Password, editpass, visible}:new View[]{Password, editpass, visible};
-         var sidepad=(int)(GlucoseCurve.metrics.density*8.0);
-         layout = new Layout(act, (l, w, h) -> {
-            hideSystemUI(act);
-            final int[] ret = {w, h};
-            return ret;
-
-         }, firstrow,new View[]{ICE,ICElabellabel,ICElabel,zero,one},editIPs, new View[]{testip, haslabel, label},
-               directions, new View[]{receive, Sendlabel, Amounts, Scans, Stream, restore}, fromrow, withqr,new View[]{transportLabel,transportAutomatic,transportTcp,transportBluetooth,transportMessages}, new View[]{delete, Close, reset, Help, save})
-            .portraitLayout(
-new View[]{Portlabel,portedit,checkhostname},new View[]{IPslabel,detect},
-               new View[]{ICE,ICElabellabel},new View[]{ICElabel},new View[]{zero,one},
-               new View[]{editIPs[0],editIPs[1]},new View[]{editIPs[2],editIPs[3]},
-               new View[]{testip,haslabel},new View[]{label},directions,
-               new View[]{receive,Sendlabel},new View[]{Amounts,Scans,Stream},new View[]{restore},
-               new View[]{startlabel},new View[]{alldata,fromnow,screenpos},
-               withqr,
-               new View[]{transportLabel,transportAutomatic},new View[]{transportTcp,transportBluetooth,transportMessages},
-
-               new View[]{Close,Help},new View[]{reset},new View[]{delete,save})
-            .systembarPadding((left,top,right,bottom)->
-               new int[]{left+sidepad,top/2,sidepad+right,bottom});
-
+         layout=null;
          }
       Close.setOnClickListener(v-> act.doonback());
-      hostview.addView(layout);
-      hostview.setFillViewport(true);
-      hostview.setSmoothScrollingEnabled(true);
-       hostview.setVerticalScrollBarEnabled(Applic.scrollbar);
-       hostview.setScrollbarFadingEnabled(true);
-       act.addMyContentView(hostview, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-       hostview.setBackgroundColor(backgroundcolor);
+      if(isWearable) {
+         var scroll=new ScrollView(act);
+         scroll.addView(layout);
+         scroll.setFillViewport(true);
+         scroll.setSmoothScrollingEnabled(true);
+         scroll.setVerticalScrollBarEnabled(Applic.scrollbar);
+         scroll.setScrollbarFadingEnabled(true);
+         act.addMyContentView(scroll, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+         scroll.setBackgroundColor(backgroundcolor);
+         hostview=scroll;
+         }
+      else {
+         var page=new M3.Page(act,R.string.connection,true);
+         final View root=page.root;
+
+         var trans=page.group(R.string.m3_bk_transport);
+         for(var r:transportRadios)
+            trans.toggle(r);
+         followHeader(page,trans);
+
+         var net=page.group(R.string.m3_bk_network);
+         net.toggle(ICE);
+         follow(root,net.item(stack(act,ICElabellabel,ICElabel)),ICElabel);
+         follow(root,net.value(R.string.m3_bk_iceside,zero,one),zero,one);
+         follow(root,net.value(R.string.port,portedit),portedit);
+         net.toggle(checkhostname);
+         follow(root,net.item(stack(act,IPslabel,editIPs)),editIPs);
+         net.toggle(detect);
+         net.toggle(testip);
+         followHeader(page,net);
+
+         var dir=page.group(R.string.m3_bk_direction);
+         for(var r:directions)
+            dir.toggle((CompoundButton)r);
+         followHeader(page,dir);
+
+         var ident=page.group(R.string.m3_bk_identity);
+         ident.toggle(haslabel);
+         follow(root,ident.item(label),label);
+         ident.toggle(Password);
+         var passrow=new LinearLayout(act);
+         passrow.setOrientation(LinearLayout.HORIZONTAL);
+         passrow.setGravity(Gravity.CENTER_VERTICAL);
+         passrow.addView(editpass,new LinearLayout.LayoutParams(0,WRAP_CONTENT,1f));
+         passrow.addView(visible,new LinearLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT));
+         follow(root,ident.item(passrow),editpass);
+
+         var data=page.group(R.string.m3_bk_data);
+         data.toggle(receive);
+         var sendgroup=page.group(R.string.sendto);
+         sendgroup.toggle(Amounts);
+         sendgroup.toggle(Scans);
+         sendgroup.toggle(Stream);
+         sendgroup.toggle(restore);
+         follow(root,sendgroup.item(stack(act,startlabel,alldata,fromnow,screenpos)),alldata,fromnow,screenpos);
+
+         var actions=page.group(R.string.m3_bk_actions);
+         follow(root,actions.action(reset.getText(),null,v->reset.performClick()),reset);
+         follow(root,actions.action(R.string.delete,null,v->delete.performClick()),delete);
+         followHeader(page,actions);
+
+         page.buttons(Help,save);
+         page.showOnly();
+         hostview=root;
+         }
     Consumer<Boolean> setICE=(isChecked) -> {
             // ICE is always a network/TURN connection. Automatic and TCP/IP are
             // therefore equivalent for ICE, while Bluetooth/Messages cannot be
@@ -1042,7 +1127,6 @@ new View[]{Portlabel,portedit,checkhostname},new View[]{IPslabel,detect},
 
       var info=new TextView(act);
       final int pad=(int)(GlucoseCurve.metrics.density*7.0);
-      if(!isWearable) info.setPadding(pad,0,pad,0);
 
       var deactive=getcheckbox(act,R.string.off,Natives.getHostDeactivated(pos));
       deactive.setOnCheckedChangeListener( (buttonView,  isChecked)->  {
@@ -1054,7 +1138,7 @@ new View[]{Portlabel,portedit,checkhostname},new View[]{IPslabel,detect},
       String mirrorInfo=mirrorStatus(pos);
       final String bluetoothStatus=BleMirror.statusForConnection(pos);
       if(bluetoothStatus!=null)
-         mirrorInfo+="<p><b>Bluetooth mirror:</b> "+TextUtils.htmlEncode(bluetoothStatus)+"</p>";
+         mirrorInfo+="<p><b>Klonowanie Bluetooth:</b> "+TextUtils.htmlEncode(bluetoothStatus)+"</p>";
       sethtml(info,mirrorInfo);
 
       ViewGroup layall;
@@ -1078,35 +1162,23 @@ ViewGroup.LayoutParams params;
         params=new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
          }
       else {
-           var modmar=Layout.getMargins(modify);
-           var hormar= (int)(GlucoseCurve.metrics.density*10);
-           modmar.setMarginStart(hormar);
-           var closemar=Layout.getMargins(close);
-           closemar.setMarginEnd(hormar);
-           View[] firstrow;
+           var title=Natives.getbackuplabel(pos);
+           var page=new M3.Page(act,(title!=null&&!title.isEmpty())?title:act.getString(R.string.connection),true);
+           var g=page.group(null);
+           deactive.setText(R.string.m3_bk_deactivated);
+           g.toggle(deactive);
+           g.nav(R.string.m3_bk_modify,null,v->modify.performClick());
            if(BuildConfig.minSDK>=20) {
-                Button qr=getbutton(act,"QR");
-                qr.setOnClickListener(v->  {
+                g.action(R.string.m3_bk_showqr,null,v->  {
                       if(pos>=0) {
                             String jsonstr=getbackJson(pos);
                             QRmake.show(act,jsonstr);
                             }
                      });
-                    firstrow=new View[]{modify,deactive,qr,close} ;
-                     }
-               else {
-                     firstrow= new View[]{modify,deactive,close} ;
-                    }
-                                                                                                
-           Layout layout=new Layout(act, (l, w, h) -> {
-                final int[] lret={w,h};
-                return lret;
-                },firstrow , new View[]{info})
-                .systembarMargins((left,top,right,bottom)->
-                    new int[]{left*7/8,top*7/8,right*7/8,0});
-            layout.setBackgroundResource(R.drawable.dialogbackground);
-            layall=layout;
-           params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.RIGHT);
+                }
+           page.group(R.string.m3_bk_status).item(info);
+           layall=page.root;
+           params=new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
             }
 
       modify.setOnClickListener(v->     changehostview(act,pos,layall));
@@ -1139,13 +1211,7 @@ ViewGroup.LayoutParams params;
    public  void mkbackupview(MainActivity act) {
       act.themeLightBars();
       act.showui=true;
-      if(!isWearable&&!Natives.getsystemUI()) {
-         act.showSystemUI();
-         Applic.app.getHandler().postDelayed( ()->{
-         realmkbackupview(act,true); },1);
-         }
-       else
-         realmkbackupview(act,true);
+      realmkbackupview(act,true);
    //    Applic.app.getHandler().postDelayed( ()-> realmkbackupview(act),1); //for what was it needed?
       }
    public  void realmkbackupview(MainActivity act,boolean lightback) {
@@ -1196,26 +1262,15 @@ ViewGroup.LayoutParams params;
       staticnum.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
         Natives.setstaticnum(isChecked);
         ActivityHealth.settingsChanged(act);
-        if(!isWearable) {
-            if(isChecked) {
-                BluetoothGlucoseMeter.stopDevices();
-                }
-            else {
-                BluetoothGlucoseMeter.startDevices();
-                }
-            }
         });
 
       staticnum.setText(R.string.dontchangeamounts);
       staticnum.setChecked(Natives.staticnum());
-      if(!isWearable) {
-         var lineheight=staticnum.getLineHeight();
-         recycle.setMinimumHeight(lineheight*6);
-         }
-      else {
+      if(isWearable) {
              recycle.setPadding(0,(int)(GlucoseCurve.metrics.density*7.0),0,(int)(GlucoseCurve.metrics.density*3.0));
          }
       View lay;
+      TextView emptyview=null;
 
       var errstr=Natives.serverError();
       var errorrow=errstr.length()>0?new View[]{getlabel(act,errstr)}:null;
@@ -1257,26 +1312,42 @@ ViewGroup.LayoutParams params;
          else {
             autoqr=null;
             }
-         var hormarg=(int)(GlucoseCurve.metrics.density*20.0f);
-         getMargins(Help).setMarginStart(hormarg);
-         getMargins(Cancel).setMarginEnd(hormarg);
-         var withqr=BuildConfig.minSDK>=20?new View[]{autoqr,hosts,Cancel}:new View[]{hosts,Cancel};
-         var layout=new Layout(act, new View[]{ip,blpan,p2p,labport,portview,Save,turnserver},new View[]{recycle},new View[] {battery,Help,Sync,reinit,staticnum},errorrow,withqr)
-            .portraitLayout(new View[]{ip},new View[]{blpan},new View[]{p2p},
-               new View[]{labport,portview,Save},new View[]{turnserver},new View[]{recycle},errorrow,
-               new View[]{battery,staticnum},BuildConfig.minSDK>=20?new View[]{autoqr,Sync,reinit}:new View[]{Sync,reinit},
-               new View[]{hosts},new View[]{Help,Cancel});
+         var page=new M3.Page(act,R.string.mirror,true);
+         final View layout=page.root;
+         var dev=page.group(R.string.m3_bk_device);
+         dev.value("wlan",getlabel(act,String.valueOf(thishost[1])));
+         if(thishost[2]!=null)
+            dev.value("bt-pan",getlabel(act,thishost[2]));
+         if(thishost[0]!=null)
+            dev.value("p2p",getlabel(act,thishost[0]));
+         dev.value(R.string.port,portview,Save);
+         dev.nav(turnserver);
+
+         var con=page.group(R.string.connections);
+         var listbox=new LinearLayout(act);
+         listbox.setOrientation(LinearLayout.VERTICAL);
+         recycle.setNestedScrollingEnabled(false);
+         listbox.addView(recycle,new LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
+         emptyview=M3.summary(act,act.getString(R.string.m3_bk_noconnections));
+         listbox.addView(emptyview,new LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
+         con.item(listbox);
+         con.nav(hosts);
+         if(autoqr!=null)
+            con.nav(autoqr);
+
+         var opt=page.group(R.string.m3_bk_options);
+         opt.toggle(staticnum);
+         opt.nav(R.string.dozemode,null,v->battery.performClick());
+         opt.action(R.string.m3_bk_sync,null,v->Sync.performClick());
+         opt.action(R.string.m3_bk_reinit,null,v->reinit.performClick());
+         if(errorrow!=null)
+            page.group(R.string.m3_bk_error).item(errorrow[0]);
+         page.buttons(Help);
         if(BuildConfig.minSDK>=20) {
             autoqr.setOnClickListener(v -> {
                 makeAutoQR(act, layout);
                 });
           };
-
-       var density=GlucoseCurve.metrics.density;
-      layout.systembarPadding((left,top,right,bottom)->new int[]{
-         left+(int)(density*10),top*5/6,right+(int)(density*10),bottom+(int)(density*3)});
-
-          {if(doLog) {Log.i(LOG_ID,"density="+GlucoseCurve.metrics.density+" systembarTop="+ MainActivity.systembarTop+" systembarLeft="+ MainActivity.systembarLeft);};};
          lay=layout;
          }
 
@@ -1293,7 +1364,18 @@ ViewGroup.LayoutParams params;
          hosts.setOnClickListener(v-> addhostview(act,lay));
       hostadapt = new HostViewAdapter(lay); //USE
       recycle.setAdapter(hostadapt);
-      recycle.setLayoutParams(new ViewGroup.LayoutParams(  MATCH_PARENT, WRAP_CONTENT));
+      if(isWearable)
+         recycle.setLayoutParams(new ViewGroup.LayoutParams(  MATCH_PARENT, WRAP_CONTENT));
+      if(emptyview!=null) {
+         final TextView empty=emptyview;
+         final Runnable showempty=()-> empty.setVisibility(hostadapt.getItemCount()==0?VISIBLE:GONE);
+         showempty.run();
+         hostadapt.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override public void onChanged() { showempty.run(); }
+            @Override public void onItemRangeInserted(int positionStart, int itemCount) { showempty.run(); }
+            @Override public void onItemRangeRemoved(int positionStart, int itemCount) { showempty.run(); }
+            });
+         }
       Runnable closerun= ()-> {
           if(lightback) act.lightBars(!getInvertColors( ));
          if(hostview!=null)
@@ -1318,7 +1400,7 @@ ViewGroup.LayoutParams params;
          closerun.run();
          });
 
-      if(!isWearable&&android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+      if(!isWearable) {
          battery.setText(R.string.dozemode);
          battery.setOnClickListener(v-> {
             Battery.batteryscreen(act,lay);
@@ -1327,7 +1409,8 @@ ViewGroup.LayoutParams params;
       else {
          battery.setVisibility(GONE);
       }
-      lay.setBackgroundColor(Applic.backgroundcolor);
+      if(isWearable)
+         lay.setBackgroundColor(Applic.backgroundcolor);
    //   act.themeLightBars();
       act.addMyContentView(lay, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
       }
@@ -1421,7 +1504,7 @@ private int getMirrorListColor(MainActivity act) {
        if(!isWearable) {
           if(transport==BleMirror.TRANSPORT_AUTOMATIC||transport==BleMirror.TRANSPORT_TCP) {
              if(ICElabelstr==null) {
-                  sb.append((names!=null&&names.length!=0)?names[0]:(Natives.detectIP(pos)?"Detect":"---"));
+                  sb.append((names!=null&&names.length!=0)?names[0]:(Natives.detectIP(pos)?"Wykryj":"---"));
                   if(!passive) {
                      sb.append(" ");
                      sb.append(port);

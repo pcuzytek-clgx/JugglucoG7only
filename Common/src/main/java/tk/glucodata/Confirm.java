@@ -27,7 +27,7 @@ import android.content.DialogInterface;
 
 public final class Confirm {
 static public void    message(Context context, String title, String mess, Runnable okproc) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context);
         builder.setTitle(title).
         setMessage(mess).
         setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -40,7 +40,7 @@ static public void    message(Context context, int title, int message, Runnable 
         message(context,context.getString(title),context.getString(message),okproc);
         }
 static public void    ask(Context context, String title, String mess, Runnable okproc) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context);
         builder.setTitle(title).
         setMessage(mess).
            setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -53,7 +53,7 @@ static public void    ask(Context context, String title, String mess, Runnable o
         }).show().setCanceledOnTouchOutside(false);
     }
 static public void    ask2(Context context, String title, String mess, Runnable okproc,Runnable cancelproc) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context);
         builder.setTitle(title).
      setMessage(mess).
            setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

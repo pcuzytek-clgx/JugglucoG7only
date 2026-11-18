@@ -1,3 +1,0 @@
-To get rid of signal:
-
-handle SIG33 nostop noprint pass

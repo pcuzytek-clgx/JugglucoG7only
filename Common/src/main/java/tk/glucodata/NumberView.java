@@ -27,7 +27,6 @@ import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
@@ -169,8 +168,8 @@ void configurationChanged(MainActivity activity) {
             pick=null;
             }
         else {
-            int hour=Build.VERSION.SDK_INT<23?pick.getCurrentHour():pick.getHour();
-            int minute=Build.VERSION.SDK_INT<23?pick.getCurrentMinute():pick.getMinute();
+            int hour=pick.getHour();
+            int minute=pick.getMinute();
             TimePicker fresh=newTimePicker(activity);
             fresh.setIs24HourView(Applic.hour24);
             fresh.setCurrentHour(hour);
@@ -201,7 +200,7 @@ void closenumview() {
     if (newnumview != null) {
         removeContentView(newnumview);
         newnumview=null;
-        if(!isWearable && android.os.Build.VERSION.SDK_INT>=28) ActivityHealth.numberEditorClosed();
+        if(!isWearable) ActivityHealth.numberEditorClosed();
         }
     editfocus.clearedittext(valueedit);
     spinner=null;
@@ -435,7 +434,7 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
     else  {
         newnumview=layout;
         } 
-    newnumview.setBackgroundColor( Applic.backgroundcolor);
+    if(isWearable) newnumview.setBackgroundColor( Applic.backgroundcolor); else M3.card(newnumview);
   savebutton.setOnClickListener(v -> {
         MainActivity act=(MainActivity)v.getContext();
         GlucoseCurve.reopener();
@@ -465,44 +464,6 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
     valueedit.requestFocus();
     editfocus.setedittext(valueedit);
 
-    View.OnClickListener menucall= v -> {
-
-        if(!isWearable) {
-            hidekeyboard();
-        if(mealview[0]==null) {
-            EnableControls(newnumview,false);
-//            newnumview.setVisibility(GONE);
-            int mptr=newmealptr[0]==0?((currentnum!=0L)?Natives.hitmeal(currentnum):0):newmealptr[0];
-            if(mptr==0)
-                mptr=Natives.getnewmealptr();
-            mealview[0]=tk.glucodata.Meal.menuview(NumberView.this, context,mptr, (carb,mealptr)->{
-                float roundt=Natives.getroundto();
-                if(roundt>0.0f)
-                    valueedit.setText(Float.toString(roundto(carb,roundt)));
-                else
-                    valueedit.setText(Float.toString(carb));
-                newmealptr[0]=mealptr;
-            },()->{
-                EnableControls(newnumview,true);
-                valueedit.requestFocus();
-
-                if(!smallScreen) {
-                    if(SmallShowKeyboard)
-                            showkeyboard(context);
-                    editfocus.setedittext(valueedit);
-                    }
-               else {
-                    tk.glucodata.help.showkeyboard(context,valueedit);
-                  }
-
-            //    newnumview.setVisibility(VISIBLE);
-                mealview[0]=null;
-
-                }    );
-            }
-    }
-
-    };
     mealbutton.setOnClickListener(v -> {
         if(currentnum!=0L && currentnum!=numio.newhit && Natives.hittype(currentnum)!=Natives.getbloodvar() && (Natives.hitmeal(currentnum)&0x80000000)!=0) {
             try {
@@ -516,7 +477,7 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
                 Log.stack(LOG_ID,"Open activity details from Amount",e);
                 Applic.argToaster(context,e.getMessage()==null?e.toString():e.getMessage(),Toast.LENGTH_LONG);
             }
-        } else menucall.onClick(v);
+        }
     });
     lasttime=time;
     Date dat = new Date(time);
@@ -586,8 +547,6 @@ public   View addnumberview(MainActivity context,final int bron,final long time,
         datebutton.setTextColor( Color.YELLOW);
          newmealptr[0]=tmpmealptr;
         mealview[0]=null;
-        {if(doLog) {Log.i(LOG_ID,"onClick");};};
-        menucall.onClick(mealbutton);
         }
     else {
         timebutton.setTextColor(savebutton.getCurrentTextColor());
@@ -609,7 +568,7 @@ void deletedialog(View v,int[] mealptr) {
     int type=Natives.hittype(currentnum);
     ArrayList<String> labels= ((Applic)context.getApplication()).getlabels();
     String mess= DateFormat.getDateTimeInstance(DateFormat.DEFAULT,DateFormat.DEFAULT).format(time)+" "+ labels.get(type)+" "+value;
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context);
         builder.setTitle(R.string.deletequestion).setMessage(mess).
            setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -685,19 +644,6 @@ private void seedelete() {
 
         setMarginStart(getMargins(savebutton),hormarg);
         }
-    }
-public void addnumberwithmenu(MainActivity context,int mealptr) {
-    if(currentnum!=0L)  {
-        if(currentnum!=numio.newhit) 
-            Natives.freehitptr(currentnum);
-        currentnum=0L;
-        }
-    var type=Natives.getmealvar();
-     addnumberview(context,1,currentTimeMillis(),Float.MAX_VALUE,type,mealptr);
-    setmealbutton(type,1, 0,shouldexclude) ;
-    nodelete();
-    thetime=-1;
-    thedate=0L;
     }
 public View addnumberview(MainActivity context) {
     if(currentnum!=0L)  {
@@ -857,7 +803,7 @@ public Layout getdateviewal(MainActivity activity, long date, Dater erdate) {
         datparams =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
         }
 
-    datepicker.setBackgroundColor( Applic.app.backgroundcolor);
+    if(isWearable) datepicker.setBackgroundColor( Applic.app.backgroundcolor); else M3.card(datepicker);
     activity.addMyContentView(datepicker, datparams);
     }
     else {
@@ -986,13 +932,8 @@ final  boolean buttonsunder=false;
         ok.setOnClickListener(vi -> {
         activity.doonback();
             int hour,min;
-            if(Build.VERSION.SDK_INT < 23) {
-                 hour=pick.getCurrentHour();
-                 min=pick.getCurrentMinute(); }
-            else {
-                 hour=pick.getHour();
-                 min=pick.getMinute();
-                }
+            hour=pick.getHour();
+            min=pick.getMinute();
         settime.accept(hour,min);
 
         });
@@ -1028,7 +969,7 @@ else {
             }
         return new int[]{w,h};
         }, views);
-    layout.setBackgroundColor( Applic.backgroundcolor);
+    if(isWearable) layout.setBackgroundColor( Applic.backgroundcolor); else M3.card(layout);
     var params=new FrameLayout.LayoutParams(layparwidth,layparheight,Gravity.TOP|Gravity.LEFT);
    if(isWearable)
           layout.setPaddingRelative(0,(int)(GlucoseCurve.metrics.density*5.0),0,(int)(GlucoseCurve.metrics.density*2.0));
@@ -1114,13 +1055,7 @@ void setmealbutton(int labelsel,int bron,int mealptr,boolean exclude) {
         }
         mealbutton.setText(R.string.mealname);
 //       if(doLog) {Log.i(LOG_ID,"bron="+bron+" mealptr="+mealptr);};
-        if(!isWearable&&labelsel==Natives.getmealvar() &&(bron==1|| mealptr>0)) {
-            mealbutton.setVisibility(VISIBLE);
-            source.setVisibility(GONE);
-            excludebox.setVisibility(GONE);
-            }
-
-    else {
+    {
        if(labelsel==Natives.getbloodvar()) {
             mealbutton.setVisibility(GONE);
             source.setVisibility(GONE);
@@ -1277,9 +1212,9 @@ Layout getkeyboard(Context context,View anchor,int keyboardMode) {
     tmp[0]=but;
     but.setText("0");
     tmp[1]=but=new Button(context);
-    but.setText(Build.VERSION.SDK_INT>=22?"\u232B":"\u2190");
+    but.setText("\u232B");
 
-    but.setContentDescription("Backspace");
+    but.setContentDescription("Usuń znak");
     but.setOnClickListener(v->{
         final Editable edit=editfocus.getedit();
         if(edit==null)
@@ -1299,7 +1234,7 @@ Layout getkeyboard(Context context,View anchor,int keyboardMode) {
     } );
     tmp[2]=but=new Button(context);
     but.setText(".");
-    but.setContentDescription("Decimal point");
+    but.setContentDescription("Przecinek dziesiętny");
     but.setOnClickListener(click);
     Layout layout=new Layout(context, (lay, w, h)->{
             int hei=GlucoseCurve.getheight();
@@ -1378,7 +1313,7 @@ Layout getkeyboard(Context context,View anchor,int keyboardMode) {
                     return new int[] {w,h};
         }, views) ;
         
-    layout.setBackgroundColor( Applic.backgroundcolor);
+    if(isWearable) layout.setBackgroundColor( Applic.backgroundcolor); else M3.card(layout);
     layout.post(layout::requestLayout);
     return layout;
     }

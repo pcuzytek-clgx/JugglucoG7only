@@ -81,7 +81,6 @@ import java.util.concurrent.TimeUnit;
 
 import tk.glucodata.nums.AllData;
 import tk.glucodata.nums.numio;
-import tk.glucodata.settings.Broadcasts;
 //import static tk.glucodata.MessageSender.messagesender;
 
 public class Applic extends Application {
@@ -105,11 +104,7 @@ public static boolean hour24=true;
 static public final int TargetSDK=BuildConfig.targetSDK;
 static public final boolean isWearable= BuildConfig.isWear==1;
 static public final boolean DynamicTheme=!isWearable;
-//static final boolean DontTalk=isWearable;
-static public final boolean DontTalk=false;
 static public final boolean useZXing= BuildConfig.noZXing==0;
-//static public final boolean includeLib= isWearable;
-static public final boolean includeLib= true;
 static public final boolean isRelease= BuildConfig.isRelease==1;
 //static public final boolean isRelease= !BuildConfig.DEBUG;
 
@@ -125,7 +120,7 @@ public  ArrayList<String> getlabels() {
     }
 public tk.glucodata.nums.AllData numdata=null;
 public GlucoseCurve curve=null;
-    public static int unit=0;
+    public static int unit=2;
 public void redraw() {
     var tmpcurve=curve;
     if(tmpcurve!=null)
@@ -163,10 +158,6 @@ static public    void argToaster(Context context,String message,int duration) {
    // Toast.makeText(context,message, duration).show();
 
     FullToasts.argToaster(context, message, duration);
-    if(!DontTalk) {
-        if(initproccalled&&Natives.speakmessages()) 
-            speak(message);
-        }
     }
 
 
@@ -174,10 +165,6 @@ static public    void argToaster(Context context,String message,int duration) {
 
 public static void argToasterWait(Context context, String message) {
     FullToasts.argToasterWait(context, message);
-    if(!DontTalk) {
-        if(initproccalled&&Natives.speakmessages()) 
-            speak(message);
-        }
     }
 
 
@@ -218,18 +205,6 @@ void setnotify(boolean on) {
     Notify.alertwatch=on;
     {if(doLog) {Log.i(LOG_ID,"setnotify="+on);};};
     }
-public void setunit(int unit)  {
-     if(Applic.unit!=unit)
-        SuperGattCallback.previousglucosevalue=0.0f;
-    Natives.setunit(unit);
-    Applic.unit=unit;
-    Notify.mkunitstr(app,unit);
-    // Kerfstok and the Libre3/Kerfstok superset share the GLUNITS protocol.
-    // This also updates a direct-Libre3 watch when no phone glucose packets are
-    // currently being sent (those packets normally carry the unit themselves).
-    if(!isWearable && numdata!=null && Natives.gethasgarmin())
-        numdata.sendunits(unit);
-    }
 public void sendlabels() {
     if(!isWearable) {
         if(Natives.gethasgarmin())
@@ -256,10 +231,6 @@ private static void setlanguage() {
         {if(doLog) {Log.i(LOG_ID,"Applic.setlangauge="+lang+" cur="+curlang);};};
         if(!lang.equals(curlang)) {
             curlang=lang;
-            if(!DontTalk) {
-                if(Talker.istalking())    
-                        SuperGattCallback.newtalker(null);
-                }
             }
         else  {
             return;
@@ -275,7 +246,7 @@ public void onConfigurationChanged(@NonNull Configuration newConfig) {
 
 //        var new24 = DateFormat.is24HourFormat(this);
         hasSystemtimeformat=DateFormat.is24HourFormat(app)==hour24;
-        Notify.timef = java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT);
+        Notify.mkDateformat();
         {if(doLog) {Log.i(LOG_ID,"Applic.onConfigurationChanged "+(Applic.hour24?" 24uur":" 12uur"));};};
  //       was24=new24;
         setlanguage();
@@ -298,10 +269,6 @@ static private void setjavahour24(boolean val) {
             }
        }
 
-static public void sethour24(boolean val) {
-     Natives.sethour24(val);
-    setjavahour24(val);
-    }
 @Override
 public void onTerminate () {
     super.onTerminate();
@@ -312,7 +279,10 @@ public void onTerminate () {
     }
 }
 
-private static final String[] scanpermissions=( (Build.VERSION.SDK_INT >= 31)? (new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT}):((Build.VERSION.SDK_INT >= 29)?new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}:new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}));
+// ACCESS_LOCAL_NETWORK (API 37, same Nearby devices group) is needed by the LAN mirror and webserver.
+private static final String[] scanpermissions=Build.VERSION.SDK_INT>=37?
+        new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_LOCAL_NETWORK}:
+        new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT};
 
 
 
@@ -342,40 +312,30 @@ static String[] hasPermissions(Context context, String[] perms) {
  * consult only these cached booleans.
  */
 private static volatile boolean bluetoothPermissionSnapshotValid=false;
-private static volatile boolean cachedMayScan=Build.VERSION.SDK_INT<23;
-private static volatile boolean cachedBluetoothScan=Build.VERSION.SDK_INT<31;
-private static volatile boolean cachedBluetoothAdvertise=Build.VERSION.SDK_INT<31;
-private static volatile boolean cachedBluetoothConnect=Build.VERSION.SDK_INT<31;
+private static volatile boolean cachedMayScan=false;
+private static volatile boolean cachedBluetoothScan=false;
+private static volatile boolean cachedBluetoothAdvertise=false;
+private static volatile boolean cachedBluetoothConnect=false;
 
 static String[] refreshBluetoothPermissions(Context context) {
-    final String[] missing;
-    if(Build.VERSION.SDK_INT>=23)
-        missing=hasPermissions(context,scanpermissions);
-    else
-        missing=new String[0];
+    final String[] missing=hasPermissions(context,scanpermissions);
 
-    boolean mayScan=missing.length==0;
     boolean scan=true;
     boolean advertise=true;
     boolean connect=true;
-    if(Build.VERSION.SDK_INT>=31) {
-        scan=true;
-        advertise=true;
-        connect=true;
-        for(String permission:missing) {
-            if(Manifest.permission.BLUETOOTH_SCAN.equals(permission))
-                scan=false;
-            else if(Manifest.permission.BLUETOOTH_ADVERTISE.equals(permission))
-                advertise=false;
-            else if(Manifest.permission.BLUETOOTH_CONNECT.equals(permission))
-                connect=false;
-            }
-        // Preserve the old Android-12+ policy: the generic Bluetooth path was
-        // considered usable only when all three Nearby Devices permissions were
-        // present. Individual BleMirror operations can still query their specific
-        // cached permission below.
-        mayScan=scan&&advertise&&connect;
+    for(String permission:missing) {
+        if(Manifest.permission.BLUETOOTH_SCAN.equals(permission))
+            scan=false;
+        else if(Manifest.permission.BLUETOOTH_ADVERTISE.equals(permission))
+            advertise=false;
+        else if(Manifest.permission.BLUETOOTH_CONNECT.equals(permission))
+            connect=false;
         }
+    // Preserve the old Android-12+ policy: the generic Bluetooth path was
+    // considered usable only when all three Nearby Devices permissions were
+    // present. Individual BleMirror operations can still query their specific
+    // cached permission below.
+    final boolean mayScan=scan&&advertise&&connect;
     synchronized(Applic.class) {
         cachedMayScan=mayScan;
         cachedBluetoothScan=scan;
@@ -401,8 +361,6 @@ static void ensureBluetoothPermissions(Context context) {
 
 static boolean bluetoothPermissionGranted(String permission) {
     ensureBluetoothPermissions(app);
-    if(Build.VERSION.SDK_INT<31)
-        return true;
     if(Manifest.permission.BLUETOOTH_SCAN.equals(permission))
         return cachedBluetoothScan;
     if(Manifest.permission.BLUETOOTH_ADVERTISE.equals(permission))
@@ -423,33 +381,19 @@ static String[] noPermissions(Context context) {
     return noperms;
     }
 static boolean mayscan() {
-    if(Build.VERSION.SDK_INT>=23) {
-        ensureBluetoothPermissions(app);
-        return cachedMayScan;
-        }
-    return true;
+    ensureBluetoothPermissions(app);
+    return cachedMayScan;
     }
 static boolean canBluetooth() {
-    if(Build.VERSION.SDK_INT>30) {
-        ensureBluetoothPermissions(app);
-        return cachedBluetoothScan&&cachedBluetoothAdvertise&&cachedBluetoothConnect;
-        }
-    return true;
+    ensureBluetoothPermissions(app);
+    return cachedBluetoothScan&&cachedBluetoothAdvertise&&cachedBluetoothConnect;
     }
 @Keep
 static int bluePermission() {
-    if(Build.VERSION.SDK_INT>23) {
-        ensureBluetoothPermissions(app);
-        if(Build.VERSION.SDK_INT>30) {
-            if(cachedBluetoothScan&&cachedBluetoothAdvertise&&cachedBluetoothConnect)
-                return 2;
-            return 0;
-            }
-        if(cachedMayScan)
-            return 2;
-        return 1;
-        }
-    return 2;
+    ensureBluetoothPermissions(app);
+    if(cachedBluetoothScan&&cachedBluetoothAdvertise&&cachedBluetoothConnect)
+        return 2;
+    return 0;
     }
 public static void updateservice(Context context,boolean usebluetooth) {
         if(isWearable||usebluetooth||Natives.backuphostNr( )>0) {
@@ -479,26 +423,24 @@ boolean canusebluetooth() {
     }
 
 static     void explicit(Context context) {
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-        try {
-        final PowerManager pm = (PowerManager)context.getSystemService(Activity.POWER_SERVICE);
-        var name=context.getPackageName();
-        if(pm.isIgnoringBatteryOptimizations(name))
-            return;
-        Intent intent;
-        if(isHarmonyOS()) {
-             intent = new Intent("android.intent.action.MAIN");
-             intent.addCategory("android.intent.category.LAUNCHER");
-             intent.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings$HighPowerApplicationsActivity"));
-             }
-        else {
-            intent = new Intent(ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-            intent.setData(Uri.parse("package:" + name));
-            }
-        context.startActivity(intent);
-        } catch(Throwable e) {
-            Log.stack(LOG_ID,"explicit",e);
-            }
+    try {
+    final PowerManager pm = (PowerManager)context.getSystemService(Activity.POWER_SERVICE);
+    var name=context.getPackageName();
+    if(pm.isIgnoringBatteryOptimizations(name))
+        return;
+    Intent intent;
+    if(isHarmonyOS()) {
+         intent = new Intent("android.intent.action.MAIN");
+         intent.addCategory("android.intent.category.LAUNCHER");
+         intent.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings$HighPowerApplicationsActivity"));
+         }
+    else {
+        intent = new Intent(ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+        intent.setData(Uri.parse("package:" + name));
+        }
+    context.startActivity(intent);
+    } catch(Throwable e) {
+        Log.stack(LOG_ID,"explicit",e);
         }
     }
 private boolean netstarted=false;
@@ -539,9 +481,6 @@ void initbluetooth(boolean usebluetooth,Context context,boolean frommain) {
         }
     SensorBluetooth.start(usebluetooth);
 
-    if(!isWearable) {
-        BluetoothGlucoseMeter.startDevices();
-        }
     }
 static boolean possiblybluetooth(Context context) {
     {if(doLog) {Log.i(LOG_ID,"possiblybluetooth");};};
@@ -601,72 +540,65 @@ private void initializeNet() {
         if(tk.glucodata.Applic.useWearos()) {
             initwearos(this);
             }
-        if (android.os.Build.VERSION.SDK_INT >=  android.os.Build.VERSION_CODES.LOLLIPOP) {
-            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            connectivityManager.registerNetworkCallback((new NetworkRequest.Builder()).build(), new ConnectivityManager.NetworkCallback() {
-        @Override
-        public void onAvailable(@NonNull Network network) {
-           hasonAvailable=true;
-           {if(doLog) {Log.i(LOG_ID, "network: onAvailable(" + network+")");};};
-           BleMirror.networkChanged();
-           if(useWearos()||hasip()) {
-             Natives.networkpresent();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager.registerNetworkCallback((new NetworkRequest.Builder()).build(), new ConnectivityManager.NetworkCallback() {
+    @Override
+    public void onAvailable(@NonNull Network network) {
+       hasonAvailable=true;
+       {if(doLog) {Log.i(LOG_ID, "network: onAvailable(" + network+")");};};
+       BleMirror.networkChanged();
+       if(useWearos()||hasip()) {
+         Natives.networkpresent();
+         MessageSender.reinit();
+        if(useWearos()) {
+           MessageSender.sendnetinfo();
+           Applic.scheduler.schedule(()-> { resetWearOS(); }, 20, TimeUnit.SECONDS);
+           }    
+          Applic.wakemirrors();
+        }
+    }
+    @Override
+    public void onUnavailable () {
+        {if(doLog) {Log.i(LOG_ID,"network: onUnavailable()");};};
+        }
+    @Override
+    public void onLosing (Network network, int maxMsToLive) {
+        {if(doLog) {Log.i(LOG_ID,"network: OnLosing("+network+","+maxMsToLive+")");};};
+        }
+    @Override
+    public void onCapabilitiesChanged (Network network, NetworkCapabilities networkCapabilities) {
+        var down=networkCapabilities.getLinkDownstreamBandwidthKbps();
+        var up=networkCapabilities.getLinkUpstreamBandwidthKbps();
+        var wifi=networkCapabilities.hasTransport(TRANSPORT_WIFI);
+        var blue=networkCapabilities.hasTransport(TRANSPORT_BLUETOOTH);
+        boolean aware = networkCapabilities.hasTransport(TRANSPORT_WIFI_AWARE);
+        {if(doLog) {Log.i(LOG_ID, "network: onCapabilitiesChanged(" + network+"downstream "+down+" Kbps up="+up+" Kbps "+(wifi?"":"no ")+" wifi, "+(blue?"":"no ")+" bluetooth, "+(aware?"":" no ")+"WIFI aware)");};};
+        }
+    @Override
+    public void onLinkPropertiesChanged (Network network, LinkProperties linkProperties) {
+        {if(doLog) {Log.i(LOG_ID, "network: onLinkPropertiesChanged("+network+", LinkProperties linkProperties) ");};};
+        // DHCP/address changes do not necessarily produce a new onAvailable().
+        // Refresh both authenticated BLE endpoint exchange and Wear /netinfo,
+        // otherwise peers can retain the previous private IP indefinitely.
+        BleMirror.networkChanged();
+        if(useWearos())
+            MessageSender.networkChanged();
+        }
+    @Override
+    public void onLost(Network network) {
+          {if(doLog) {Log.i(LOG_ID, "onLost(" + network+")");};};
+        BleMirror.networkChanged();
+        Natives.networkabsent();
              MessageSender.reinit();
-            if(useWearos()) {
-               MessageSender.sendnetinfo();
-               Applic.scheduler.schedule(()-> { resetWearOS(); }, 20, TimeUnit.SECONDS);
-               }    
-              Applic.wakemirrors();
-            }
-        }
-        @Override
-        public void onUnavailable () {
-            {if(doLog) {Log.i(LOG_ID,"network: onUnavailable()");};};
-            }
-        @Override
-        public void onLosing (Network network, int maxMsToLive) {
-            {if(doLog) {Log.i(LOG_ID,"network: OnLosing("+network+","+maxMsToLive+")");};};
-            }
-        @Override
-        public void onCapabilitiesChanged (Network network, NetworkCapabilities networkCapabilities) {
-            var down=networkCapabilities.getLinkDownstreamBandwidthKbps();
-            var up=networkCapabilities.getLinkUpstreamBandwidthKbps();
-            var wifi=networkCapabilities.hasTransport(TRANSPORT_WIFI);
-            var blue=networkCapabilities.hasTransport(TRANSPORT_BLUETOOTH);
-            boolean aware= false;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                aware = networkCapabilities.hasTransport(TRANSPORT_WIFI_AWARE);
-            }
-            {if(doLog) {Log.i(LOG_ID, "network: onCapabilitiesChanged(" + network+"downstream "+down+" Kbps up="+up+" Kbps "+(wifi?"":"no ")+" wifi, "+(blue?"":"no ")+" bluetooth, "+(aware?"":" no ")+"WIFI aware)");};};
-            }
-        @Override
-        public void onLinkPropertiesChanged (Network network, LinkProperties linkProperties) {
-            {if(doLog) {Log.i(LOG_ID, "network: onLinkPropertiesChanged("+network+", LinkProperties linkProperties) ");};};
-            // DHCP/address changes do not necessarily produce a new onAvailable().
-            // Refresh both authenticated BLE endpoint exchange and Wear /netinfo,
-            // otherwise peers can retain the previous private IP indefinitely.
-            BleMirror.networkChanged();
-            if(useWearos())
-                MessageSender.networkChanged();
-            }
-        @Override
-        public void onLost(Network network) {
-              {if(doLog) {Log.i(LOG_ID, "onLost(" + network+")");};};
-            BleMirror.networkChanged();
-            Natives.networkabsent();
-                 MessageSender.reinit();
 //           if(hasonAvailable) 
-               if(useWearos()) {
-                Applic.wakemirrors();
-                Applic.scheduler.schedule(()-> { resetWearOS(); }, 20, TimeUnit.SECONDS);
-            }
+           if(useWearos()) {
+            Applic.wakemirrors();
+            Applic.scheduler.schedule(()-> { resetWearOS(); }, 20, TimeUnit.SECONDS);
         }
-        });
+    }
+    });
 
-        if(hasip()) Natives.networkpresent();
-        }
-    else
-        Natives.networkpresent();
+    if(hasip()) Natives.networkpresent();
 
       if(isWearable&&!(dataAtStart=hasData())) {
           final ScheduledFuture<?>[] askstarthandle={null};
@@ -780,6 +712,8 @@ public static    int stopprogram=0;
     @Override
     public void onCreate() {
         super.onCreate();
+    util.forcePolish(this);
+    com.google.android.material.color.DynamicColors.applyToActivitiesIfAvailable(this);
 
     supportsRtl = (getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_SUPPORTS_RTL) != 0;
     if(DiskSpace.check(this)) {
@@ -795,11 +729,9 @@ public static    int stopprogram=0;
 static public int backgroundcolor= isWearable?BLACK:RED;
 void setbackgroundcolor(Context context) {
 if(!isWearable) {
-   if(Build.VERSION.SDK_INT >= 21) {
-        TypedValue typedValue = new TypedValue();
-        if(context.getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true) && typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT) 
-        backgroundcolor= typedValue.data;
-        }
+   TypedValue typedValue = new TypedValue();
+   if(context.getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true) && typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT) 
+   backgroundcolor= typedValue.data;
      }    
     }
 
@@ -887,9 +819,7 @@ static void doglucose(String SerialNumber, int mgdl, float gl, float rate, int a
     if(!isWearable) {
             if(sensorptr!=0L) {
                 {if(doLog) {Log.i(LOG_ID,"sensorptr="+format("%x",sensorptr));};};
-                if(Build.VERSION.SDK_INT >= 28) {
-                    HealthConnection.Companion.writeAll(sensorptr,SerialNumber);
-                    }
+                HealthConnection.Companion.writeAll(sensorptr,SerialNumber);
                }
         }
     if(wakelock!=null)
@@ -957,62 +887,21 @@ if(isWearable) {
     Specific.setclose(!Natives.getdontuseclose());
     }
 
-    Floating.init(); 
    final var initversion=Natives.getinitVersion();
     if(initversion<39) {
           if(initversion<29) {
              if(initversion<22) {
-                if(initversion<14) {
-                   if(initversion<13) {
-                      Broadcasts.updateall();
-                      }
-                   if(Notify.arrowNotify!=null)
-                      Natives.setfloatingFontsize((int) Notify.glucosesize);
-                   Natives.setfloatingbackground(WHITE);
-                    Natives.setfloatingforeground(BLACK);
-                   }
                 }
-             sethour24(DateFormat.is24HourFormat(app));
              }
           Natives.setinitVersion(39);
           }
-
-   setjavahour24(Natives.gethour24());
-    XInfuus.setlibrenames();
-   EverSense.setreceivers();
-    JugglucoSend.setreceivers();
-    SendLikexDrip.setreceivers();
+   if(!Natives.gethour24())
+      Natives.sethour24(true);
+   setjavahour24(true);
+   if(Natives.getRotate())
+      Natives.setRotate(false);
         }
 
-static public  boolean    talkbackrunning=false;
-static    void        talkbackon(Context cont) {
-    if(!DontTalk) {
-        SuperGattCallback.newtalker(cont);
-        talkbackrunning=true;
-
-        Natives.settouchtalk(true);
-        Natives.setspeakmessages(true);
-        Natives.setspeakalarms(true);
-        }
-
-    }
-
-static    void        talkbackoff() {
-    if(!DontTalk) {
-        talkbackrunning=false;
-        }
-    }
-@Keep
-static public void speak(String message) {
-    if(!DontTalk) {
-        var talker=SuperGattCallback.talker;
-        if(talker==null) {
-            SuperGattCallback.newtalker(null);
-            talker=SuperGattCallback.talker;
-            }
-        talker.speak(message);
-        }
-    }
 static public boolean getHeartRate() {
     return initproccalled&&Natives.getheartrate();
     }

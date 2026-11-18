@@ -25,19 +25,14 @@ import static tk.glucodata.Log.doLog;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
-import android.os.Build;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import androidx.annotation.RequiresApi;
 
 public class Flash  {
 static private final String LOG_ID="Flash";
@@ -47,70 +42,6 @@ static private final String LOG_ID="Flash";
         void end();
     };
 
-    @SuppressWarnings("deprecation")
-    static private class oldflash implements Flasher {
-        private Camera.Parameters parameters;
-        private Camera mCamera;
-
-       @SuppressWarnings("deprecation")
-        oldflash(Context context) {
-            try {
-                mCamera = Camera.open();
-                SurfaceTexture dummy = new SurfaceTexture(0);
-                mCamera.setPreviewTexture(dummy);
-                parameters = mCamera.getParameters();
-            }
-            catch(Throwable e) {
-		       mCamera=null;
-               Log.stack(LOG_ID,"oldflash",e);
-            }
-        }
-       @SuppressWarnings("deprecation")
-        public void on() {
-            {if(doLog) {Log.i(LOG_ID,"Flash on");};};
-		if(mCamera==null)
-			return;
-            try {
-                mCamera.reconnect();
-                //noinspection deprecation
-                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                //noinspection deprecation
-                mCamera.setParameters(parameters);
-                mCamera.startPreview();
-            }catch (Throwable e) {
-                Log.stack(LOG_ID,"on",e);
-            }
-        }
-
-       @SuppressWarnings("deprecation")
-        public void off() {
-		if(mCamera==null)
-			return;
-            {if(doLog) {Log.i(LOG_ID,"Flash off");};};
-            try {
-                //noinspection deprecation
-                parameters = mCamera.getParameters();
-                //noinspection deprecation
-                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                //noinspection deprecation
-                mCamera.setParameters(parameters);
-                mCamera.stopPreview();
-            } catch (Throwable e) {
-                Log.stack(LOG_ID,"off",e);
-            }
-        }
-
-       @SuppressWarnings("deprecation")
-public    void end() {
-	if(mCamera==null)
-		return;
-        mCamera.release();
-	mCamera=null;
-
-    }
-    };
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 static    class flash23 implements Flasher {
 
         private CameraManager camManager ;
@@ -118,7 +49,6 @@ static    class flash23 implements Flasher {
         public void end() {
 
         };
-        @RequiresApi(api = Build.VERSION_CODES.M)
         flash23(Context context) {
             try {
                 camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
@@ -145,7 +75,6 @@ static    class flash23 implements Flasher {
                     Log.stack(LOG_ID,"flash23",e);
             }
         }
-        @RequiresApi(api = Build.VERSION_CODES.M)
         void set(boolean val) {
             try {
                 if(cameraId!=null) {
@@ -160,11 +89,9 @@ static    class flash23 implements Flasher {
                     Log.stack(LOG_ID,"set",e);
             }
         }
-        @RequiresApi(api = Build.VERSION_CODES.M)
         public void on() {
             set(true);
         }
-        @RequiresApi(api = Build.VERSION_CODES.M)
         public void off() {
             set(false);
         }
@@ -208,12 +135,7 @@ static     Flasher flash=null;
 static    ScheduledFuture<?> flashschedule=null;
 static void start(Context context) {
 
-	if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-	    flash = new flash23(context);
-	    }
-	else {
-		flash =new oldflash(context);
-	}
+	flash = new flash23(context);
 
 	stopflash=false;
 	flashschedule  = scheduler.scheduleAtFixedRate(flashmore, 0,150 , TimeUnit.MILLISECONDS);

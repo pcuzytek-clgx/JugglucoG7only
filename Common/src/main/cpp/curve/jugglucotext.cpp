@@ -101,48 +101,22 @@ const jugglucotext engtext {
 	.SD="SD: %.2f",
 	.glucose_variability="Glucose variability: %.1f%%",
      .menustr0={
-		"ChatGPT",
 		"Menus",
 		"Watch",
 		"Sensor",
 		"Settings",
-
-#if defined(SIBIONICS)
-		"Photo",
-#else
-		"About",
-#endif
-
 		"Close",
 		"Stop Alarm"
 		},
 	.menustr1={
-		"Export",
 		"Mirror",
-		engtext.newamount,
-		"List", 
 #else
        .statistics=
 #endif //INJUGGLUCO
 		"Statistics",
 #ifdef INJUGGLUCO
-		"Talk",
-		"Float"
 		},
-	.menustr2= {"System UI",
-	"Scans",
-	"Stream",
-	"History",
-	"Amounts",
-	"Meals",
-	"Dark mode"},
-	.menustr3= {hourminstr,
-	"Search",
-	"Date",
-	"Day back",
-	"Day later",
-	"Week back",
-	"Week later"},
+	.menustr2= {"Stream"},
 #endif //INJUGGLUCO
 #else
  .amount="Amount",
@@ -229,8 +203,7 @@ are needed. In your case it has problems with the following file)",
 
 		;
 
-language language_en("en",&engtext);
-const jugglucotext *usedtext= &engtext;
+const jugglucotext *usedtext= &pltext;
 #include "logs.hpp"
 /*
 void setuseeng() {

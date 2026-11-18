@@ -114,13 +114,7 @@ const char *const * const sendptr=sendmessagestrbase+1;
 	else {
 		for(int i=0;i<len;i++) {
 			namehost name(host.ips+i);
-	#if __ANDROID_API__ >= 26
 			ipsptr=stpcpy(ipsptr,name.data());
-	#else
-			const int nlen=strlen(name.data());
-			memcpy(ipsptr,name.data(),nlen);
-			ipsptr+=nlen;
-	#endif
 			*ipsptr++=' ';
 			}
 		}

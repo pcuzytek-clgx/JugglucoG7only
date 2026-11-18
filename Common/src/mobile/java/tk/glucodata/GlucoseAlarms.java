@@ -47,10 +47,6 @@ public    void handlealarm() {
             Log.stack(LOG_ID,"reconnect Libre3 watch",th);
             }
         }
-    final var view=Floating.floatview;
-    if(view!=null) {
-        view.postInvalidate();
-        }
     final boolean haslossalarm=hasalarmloss();
     long wastime = SuperGattCallback.lastfoundL;
     if(wastime==0L) {
@@ -79,9 +75,6 @@ public    void handlealarm() {
                     if(lasttime!=0L)
                         wastime=lasttime;
                     Notify.onenot.lossalarm(wastime);
-                     if(SuperGattCallback.doWearInt)  {
-                        WearInt.missingalarm(nu /*SIC, that what xDrip is doing*/);
-                        }
                     //saidloss = true;
                     }
                  else {

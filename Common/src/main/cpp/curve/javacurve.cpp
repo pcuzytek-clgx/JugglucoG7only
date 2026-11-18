@@ -142,20 +142,16 @@ JavaVM *vmptr;
 static jmethodID summaryready=nullptr;
 
 static jmethodID showsensorinfo=nullptr;
-jmethodID jdoglucose=nullptr, jupdateDevices=nullptr, jbluetoothEnabled=nullptr,jspeak=nullptr, jresetWearOS=nullptr, jbluePermission=nullptr;
+jmethodID jdoglucose=nullptr, jupdateDevices=nullptr, jbluetoothEnabled=nullptr, jresetWearOS=nullptr, jbluePermission=nullptr;
 //jmethodID jchangedProfile;
 jclass JNIApplic,JNIString;
-#ifdef OLDEVERSENSE
 #ifndef WEAROS
-jclass EverSense;
-jmethodID sendGlucoseBroadcast=nullptr,jtoGarmin=nullptr, jGarmindeletelast=nullptr,jswitchbluetooth=nullptr;
-#endif
+jmethodID jtoGarmin=nullptr, jGarmindeletelast=nullptr,jswitchbluetooth=nullptr;
 #endif
 #ifdef WEAROS
 jmethodID jsetinittext=nullptr;
 jmethodID jrminitlayout=nullptr;
 #endif
-extern void initlibreviewjni(JNIEnv *env);
 
 extern bool jinitmessages(JNIEnv* env);
 #ifndef NOLOG
@@ -238,9 +234,6 @@ if(cl) {
  if(!(jbluetoothEnabled=env->GetStaticMethodID(JNIApplic,"bluetoothEnabled","()Z"))) {
  LOGAR(R"(jbluetoothEnabled=env->GetStaticMethodID(JNIApplic,"bluetoothEnabled","()Z") failed)" "");
  }
- if(!(jspeak=env->GetStaticMethodID(JNIApplic,"speak","(Ljava/lang/String;)V"))) {
- LOGAR(R"(jspeak=env->GetStaticMethodID(JNIApplic,"speak","(Ljava/lang/String;)V") failed)" "");
- }
  if(!(jresetWearOS=env->GetStaticMethodID(JNIApplic,"resetWearOS","()V"))) {
  LOGAR(R"(jresetWearOS=env->GetStaticMethodID(JNIApplic,"resetWearOS","()V") failed)" "");
  }
@@ -279,25 +272,6 @@ else {
 }
 
 
-#ifdef OLDEVERSENSE
-#ifndef WEAROS
-{
-const static jclass cl=env->FindClass("tk/glucodata/EverSense");
-if(cl) {
-
- EverSense = (jclass)env->NewGlobalRef(cl);
- env->DeleteLocalRef(cl);
-// broadcastglucose(int mgdl, float rate, long timmsec)
- if(!(sendGlucoseBroadcast=env->GetStaticMethodID(EverSense,"broadcastglucose","(IFJ)V"))) {
- LOGAR(R"(GetStaticMethodID(EverSense,"broadcastglucose","(IFJ)V") failed)" "");
- }
- }
-else {
- LOGAR(R"(FindClass("tk/glucodata/EverSense") failed)" "");
- }
- }
-#endif
-#endif
  /*
 const static jclass clappl=env->FindClass("tk/glucodata/Applic");
 jclass Applic=nullptr;
@@ -314,9 +288,6 @@ if(loadglucoseclass(env)) {
  }
 return JNI_ERR;
 */
-#ifndef WEAROS
-initlibreviewjni(env);
-#endif
 
 
 #ifdef WEAROS_MESSAGES
@@ -470,16 +441,9 @@ extern "C" JNIEXPORT void JNICALL fromjava(initopengl)(JNIEnv* env, jclass obj, 
 // appcurve.setdiffcurrent(settings->data()->currentRelative);
 }
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setcurrentRelative)(JNIEnv *env, jclass cl,jboolean val) {
- settings->data()->currentRelative=val;
- appcurve.setdiffcurrent(val);
- }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getcurrentRelative)(JNIEnv *env, jclass cl) {
- return settings->data()->currentRelative;
- }
 
 
-extern std::string_view libdirname;
+std::string_view libdirname;
 extern int setfilesdir(const std::string_view filesdir,const char *country) ;
 //#include "curve/shell.h"
 extern "C" JNIEXPORT int JNICALL fromjava(setfilesdir)(JNIEnv *env, jclass clazz, jstring dir,jstring jcountry,jstring nativedir) {
@@ -676,17 +640,6 @@ extern "C" JNIEXPORT jint JNICALL fromjava(search) (JNIEnv *env, jclass clazz,ji
  return res;
  }
 #endif
-extern "C" JNIEXPORT void JNICALL fromjava(movedate) (JNIEnv *env, jclass clazz,jlong milli,jint year,jint month,jint day) {
- time_t tim=milli/1000LL;
- struct tm      stm{};
- localtime_r(&tim,&stm);
- stm.tm_year=year-1900;
- stm.tm_mon=month;
- stm.tm_mday=day;
- time_t timto=mktime(&stm);
- appcurve.setstarttime(appcurve.starttime+uint32_t((int64_t)timto-(int64_t)tim));
- appcurve.begrenstijd() ;
- };
 extern "C" JNIEXPORT void JNICALL fromjava(setStartTime) (JNIEnv *env, jclass clazz,jlong milli) {
  appcurve.setstarttime(milli/1000LL);
  appcurve.begrenstijd() ;
@@ -723,10 +676,6 @@ extern "C" JNIEXPORT void JNICALL fromjava(endnumlist)(JNIEnv *env, jclass thiz)
  appcurve.endnumlist();
  }
 #endif
-extern int showui;
-extern "C" JNIEXPORT jboolean JNICALL fromjava(getsystemUI)(JNIEnv *env, jclass thiz) {
- return showui;
- }
 int64_t openNums(std::string_view numpath,int64_t ident);
 
 extern pathconcat numbasedir;
@@ -759,6 +708,9 @@ extern "C" JNIEXPORT jint JNICALL fromjava(getlastcolor)(JNIEnv *env, jclass thi
 extern bool makepercetages() ;
 extern "C" JNIEXPORT jboolean JNICALL fromjava(makepercentages)(JNIEnv *env, jclass thiz) {
  return makepercetages();
+ }
+extern "C" JNIEXPORT void JNICALL fromjava(dexShowNow)(JNIEnv *env, jclass thiz) {
+ appcurve.dexShowNow();
  }
 extern int numlist;
 extern "C" JNIEXPORT void JNICALL fromjava(makenumbers)(JNIEnv *env, jclass thiz) {
@@ -802,13 +754,6 @@ bool rmInitLayout() {
  return true;
  }
 #endif
-void speak(const char *message) {
- if(message)
- getenv()->CallStaticVoidMethod(JNIApplic,jspeak,getenv()->NewStringUTF(message));
- else {
- LOGAR("speak(null)");
- }
- }
 extern void toGarmin(int base);
 void toGarmin(int base) {
 #ifndef WEAROS
@@ -833,6 +778,9 @@ void toCalendar(const char *message) {
  } */
 
 
+#ifdef DONTTALK
+void speak(const char *) {}
+#endif
 #ifndef DONTTALK
 extern bool speakout;
 extern "C" JNIEXPORT void JNICALL fromjava(settouchtalk)(JNIEnv *env, jclass thiz,jboolean val) {
@@ -903,18 +851,7 @@ extern "C" JNIEXPORT jlong JNICALL fromjava(saylastglucose)(JNIEnv *env, jclass 
 #endif
 #ifndef WEAROS
 //MENUS functions:
-extern "C" JNIEXPORT jboolean JNICALL fromjava(getsystemui)(JNIEnv *env, jclass thiz) {
- return showui;
- }
-extern "C" JNIEXPORT void JNICALL fromjava(setsystemui)(JNIEnv *env, jclass thiz,jboolean val) {
- showui=val;
- settings->setui(showui);
- }
 
-extern "C" JNIEXPORT void JNICALL fromjava(settonow)(JNIEnv *env, jclass thiz) {
- auto max=time(nullptr);
- appcurve.setstarttime(max-appcurve.duration*3/5);
- }
 
 
 extern struct lastscan_t scantoshow;
@@ -994,29 +931,16 @@ extern "C" JNIEXPORT jlong JNICALL fromjava(percentileEndtime) (JNIEnv *env, jcl
  }
 
 #endif
-extern "C" JNIEXPORT void  JNICALL   fromjava(setInvertColors)(JNIEnv *env, jclass cl,jboolean val) {
-	appcurve.setinvertcolors(val);
-	}
-
-#if defined(JUGGLUCO_APP)&&!defined(WEAROS)
-extern bool  exportdata(uint32_t starttime, uint32_t duration,int type,int fd,float days) ;
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(exportdata)(JNIEnv *env, jclass cl,jint type,jint fd,jfloat days) {
- return  exportdata(appcurve.starttime, appcurve.duration,type,fd,days);
- }
-#endif
 
 extern "C" JNIEXPORT void  JNICALL   fromjava(setfixatex)(JNIEnv *env, jclass cl,jboolean val) {
 	settings->data()->fixatex=val;
 	appcurve.fixatex=val;
 	settings->data()->duration=appcurve.duration;
 	}
-void setallunit(int unit) {
-	settings->setunit(unit);
- appcurve.setunit(unit);
+void setallunit(int) {
+	settings->setunit(2);
+ appcurve.setunit(2);
  }
-extern "C" JNIEXPORT void  JNICALL   fromjava(setunit)(JNIEnv *env, jclass cl,jint unit) {
- setallunit(unit);
-	}
 
 extern "C" JNIEXPORT void  JNICALL   fromjava(setfixatey)(JNIEnv *env, jclass cl,jboolean val) {
     settings->data()->fixatey=val;

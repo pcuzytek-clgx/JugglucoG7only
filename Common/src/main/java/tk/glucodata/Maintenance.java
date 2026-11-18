@@ -28,7 +28,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,11 +55,7 @@ static    void setMaintenancealarm(Context context) {
         Intent alarmintent = new Intent(context, Maintenance.class);
 
 	final int alarmflags;
-	if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-	   alarmflags = PendingIntent.FLAG_IMMUTABLE;
-	}
-	else
-	   alarmflags = 0;
+	alarmflags = PendingIntent.FLAG_IMMUTABLE;
 
         PendingIntent onalarm = getBroadcast(context, alarmrequest, alarmintent, alarmflags);
         AlarmManager manager= (AlarmManager) context.getSystemService(ALARM_SERVICE);

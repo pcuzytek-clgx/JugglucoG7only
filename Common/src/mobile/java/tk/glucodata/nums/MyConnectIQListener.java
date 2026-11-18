@@ -73,18 +73,18 @@ public class MyConnectIQListener implements ConnectIQ.ConnectIQListener {
 		boolean hasgarmin=Natives.gethasgarmin();
 		Natives.sethasgarmin(false);
 		if(hasgarmin) {
-			message="Garmin Connect Mobile needs to be installed"; 
+			message="Należy zainstalować Garmin Connect Mobile"; 
 			break;
 			}
 		else
 	    		{if(doLog) {Log.i(LOG_ID,"GCM_NOT_INSTALLED");};};
 			return;
-                case GCM_UPGRADE_NEEDED: message="Garmin Connect Mobile needs to be upgraded";break;
-                case SERVICE_ERROR: message="Service Error";break;
-                default: message="Some Error";
+                case GCM_UPGRADE_NEEDED: message="Należy zaktualizować Garmin Connect Mobile";break;
+                case SERVICE_ERROR: message="Błąd usługi";break;
+                default: message="Wystąpił błąd";
             };
 	    {if(doLog) {Log.i(LOG_ID,message);};};
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            AlertDialog.Builder dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(context);
             dialog.setTitle(errStatus.name());
             dialog.setMessage(message);
             dialog.setPositiveButton(android.R.string.ok, null);

@@ -36,8 +36,7 @@ union bounds_t ;
 typedef std::pair<std::string_view,std::string_view> errortype;
 struct geo_t;
 struct jugglucotext;
-extern const jugglucotext engtext;
-extern jugglucotext artext;
+extern jugglucotext pltext;
 
 struct JCurve {
 protected:
@@ -77,10 +76,10 @@ inline float gconvert(const float mgperL) const {
 inline int userunit2mgL(const float unit) const {
         return (int)round(unit/convertmult);
         }
-const jugglucotext *usedtext=&engtext;
+const jugglucotext *usedtext=&pltext;
 
 bool isRTL() const {
-    return usedtext==&artext;
+    return false;
     }
 
 
@@ -266,6 +265,25 @@ bool nowclamp=false;
 int diffcurrent=0;
 
 std::vector<mealposition> mealpos;
+#ifndef WEAROS
+/* G7 fork: Dexcom-app-like home screen on tall portrait phones.  A header with
+ * the current value in a ring, range chips and a card with the graph.  The
+ * rectangles are physical surface coordinates, recomputed every frame. */
+struct dexrect_t { float left=0,top=0,right=0,bottom=0;
+    bool contains(float x,float y) const {return x>=left&&x<right&&y>=top&&y<bottom;}
+    };
+static constexpr int dexrangehours[]={3,6,12,24};
+dexrect_t dexchips[std::size(dexrangehours)];
+dexrect_t dexgraph,dexcard,dexbubble;
+bool dexdrawing=false;
+float dexLabelWidth() const {return density*40.0f;}
+bool dexPhoneLayout() const;
+void dexGeometry();
+void showDexHeader(NVGcontext* avg,uint32_t nu);
+int dexChipAt(float x,float y) const;
+void dexShowNow();
+void setDexRange(int hours);
+#endif
 void setdiffcurrent(bool val) {
    LOGGER("setdiffcurrent(nowclamp=%d)  doclamp=false\n",val);
    doclamp=false;

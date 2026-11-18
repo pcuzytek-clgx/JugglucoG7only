@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.os.Build;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -35,6 +34,8 @@ import android.widget.Button;
 
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.util.TypedValue;
 import android.widget.ScrollView;
 import android.widget.Space;
 import android.widget.TextView;
@@ -52,7 +53,6 @@ import static android.view.View.VISIBLE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Applic.isWearable;
-import static tk.glucodata.Applic.talkbackrunning;
 import static tk.glucodata.Natives.getalarmdisturb;
 import static tk.glucodata.help.help;
 import static tk.glucodata.help.helplight;
@@ -107,10 +107,7 @@ void setringer(int ki,String uristr) {
 	}
 static public void EnableControls(View view,boolean enable){
     if(view!=null) {
-        if(talkbackrunning)
-            view.setVisibility(enable?VISIBLE:GONE);
-        else
-            subEnableControls(view,enable);
+        subEnableControls(view,enable);
         }
 	}
 
@@ -207,16 +204,14 @@ static private void subEnableControls(View view,boolean enable){
 	CheckDirectionBox disturb=new CheckDirectionBox(context);
 	if(!isWearable) {
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			disturb.setText(R.string.disturb);
-			final boolean dodisturb=getalarmdisturb(kind);
-			disturb.setChecked(dodisturb);
-			disturb.setOnCheckedChangeListener((buttonView,  isChecked) -> {
-				 if (isChecked) {
-					context.asknotificationAccess(); }
-					}
-					);
-			}
+		disturb.setText(R.string.disturb);
+		final boolean dodisturb=getalarmdisturb(kind);
+		disturb.setChecked(dodisturb);
+		disturb.setOnCheckedChangeListener((buttonView,  isChecked) -> {
+			 if (isChecked) {
+				context.asknotificationAccess(); }
+				}
+				);
 		}
 	 EditText waitedit=new EditText(context);
 		waitedit.setMinimumHeight(minheight);
@@ -227,7 +222,7 @@ static private void subEnableControls(View view,boolean enable){
 				hidekeyboard(context);
 				int dur=(str!=null)?Integer.parseInt(str):duration;
 		 		Ringtone ringtone = Notify.mkrings(uri, kind);
-				Notify.playring(ringtone,dur,sound.isChecked(),hasflash&&flashview.isChecked(),vibration.isChecked(),isWearable||Build.VERSION.SDK_INT < Build.VERSION_CODES.M||disturb.isChecked(),kind);
+				Notify.playring(ringtone,dur,sound.isChecked(),hasflash&&flashview.isChecked(),vibration.isChecked(),isWearable||disturb.isChecked(),kind);
 				} catch(Throwable e) {
 				Log.stack(LOG_ID,"play",e);
 					Applic.argToaster(context, context.getString(R.string.can_t_play)+str+ context.getString(R.string.seconds), Toast.LENGTH_SHORT);
@@ -318,39 +313,50 @@ View[] durviews;
       views[start+3]=new View[]{space1,play,Cancel,space2};
       }
    else  {
-      views[start+2]=(Build.VERSION.SDK_INT <Build.VERSION_CODES.M? new View[]{sound}:new View[]{sound,disturb});
+      views[start+2]=new View[]{sound,disturb};
       views[start+3]=new View[]{flashview,vibration};
    }
 	
-	View lay;
+	final View lay;
+	if(isWearable)  {
 	ScrollView scroll=new ScrollView(context);
 	lay=scroll;
         Layout layout = new Layout(context, (l, w, h) -> {
 			return new int[]{w,h};}, views);
         scroll.addView(layout);
-        ViewGroup.LayoutParams params;
-	if(isWearable)  {
 		lay.setBackgroundColor(tk.glucodata.Applic.backgroundcolor);
-//		 int laypad=(int)(GlucoseCurve.metrics.density*(hasname==1?20.0f:35.0f));
 		 int laypad=(int)(GlucoseCurve.metrics.density*14);
-		final int sidepad=(int)(GlucoseCurve.metrics.density*10.0f);
 		 layout.setPadding((int)(GlucoseCurve.metrics.density*13.0f),(int)(GlucoseCurve.metrics.density*7.0f),(int)(GlucoseCurve.metrics.density*13.0f),laypad);
-        params=new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT);
+	 context.addMyContentView(lay, new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT));
 		 }
 	else {
-		layout.setBackgroundResource(R.drawable.dialogbackground);
-		 int laypad=(int)(GlucoseCurve.metrics.density*4.0f);
-		 lay.setPadding(laypad,0,laypad,laypad);
-//                Layout.getMargins(lay).topMargin=MainActivity.systembarTop*5/6;
-                 //layout.systembarMargins();
-                 params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
-
-                // fparams.topMargin=MainActivity.systembarTop*5/6;
-                 //params =fparams;
-            layout.systembarMargins((left,top,right,bottom)->new int[]{0,top*5/6,0,0});
-		 }
-	 context.addMyContentView(lay, params);
-		Save.setOnClickListener(v->{
+		var page=new M3.Page(context,label!=null?label:context.getString(R.string.ringtonename),true);
+		var snd=page.group(R.string.m3_ringtone_sound);
+		snd.toggle(sound);
+		snd.toggle(def);
+		var namerow=new LinearLayout(context);
+		namerow.setOrientation(LinearLayout.HORIZONTAL);
+		namerow.setGravity(Gravity.CENTER_VERTICAL);
+		name.setTextSize(TypedValue.COMPLEX_UNIT_SP,17);
+		name.setTextColor(M3.onSurface(context));
+		name.setPadding(0,0,0,0);
+		namerow.addView(name,new LinearLayout.LayoutParams(0,WRAP_CONTENT,1f));
+		M3.style(Select);
+		namerow.addView(Select,new LinearLayout.LayoutParams(WRAP_CONTENT,WRAP_CONTENT));
+		snd.item(namerow);
+		var al=page.group(R.string.m3_ringtone_alarm);
+		al.value(R.string.m3_duration,duredit,durviews[3]);
+		if(glucosealarm)
+			al.value(R.string.m3_suspension,waitedit);
+		al.toggle(vibration);
+		if(hasflash)
+			al.toggle(flashview);
+		al.toggle(disturb);
+		page.buttons(play,Cancel,Save);
+		page.buttons(help);
+		page.showOnly();
+		lay=page.root;
+		}		Save.setOnClickListener(v->{
 			Notify.stopalarm();
 			try {
 			String str=duredit.getText().toString();
@@ -396,9 +402,7 @@ View[] durviews;
 				};
 
 			if(!isWearable)  {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					Natives.setalarmdisturb(kind,disturb.isChecked());
-					}
+				Natives.setalarmdisturb(kind,disturb.isChecked());
 				}
 
 			if(parview!=null)

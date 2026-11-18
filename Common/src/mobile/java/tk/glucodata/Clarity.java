@@ -28,6 +28,7 @@ import androidx.appcompat.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -83,12 +84,26 @@ public final class Clarity {
         var enabled=getcheckbox(act,act.getString(R.string.clarity_send_enabled),state.enabled);
         var history=getcheckbox(act,act.getString(R.string.clarity_use_history),state.libre3History);
         var numbers=getcheckbox(act,R.string.sendamounts,state.numbers);
-        var account=getlabel(act,state.account);
-        var status=getlabel(act,statusText(act,state));
+        var page=new M3.Page(act,"Dexcom Clarity",true);
+        final View layout=page.root;
+        var gaccount=page.group(R.string.m3_share_clarity_account);
+        var loginrow=gaccount.nav(act.getString(R.string.clarity_sign_in),accountText(act,state.account),null);
+        TextView account=loginrow.findViewWithTag("summary");
+        var gsend=page.group(R.string.m3_share_clarity_sending);
+        gsend.toggle(enabled);
+        gsend.toggle(history);
+        gsend.toggle(numbers);
         final long[] since={state.since};
         var format=new SimpleDateFormat("yyyy-MM-dd",Locale.ROOT);
-        var date=getlabel(act,act.getString(R.string.clarity_start_date,format.format(new Date(since[0]*1000L))));
         var changestart=getbutton(act,R.string.changestartbutton);
+        var daterow=gsend.action(changestart.getText(),act.getString(R.string.clarity_start_date,format.format(new Date(since[0]*1000L))),v->changestart.performClick());
+        TextView date=daterow.findViewWithTag("summary");
+        var categories=getbutton(act,act.getString(R.string.clarity_categories));
+        gsend.nav(act.getString(R.string.clarity_categories),null,v->categories.performClick());
+        var gstatus=page.group(R.string.m3_share_clarity_status);
+        TextView status=gstatus.text(statusText(act,state));
+        var send=getbutton(act,R.string.sendnow);
+        gstatus.action(send.getText(),null,v->send.performClick());
         changestart.setOnClickListener(v->{
             var selected=Calendar.getInstance();
             selected.setTimeInMillis(since[0]*1000L);
@@ -98,7 +113,7 @@ public final class Clarity {
                 chosen.set(year,month,day);
                 final long candidate=chosen.getTimeInMillis()/1000L;
                 if(candidate==since[0])return;
-                new AlertDialog.Builder(act)
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(act)
                     .setTitle(act.getString(R.string.clarity_change_start_title))
                     .setMessage(act.getString(R.string.clarity_change_start_message,format.format(chosen.getTime())))
                     .setNegativeButton(R.string.cancel,null)
@@ -111,17 +126,11 @@ public final class Clarity {
             picker.getDatePicker().setMaxDate(System.currentTimeMillis());
             picker.show();
         });
-        var categories=getbutton(act,act.getString(R.string.clarity_categories));
-        var login=getbutton(act,act.getString(R.string.clarity_sign_in));
-        var send=getbutton(act,R.string.sendnow);
         var save=getbutton(act,R.string.save);
-        var close=getbutton(act,R.string.cancel);
         final var helpbutton=getbutton(act,R.string.helpname);
         helpbutton.setOnClickListener(v-> help(R.string.clarityhelp,act));
-        status.setLayoutParams(new ViewGroup.LayoutParams(  MATCH_PARENT, WRAP_CONTENT));
-        var layout=new Layout(act,(l,w,h)->new int[]{w,h},new View[]{date,changestart},new View[]{status},new View[]{history,numbers,categories},new View[]{enabled,login,account},new View[]{send,helpbutton,close,save}).portraitLayout(new View[]{date,changestart},new View[]{status},new View[]{enabled},new View[]{history},new View[]{numbers,categories},new View[]{login},new View[]{account},new View[]{send,helpbutton},new View[]{close,save});
-        layout.setBackgroundColor(Applic.backgroundcolor);
-        final Runnable refresh=()->{try{var s=Natives.clarityStatus();if(s==null)throw new IllegalStateException();account.setText(s.account);status.setText(statusText(act,s));}catch(Exception ex){logFailure("Refresh settings",ex);}};
+        page.buttons(helpbutton,save);
+        final Runnable refresh=()->{try{var s=Natives.clarityStatus();if(s==null)throw new IllegalStateException();account.setText(accountText(act,s.account));status.setText(statusText(act,s));}catch(Exception ex){logFailure("Refresh settings",ex);}};
         numbers.setOnCheckedChangeListener((button,checked)->{
             if(checked && !ClarityAmounts.ready()) {
                 numbers.setChecked(false);
@@ -129,11 +138,7 @@ public final class Clarity {
             }
         });
         categories.setOnClickListener(v->ClarityAmounts.show(act,layout,()->{}));
-        Runnable done=()->{
-            removeContentView(layout);
-            parent.setVisibility(View.VISIBLE);};
-        close.setOnClickListener(v->act.doonback());
-        login.setOnClickListener(v->ClarityLogin.show(act,layout,refresh));
+        loginrow.setOnClickListener(v->ClarityLogin.show(act,layout,refresh));
         send.setOnClickListener(v->{Natives.clarityWake();refresh.run();});
         save.setOnClickListener(v->{
         try {
@@ -153,12 +158,9 @@ public final class Clarity {
             Applic.Toaster(act.getString(R.string.clarity_save_settings_error));
             }});
         parent.setVisibility(View.GONE);
-        final int sidepad=(int)(GlucoseCurve.metrics.density*8);
-        layout.systembarPadding((left,top,right,bottom)-> {
-              return   new int[]{left+sidepad,top,sidepad+right,bottom};
-              });
-
-        act.addMyContentView(layout,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-        MainActivity.setonback(done);
+        page.show(()->parent.setVisibility(View.VISIBLE));
+    }
+    private static String accountText(MainActivity act,String account) {
+        return account==null||account.isEmpty()?act.getString(R.string.m3_share_clarity_noaccount):account;
     }
 }

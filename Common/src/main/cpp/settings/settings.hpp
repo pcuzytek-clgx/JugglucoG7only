@@ -945,8 +945,8 @@ Settings(const char *settingsname,const char *base,const char *country): Mmap(se
                           #ifdef CARRY_LIBS
                                 data()->havelibrary=true;
                           #endif
-                          #ifdef WEAROS
                                 data()->invertcolors=true;
+                          #ifdef WEAROS
                                 data()->usegarmin=false;
                           #else
                                 data()->usegarmin=true;
@@ -1031,7 +1031,7 @@ Settings(const char *settingsname,const char *base,const char *country): Mmap(se
 #endif
     setconvert(country);
 
-     showui=getui();
+     showui=true;
     if(!data()->httpport)
         data()->httpport=defaulthttpport;
 }
@@ -1098,8 +1098,9 @@ uint32_t targethigh() const {
 bool usemmolL() const {
     return data()->unit==1;
     }
-void setunit(int unit) {
-    LOGGER("setunit(%d)\n",unit);
+void setunit(int) {
+    // Only mg/dL is supported.
+    const int unit=2;
     if((data()->unit=unit)==1) {
         convertmult= convertmultmmol;
         gformat="%.1f";

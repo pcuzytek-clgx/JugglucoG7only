@@ -81,7 +81,7 @@ charptr_t
 	GMI,
 	SD,
 	glucose_variability;
-std::string_view menustr0[8], menustr1[7], menustr2[7], menustr3[7];
+std::string_view menustr0[7], menustr1[7], menustr2[7], menustr3[7];
 std::string_view *menustr[4]={menustr0,menustr1,menustr2,menustr3};
 #else
 ;
@@ -142,7 +142,7 @@ std::string_view getTrendName(int type) const {
 std::string_view statisticsName() const {
     return 
     #ifdef INJUGGLUCO
-    menustr1[4];
+    menustr1[1];
     #else
     statistics;
     #endif
@@ -164,6 +164,7 @@ int spokenmonthlabel(int month,char *buf,int max) const {
 
 extern const jugglucotext *usedtext;
 extern const jugglucotext engtext;
+extern jugglucotext pltext;
 #include <ctype.h>
 #define mklanguagenum2(a,b) a|b<<8
 #define mklanguagenum(lang) mklanguagenum2(lang[0],lang[1])
@@ -178,7 +179,7 @@ class language {
     static const jugglucotext* gettext(uint16_t lang)  {
     if(auto hit = langmap.find(lang); hit != langmap.end())
             return hit->second;
-        return &engtext;
+        return &pltext;
         }
     static const jugglucotext* gettext(const char *name)  {
         return gettext(mklanguagenumlow(name));

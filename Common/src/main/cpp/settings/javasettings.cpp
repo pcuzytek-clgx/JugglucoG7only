@@ -293,51 +293,8 @@ applications (Magiskhide or Denylist) and change its own name, both
 are needed. In your case it has problems with the following file)";
 */
 #ifndef WEAROS
-static constexpr const char endstart[]=R"(:</p>)";
-
-extern bool wrongfiles() ;
-extern        std::vector<std::string_view> usedfiles;
-#include "curve/jugglucotext.hpp"
-extern bool rootcheck;
-extern bool magicmounts;
-extern const std::string_view selfmounts;
-
 extern "C" JNIEXPORT jstring  JNICALL   fromjava(advanced)(JNIEnv *env, jclass cl) {
-    if(!rootcheck)
-        return nullptr;
-    if(wrongfiles()) {
-        const int textlen= usedtext->advancedstart.size();
-        int totlen=textlen+sizeof(endstart)-1+(usedfiles.size()>1?1:0);
-        const char tus[]="<br/>\n";
-        constexpr int tuslen=sizeof(tus)-1;
-        for(auto el:usedfiles)
-            totlen+=el.size()+tuslen;
-        if(magicmounts)
-            totlen+=selfmounts.size()+tuslen;
-        char buf[totlen];
-        int it=textlen;
-        memcpy(buf,usedtext->advancedstart.data(),it);
-        if((usedfiles.size()+magicmounts)>1&&usedtext->add_s)
-            buf[it++]='s';
-        memcpy(buf+it,endstart,sizeof(endstart)-1);
-        it+= sizeof(endstart)-1;
-        for(auto el:usedfiles) {
-            memcpy(buf+it,el.data(),el.size());
-            it+=el.size();
-            memcpy(buf+it,tus,tuslen);
-            it+=tuslen;
-            }
-        if(magicmounts) {
-            memcpy(buf+it,selfmounts.data(),selfmounts.size());
-            it+=selfmounts.size();
-            memcpy(buf+it,tus,tuslen);
-            it+=tuslen;
-            }
-        buf[totlen-1]='\0';
-        return env->NewStringUTF(buf);
-        }
-    else
-        return nullptr;
+    return nullptr;
     }
 #endif
 /*
@@ -441,7 +398,7 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(setScreenOrientation)(JNIEnv *env,
     settings->data()->orientation=val;
     }
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getInvertColors)(JNIEnv *env, jclass cl) {
-    return settings->data()->invertcolorsget();
+    return true;
     }
 
 
@@ -509,49 +466,6 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getuseflash)(JNIEnv *env, jcla
 extern "C" JNIEXPORT void  JNICALL   fromjava(setuseflash)(JNIEnv *env, jclass cl,jboolean val) {
     settings->data()->flash=val;
     }
-extern "C" JNIEXPORT jintArray  JNICALL   fromjava(numAlarmEvents)(JNIEnv *env, jclass cl) {
-   LOGAR("start numAlarmEvents");
-    vector<int> failures=settings->numAlarmEvents();
-   LOGAR("after failures=numAlarmEvents");
-    const int failnr= failures.size();
-    if(!failnr) {
-      LOGAR("failures.size()==0");
-        return nullptr;
-      }
-    jintArray  uit=env->NewIntArray(failnr) ;
-    env->SetIntArrayRegion(uit, 0,failnr, failures.data());
-    return uit;
-    }
-
-extern "C" JNIEXPORT jlong  JNICALL   fromjava(firstAlarm)(JNIEnv *env, jclass cl) {
-    return settings->firstAlarm()*1000LL;
-    }
-extern "C" JNIEXPORT void  JNICALL   fromjava(setNumAlarm)(JNIEnv *env, jclass cl,jint type,jfloat value,jint start,jint alarm) {
-    settings->setnumalarm(type,value,start,alarm);
-    }
-extern "C" JNIEXPORT void  JNICALL   fromjava(delNumAlarm)(JNIEnv *env, jclass cl,jint pos) {
-    settings->delnumalarm(pos) ;
-    }
-//setNumAlarm(
-extern "C" JNIEXPORT  jobjectArray JNICALL   fromjava(getNumAlarm)(JNIEnv *env, jclass cl,jint pos) {
-    if(pos>=settings->data()->alarmnr)
-        return nullptr;
-    amountalarm &alarm=settings->data()->numalarm[pos];
-    jclass objectclass = env->FindClass( "java/lang/Object");
-    jobjectArray jall = env->NewObjectArray( 2, objectclass, NULL);
-    jclass classFloat = env->FindClass("java/lang/Float");
-    jmethodID floatInit = env->GetMethodID(classFloat, "<init>", "(F)V");
-    jobject jvalue = env->NewObject(classFloat, floatInit,alarm.value);
-    env->SetObjectArrayElement(jall, 0, jvalue);
-    jshortArray  uit=env->NewShortArray(4) ;
-    env->SetShortArrayRegion(uit, 0,4,  reinterpret_cast<int16_t *>(&alarm.start));
-    env->SetObjectArrayElement(jall, 1,uit);
-    return jall;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getNumAlarmCount)(JNIEnv *env, jclass cl) {
-    return settings->data()->alarmnr;
-    }
-
 extern "C" JNIEXPORT jint  JNICALL   fromjava(camerakey)(JNIEnv *env, jclass cl) {
     return settings->data()->camerakey;
     }
@@ -834,14 +748,9 @@ extern "C" JNIEXPORT jboolean JNICALL fromjava(getnewLibre3Activation)(JNIEnv *e
     std::lock_guard<std::mutex> lock(newLibre3ReceiverMutex);
     return settings->data()->newLibre3Activation;
     }
-extern  void  setAskForAccount();
 extern "C" JNIEXPORT void JNICALL fromjava(setnewLibre3Activation)(JNIEnv *env,jclass cl,jboolean value) {
     std::lock_guard<std::mutex> lock(newLibre3ReceiverMutex);
     settings->data()->newLibre3Activation=value;
-
-    if(value&&!settings->data()->newLibre3ReceiverIDreceived)  {
-            setAskForAccount();
-            }
     }
 extern "C" JNIEXPORT jboolean JNICALL fromjava(getnewLibre3Takeover)(JNIEnv *env,jclass cl) {
     std::lock_guard<std::mutex> lock(newLibre3ReceiverMutex);
@@ -1112,11 +1021,8 @@ extern "C" JNIEXPORT jstring  JNICALL   fromjava(getnewYuApiKey)(JNIEnv *env, jc
 #endif
 
 extern void startthreads() ;
-extern bool inituploader(JNIEnv *env);
- 
 extern "C" JNIEXPORT void  JNICALL   fromjava(startthreads)(JNIEnv *env, jclass cl) {
     startthreads();
-    inituploader(env);
     }
 
 extern int startmeals() ;
@@ -1348,55 +1254,18 @@ extern "C" JNIEXPORT jint  JNICALL   fromjava(getinitVersion)(JNIEnv *env, jclas
     return settings->data()->initVersion;
     }
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatglucose)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->floatglucose=val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getfloatglucose)(JNIEnv *env, jclass cl) {
-    return settings->data()->floatglucose;
-    }
-
-
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingFontsize)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingFontsize=val;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingFontsize)(JNIEnv *env, jclass cl) {
-    return settings->data()->floatingFontsize;
-    }
-
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingbackground)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingbackground=val;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingbackground)(JNIEnv *env, jclass cl) {
-    return settings->data()->floatingbackground;
-    }
 
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingforeground)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingforeground=val;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingforeground)(JNIEnv *env, jclass cl) {
-    return (settings->data()->floatingforeground|0xFF000000);
-    }
 
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingTouchable)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->floatingNotTouchable=!val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getfloatingTouchable)(JNIEnv *env, jclass cl) {
-    return !settings->data()->floatingNotTouchable;
-    }
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloatingPos)(JNIEnv *env, jclass cl,jint val) {
-    settings->data()->floatingPos=val;
-    }
+
+
+
 
 extern void    makenightswitch();
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getfloatingPos)(JNIEnv *env, jclass cl) {
-    makenightswitch(); //Something after everything
-    return settings->data()->floatingPos;
-    }
 
 
 
@@ -1478,7 +1347,6 @@ extern "C" JNIEXPORT jstring  JNICALL   fromjava(getnightuploadurl)(JNIEnv *env,
 extern "C" JNIEXPORT jstring  JNICALL   fromjava(getnightuploadsecret)(JNIEnv *env, jclass cl) {
     return myNewStringUTF(env,settings->data()->nightuploadsecret);
     }
-    extern    void enduploaderthread();
 extern "C" JNIEXPORT void  JNICALL   fromjava(setNightUploader)(JNIEnv *env, jclass cl,jstring jurl,jstring jsecret,jboolean active,jboolean v3) {
     settings->data()->nightscoutV3=v3;
     if(jurl!=nullptr) {
@@ -1507,10 +1375,6 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(setNightUploader)(JNIEnv *env, jcl
         name[len]='\0';
         }
     settings->data()->nightuploadon=active;
-    if(active)
-        inituploader(env);
-    else
-         enduploaderthread();
      }
 extern "C" JNIEXPORT void  JNICALL   fromjava(setAndroid13)(JNIEnv *env, jclass cl,jboolean val) {
     settings->data()->android13=val;
@@ -1525,214 +1389,9 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getwatchdrip)(JNIEnv *env, jcl
     return settings->data()->watchdrip;
     }
 
-NovoPen   *getnovopen(JNIEnv *env,jstring jserial) {
-    auto &pens=settings->data()->pens;
-    int nr=settings->data()->pensnr;
-    if(nr>=pens.size())  {
-        LOGGER("nr (%d) >=pens.size() (%zd)\n",nr,pens.size());
-        return nullptr;
-        }
-    auto *start=pens.begin();
-    auto *end=&pens[nr];
-    NovoPen zoek;
-    char *serial=zoek.serial;
-    jint jlen = env->GetStringLength(jserial);
-    env->GetStringUTFRegion(jserial, 0,jlen, serial);
-    serial[jlen]='\0';
-        constexpr const auto comp=[](const NovoPen &el,const NovoPen &se ){
-        return strcmp(el.serial,se.serial)<0;
-        };
-        auto *hit=std::upper_bound(start,end, zoek,comp); //first element larger than jserial
-    if(hit>start) {
-        auto *prehit=hit-1;    
-        if(!strcmp(prehit->serial,serial)) {
-            LOGGER("%d: old pen %s pensnr=%d\n",prehit-start,serial,settings->data()->pensnr);
-            return prehit;
-            }
-        }
-    if(hit!=end) {
-        memmove(hit+1,hit,(end-hit)*sizeof(*hit));
-        }
-
-    strcpy(hit->serial,serial);
-    hit->type=-1;
-    ++settings->data()->pensnr;
-    LOGGER("%d: new pen %s pensnr=%d\n",hit-start,serial,settings->data()->pensnr);
-    return hit;
-    }
-
-struct dose_t {
-    uint8_t reltime[4];
-    uint16_t sign1;
-    uint8_t units[2];
-    uint32_t sign2;
-    bool rightsign()const {
-        if((sign2&0xFFFFFF)!=8) {
-            LOGGER("sign2=%d!=8\n",sign2);
-            return false;
-            }
-        const int error=sign2&0xFF000000;
-        if(error) {
-            LOGGER("rightsign message=%d\n",error);
-            }
-        if(sign1==0x00FF)
-            return true;
-        LOGGER("sign1==%X!=0xFF",sign1);
-        return false;
-        }
-    uint32_t getreltime() const {
-        uint32_t uit;
-        std::reverse_copy(reltime,reltime+4,reinterpret_cast<uint8_t *>(&uit));
-        return uit;
-        }
-    float getvalue() const {
-        return float(units[0]<<8|units[1])*.1f;
-        }
-
-};
-
 #include "nums/numdata.hpp"
 extern void    setnumchanged(uint32_t tim);
 extern void toGarmin(int base);
-int savedoses(NovoPen *pen,uint32_t reftime,uint8_t *bytes,int len) {
-    int type=pen->type;
-    auto lasttime=pen->lasttime;
-    int count=len/12;
-    auto *ptr=bytes;
-    uint32_t now=time(nullptr);
-    uint32_t old=now-100*24*60*60;
-    extern Numdata *getherenums();
-
-    Numdata *numda=getherenums();
-    int savednr=0;
-    bool used=false;
-    uint32_t nexttime=0;
-    for(int i=0;i<count;i++,ptr+=sizeof(dose_t)) {    
-        const dose_t *dose=reinterpret_cast<const dose_t *>(ptr);
-        if(!dose->rightsign()) {
-            continue;
-            }
-        auto time=reftime+dose->getreltime();    
-        float value=dose->getvalue();
-        #ifndef NOLOG
-        time_t tim=time;
-        LOGGER("dose: %.1f %s",value,ctime(&tim));
-        #endif
-        if(time<=lasttime) {
-            LOGGER("time %u <=lasttime %u\n",time,lasttime);
-            break;
-            }
-        if(time<old||time>now) {
-            LOGGER("time=%u\n",time);
-            continue;
-            }
-        if(!isnormal(value)||value>60) {
-            LOGGER("%.1f\n",value);
-            continue;
-            }
-        
-        if(!used)  {
-            used=true;
-            }
-        else  {
-            if(value<=2.0f&&((int64_t)nexttime-time)<60) {
-                LOGAR("prime dose");
-                used=false;
-                continue;
-                }
-            }
-        numda->numsaveonly( time, value,type ,0) ;
-        nexttime=time;
-        ++savednr;
-        }
-    setnumchanged(now);
-    backup->wakebackup(wakenums);    
-    return savednr;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(oldnovopenvalue)(JNIEnv *env, jclass cl,jlong referencetime,jstring jserial,jbyteArray jrawdoses) {
-    NovoPen   *pen=getnovopen(env,jserial);
-    if(!pen||!pen->lasttime)  {
-        return false;
-        }
-    jsize lens=env->GetArrayLength(jrawdoses);
-    uint8_t*  bytes=reinterpret_cast<uint8_t *>(   env->GetPrimitiveArrayCritical(jrawdoses,nullptr));
-    LOGGER("jrawdoses=%p\n",bytes);
-    if(!bytes) {
-        LOGSTRING("GetByteArrayElements(jrawdoses,nullptr)==null\n");
-        return -1;
-       }
-    destruct _dest([env,bytes,jrawdoses]() {
-        env->ReleasePrimitiveArrayCritical(jrawdoses, bytes, JNI_ABORT);
-        });
-    
-    const dose_t *dose=reinterpret_cast<const dose_t *>(bytes+lens-sizeof(dose_t));
-    uint32_t dosetime=    referencetime+dose->getreltime();
-    return pen->lasttime>dosetime;
-    }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(savenovopen)(JNIEnv *env, jclass cl,jlong referencetime,jstring jserial,jint type,jbyteArray jrawdoses,jboolean setlast) {
-   jint ret;
-   {
-    NovoPen   *pen=getnovopen(env,jserial);
-    if(!pen)  {
-        return -1;
-        }
-    pen->type=type;
-
-    jsize lens=env->GetArrayLength(jrawdoses);
-    uint8_t*  bytes=reinterpret_cast<uint8_t *>(   env->GetPrimitiveArrayCritical(jrawdoses,nullptr));
-    LOGGER("jrawdoses=%p#%d\n",bytes,lens);
-    if(!bytes) {
-            LOGSTRING("GetPrimitiveArrayCritical(jrawdoses,nullptr)==null\n");
-            return -1;
-            }
-    destruct _dest([env,bytes,jrawdoses]() {
-          env->ReleasePrimitiveArrayCritical(jrawdoses, bytes, JNI_ABORT);
-        });
-    ret= savedoses(pen,referencetime,bytes,lens);
-    if(setlast)
-        pen->lasttime=time(nullptr);
-    }
-    toGarmin(0);
-    return ret;
-    }
-extern "C" JNIEXPORT void  JNICALL   fromjava(setnovopenttimeandtype)(JNIEnv *env, jclass cl,jlong time,jint type,jstring jserial) {
-    NovoPen   *pen=getnovopen(env,jserial);
-    if(pen)  {
-        pen->lasttime=time/1000L;
-        pen->type=type;
-        }
-    }
-extern "C" JNIEXPORT jlong  JNICALL   fromjava(novopentype)(JNIEnv *env, jclass cl,jstring jserial) {
-    auto &pens=settings->data()->pens;
-    int nr=settings->data()->pensnr;
-    LOGGER("novopentype pensnr=%d\n",nr);
-    if(nr<=0) {
-        return -1L;
-        }
-    auto *start=pens.begin();
-    auto *end=&pens[nr];
-    NovoPen zoek;
-    char *serial=zoek.serial;
-    jint jlen = env->GetStringLength(jserial);
-    env->GetStringUTFRegion(jserial, 0,jlen, serial);
-    serial[jlen]='\0';
-    constexpr const auto comp=[](const NovoPen &el,const NovoPen &se ){
-        return strcmp(el.serial,se.serial)<0;
-        };
-    auto *hit=std::upper_bound(start,end, zoek,comp); //first element larger than jserial
-    if(hit>start) {    
-        auto *prehit=hit-1;    
-        if(!strcmp(prehit->serial,serial)) {
-            time_t lasttime= prehit->lasttime;
-            jlong uit= (((uint64_t)prehit->type<<32)|(uint64_t)(lasttime&0xFFFFFFFF));
-            LOGGER("uit=%llX   %d novopentype(%s) lasttime=%zu %s",uit,(int)(prehit-start),serial,lasttime,ctime(&lasttime));
-            return uit;
-            }
-        }
-    LOGGER("%s not found\n",serial);
-    return -1L;
-    }
-
 extern "C" JNIEXPORT void  JNICALL   fromjava(setSeparate)(JNIEnv *env, jclass cl,jboolean val) {
     settings->data()->separatenotify=val;
     }
@@ -1768,9 +1427,6 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(saveVoice)(JNIEnv *env, jclass cl,
     settings->data()->voicespeakerGet()=voice;
     settings->data()->voiceactiveset(active);
     }
-extern "C" JNIEXPORT jint  JNICALL   fromjava(getVoiceTalker)(JNIEnv *env, jclass cl) {
-    return settings->data()->voicespeakerGet();
-    }
 extern "C" JNIEXPORT jint  JNICALL   fromjava(getVoiceSeparation)(JNIEnv *env, jclass cl) {
     return settings->data()->voicesepget();
     }
@@ -1799,13 +1455,10 @@ extern "C" JNIEXPORT void  JNICALL   fromjava(setLibreCountry)(JNIEnv *env, jcla
     }
 
 
-extern bool switchgen2();
 
 extern "C" JNIEXPORT void  JNICALL   fromjava(setStreamHistory)(JNIEnv *env, jclass cl,jboolean val) {
     if(val!= settings->data()->streamHistory) {
         settings->data()->streamHistory=val;
-        if(val)
-            switchgen2();
         }
     }
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getStreamHistory)(JNIEnv *env, jclass cl) {
@@ -1924,18 +1577,6 @@ extern "C" JNIEXPORT jfloat  JNICALL   fromjava(getIOBvalue)(JNIEnv *env, jclass
 #endif
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setfloattime)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->floattime=val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getfloattime)(JNIEnv *env, jclass cl) {
-    return settings->data()->floattime;
-    }
-extern "C" JNIEXPORT void  JNICALL   fromjava(sethidefloatinJuggluco)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->hidefloatinJuggluco=val;
-    }
-extern "C" JNIEXPORT jboolean  JNICALL   fromjava(gethidefloatinJuggluco)(JNIEnv *env, jclass cl) {
-    return settings->data()->hidefloatinJuggluco;
-    }
 
 extern "C" JNIEXPORT jfloat  JNICALL   fromjava(getthreshold)(JNIEnv *env, jclass cl) {
     return settings->data()->threshold;
@@ -2165,9 +1806,6 @@ extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getRotate)(JNIEnv *env, jclass
     }
 
 
-extern "C" JNIEXPORT void  JNICALL   fromjava(setRotateText)(JNIEnv *env, jclass cl,jboolean val) {
-    settings->data()->rotateText=val;
-    }
 extern "C" JNIEXPORT jboolean  JNICALL   fromjava(getRotateText)(JNIEnv *env, jclass cl) {
     return settings->data()->rotateText;
     }

@@ -68,44 +68,34 @@ final class ClarityAmounts {
         }
         final float[] weights=new float[kinds.length];
         final Runnable[] redraw={null};
-        int arsize=(kinds.length+1)/2+1;
-        final TextView[][] buttons=new TextView[arsize][];
-        final TextView[][] portraitbuttons=new TextView[kinds.length+1][];
+        final TextView[] summaries=new TextView[kinds.length];
         var save=getbutton(act,R.string.save);
+        var page=new M3.Page(act,R.string.clarity_categories,true);
+        var group=page.group(R.string.m3_share_clarity_labels);
         redraw[0]=()->{
             boolean complete=kinds.length>0;
             for(int i=0;i<kinds.length;++i) {
                 int kind=kinds[i];
-                int row=i/2;
-                int inrow=i%2;
-                String text=act.getString(R.string.clarity_category_label,labels.get(i),act.getString(names[kind]));
+                String text=act.getString(names[kind]);
                 if(kind==3)text=act.getString(R.string.clarity_category_carbs_weight,text,Float.toString(weights[i]));
-                buttons[row][inrow].setText(text);
+                summaries[i].setText(text);
                 if(kind==0)complete=false;
             }
             save.setEnabled(complete);
+            save.setAlpha(complete?1f:.38f);
            };
-        int row=0;
         for(int i=0;i<kinds.length;++i) {
             final int pos=i;
 
             weights[i]=Natives.getlibrefoodweight(0,i);
             if(kinds[i]==3 && (Float.isNaN(weights[i]) || Float.isInfinite(weights[i]) || weights[i]<=0))
                 kinds[i]=0;
-            var button=getbutton(act,"");
-            if(i%2==0) {
-                buttons[row]=new TextView[(i+1)<kinds.length?2:1];
-                buttons[row][0]=button;
-                }
-            else {
-                buttons[row++][1]=button;
-                }
-            portraitbuttons[i]=new TextView[]{button};
-           // rows.addView(button);
+            var button=group.action(labels.get(i)," ",null);
+            summaries[i]=button.findViewWithTag("summary");
             button.setOnClickListener(v->{
                 String[] choices=new String[names.length-1];
                 for(int j=0;j<choices.length;++j)choices[j]=act.getString(names[j+1]);
-                new AlertDialog.Builder(act).setTitle(labels.get(pos))
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(labels.get(pos))
                     .setSingleChoiceItems(choices,kinds[pos]-1,(dialog,which)->{
                         int chosen=which+1;
                         if(chosen==6) {
@@ -122,7 +112,7 @@ final class ClarityAmounts {
                             weight.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
                             float initial=weights[pos];
                             weight.setText(initial>0 && !Float.isInfinite(initial)?Float.toString(initial):"1");
-                            var editor=new AlertDialog.Builder(act).setTitle(act.getString(R.string.clarity_grams_per_unit,labels.get(pos)))
+                            var editor=new com.google.android.material.dialog.MaterialAlertDialogBuilder(act).setTitle(act.getString(R.string.clarity_grams_per_unit,labels.get(pos)))
                                 .setView(weight).setNegativeButton(R.string.cancel,null)
                                 .setPositiveButton(R.string.save,null).create();
                             editor.setOnShowListener(d->editor.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(w->{
@@ -150,10 +140,6 @@ final class ClarityAmounts {
 
         redraw[0].run();
 
-        var cancel=getbutton(act,R.string.cancel);
-
-        cancel.setOnClickListener(v->act.doonback());
-
         save.setOnClickListener(v->{
             // A concurrent label edit must not silently reassign these indexes.
             if(!labels.equals(Natives.getLabels())) {
@@ -170,17 +156,7 @@ final class ClarityAmounts {
             saved.run();
         });
         parent.setVisibility(View.GONE);
-        portraitbuttons[kinds.length]=buttons[buttons.length-1]= new TextView[]{cancel,save};
-        var layout=new Layout(act,buttons).portraitLayout(portraitbuttons);
-        layout.systembarPadding();
-        layout.setBackgroundColor(Applic.backgroundcolor);
-        var scroll=new ScrollView(act);
-        scroll.addView(layout);
-        scroll.setFillViewport(true);
-        scroll.setSmoothScrollingEnabled(true);
-        scroll.setVerticalScrollBarEnabled(Applic.scrollbar);
-        scroll.setScrollbarFadingEnabled(true);
-        act.addMyContentView(scroll,new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT));
-        act.setonback(()->{removeContentView(scroll);parent.setVisibility(View.VISIBLE);});
+        page.buttons(save);
+        page.show(()->parent.setVisibility(View.VISIBLE));
     }
 }

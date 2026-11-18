@@ -46,21 +46,16 @@ import java.util.Arrays;
 
 import tk.glucodata.settings.Settings;
 
-import static android.content.Context.VIBRATOR_SERVICE;
 import static android.view.View.GONE;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.mgdLmult;
-import static tk.glucodata.BuildConfig.libreVersion;
-import static tk.glucodata.Gen2.getversion;
-import static tk.glucodata.Libre3.libre3NFC;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.Log.showbytes;
 import static tk.glucodata.MainActivity.systembarBottom;
 import static tk.glucodata.MainActivity.systembarLeft;
 import static tk.glucodata.MainActivity.systembarRight;
 import static tk.glucodata.MainActivity.systembarTop;
-import static tk.glucodata.Natives.getlibreAccountIDnumber;
 import static tk.glucodata.settings.Settings.removeContentView;
 import static tk.glucodata.util.getbutton;
 import static tk.glucodata.util.getlabel;
@@ -70,343 +65,31 @@ public class ScanNfcV   {
 
 
 
-static private byte[] newdevice=null;
     @SuppressWarnings("deprecation")
 public static void failure(Vibrator vibrator) {
     final long[] vibrationPatternFailure = {0, 500}; // [ms]
-        if(android.os.Build.VERSION.SDK_INT < 26)
-        vibrator.vibrate(vibrationPatternFailure, -1);
-    else
         vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternFailure, -1));
     }
 
 
 
 
-static            boolean mayEnablestreaming(Tag tag,byte[] uid,byte[] info) {
-    if(!Natives.streamingAllowed()) {
-        {if(doLog) {Log.d(LOG_ID,"!Natives.streamingAllowed()");};};
-        return false;
-        }
-    if(!AlgNfcV.enableStreaming(tag, info)) {
-        {if(doLog) {Log.d(LOG_ID, "Enable streaming failed");};};
-        return false;
-        } 
-
-    String sensorident = Natives.getserial(uid, info);
-    {if(doLog) {Log.d(LOG_ID, "Streaming enabled, resetDevice " + sensorident);};};
-    if(SensorBluetooth.resetDevice(sensorident))
-        askpermission=true;
-    return true;
-    }
-
-
-
-static     AudioAttributes audioattributes;
-static {
-        if(android.os.Build.VERSION.SDK_INT >= 21)
-         audioattributes=new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM) .build();
-    };
-static    VibrationAttributes vibrationattributes=android.os.Build.VERSION.SDK_INT <33?null:new VibrationAttributes.Builder().setUsage(VibrationAttributes.USAGE_ALARM) .build();
+static     AudioAttributes audioattributes=new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM) .build();
+static    VibrationAttributes vibrationattributes=new VibrationAttributes.Builder().setUsage(VibrationAttributes.USAGE_ALARM) .build();
 static void vibrates(Vibrator vibrator,final long[] vibrationPatternstart ,final int[]  amplitude) {
-    if( android.os.Build.VERSION.SDK_INT <33) {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternstart,amplitude, 1),audioattributes);
-        }
-    else {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternstart,amplitude, 1),vibrationattributes);
-        }
+    vibrator.vibrate(VibrationEffect.createWaveform(vibrationPatternstart,amplitude, 1),vibrationattributes);
     }
-static private   boolean askpermission=false;
     @SuppressWarnings("deprecation")
 public static Vibrator getvibrator(Context context) {
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-        return ((VibratorManager)context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE)).getDefaultVibrator();
-    }
-    else
-        return (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+    return ((VibratorManager)context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE)).getDefaultVibrator();
 
     }
 public static void startvibration(Vibrator vibrator) {
-        if(android.os.Build.VERSION.SDK_INT < 26)
-            vibrator.vibrate( new long[]  {0, 100, 10,50,50} , 1);
-        else {
         final long[] vibrationPatternstart = {0, 70, 50,50,50,50,50};
         final int[] amplitude={0,  255,150,0,255,50,0};
         vibrates(vibrator,vibrationPatternstart,amplitude); 
-            }
     }
-static private int[] libre3scan(GlucoseCurve curve,MainActivity main, Vibrator vibrator,Tag tag) {
-    int value=0;
-    int ret = 0x100000;
-  //  if(android.os.Build.VERSION.SDK_INT >= 26) 
-    {
-        long streamptr;
-        streamptr=libre3NFC(tag,curve);
-        vibrator.cancel();
-        if(streamptr==2L) {
-            {if(doLog) {Log.i(LOG_ID,"streamptr==2");};};
-            ret= 0xFD;
-            }
-        else {
-          if(libreVersion == 3) {
-            if(streamptr>=0L&&streamptr<7L) {
-                switch((int)(streamptr&0xFFFFFFF)) {
-                    case 0: {
-                            if(getlibreAccountIDnumber()==0) {
-                                if(doLog) Log.i(LOG_ID,"zero account ID"); 
-                                ret=0xF8;
-                                }
-                            else {
-                                if(doLog) Log.i(LOG_ID,"streamptr==0"); 
-                                ret=0xFA;
-                                }
-                            };break;
-                    case 1: {
-                        {if(doLog) {Log.i(LOG_ID,"streamptr==1");};};
-                        ret=0xFB;
-                        };break;
-                    case 5: {
-                        {if(doLog) {Log.i(LOG_ID,"terminated");};};
-                        SensorLifecycle.changed();
-                        ret=13;
-                        break;
-                        }
-                    case 6: {
-                        {if(doLog) {Log.i(LOG_ID,"ended");};};
-                        SensorLifecycle.changed();
-                        ret=4;
-                        break;
-                        }
-                    default: {
-                         if(streamptr>0L&&streamptr<4L) {
-                            {if(doLog) {Log.i(LOG_ID,"0<streamptr<4");};};
-                              ret=0xFA;
-                              }
-                        }
-                    }
-                }
-             else {
-                 var name = Natives.getSensorName(streamptr);
-                 if(name==null){
-                    {if(doLog) {Log.i(LOG_ID,"name==null");};};
-                    ret=0xFA;
-                    Natives.freedataptr(streamptr);
-                    }
-                 else{
-                    {if(doLog) {Log.i(LOG_ID,"scanned "+name);};};
-                    if(SensorBluetooth.resetDeviceOrFree(streamptr, name))
-                        askpermission = true;
-                    ret = 0xFC;
-                    value=1;
-                    askcalendar=true;
-                   // curve.render.sensorid=name;
-                    curve.render.badscan =calendar(main, ret, name);
-                    }
-                }
-                }
-            else {
-                {if(doLog) {Log.i(LOG_ID,"libreVersion!=3");};};
-                ret = 0xFE;
-                }
-        }
-        if(ret!=0xFC)
-            failure(vibrator);
-       }
-//       else  { {if(doLog) {Log.i(LOG_ID,"No Libre 3 Android <8");};}; ret=0xF9; }
-    curve.requestRender();
-    return new int[]{ret,value};
-    }
-static public synchronized void scan(GlucoseCurve curve,Tag tag) {
-    askpermission=false;
-    MainActivity main= (MainActivity)(curve.getContext());
-    if(!isWearable) {
-        if (Menus.on) {
-            Applic.RunOnUiThread(() -> {
-                MainActivity.doonback();
-                Menus.on = true;
-            });
-        }
-    }
-    var vibrator=getvibrator(main);
-    startvibration(vibrator);
-    curve.render.stepresult=GlucoseCurve.STEPBACK;
-    curve.render.sensorid=null;
-        {
-    if(!Natives.gethaslibrary()) {
-        vibrator.cancel();
-        failure(vibrator);
-        if(main.openfile!=null)
-            Applic.RunOnUiThread(() -> {   main.openfile.showchoice(main,true); });
-        return;
-        }
-    int value=0;
-    int ret = 0x100000;
-        try {
-           byte[] uid=tag.getId();
-            if(doLog) {
-                String sensid="";
-                for(var e:uid) {
-                    sensid=String.format("%02X",(0xFF&e))+sensid;
-                    }
-                {if(doLog) {Log.i(LOG_ID,"TAG::sensid="+sensid);};};
-                }
-            {
-            var isLibre3=uid.length==8&&uid[6]!=7;
-            byte[] info = AlgNfcV.nfcinfotimes(tag,(isLibre3||doLog)?1:10);
-            if(info==null||info.length!=6) {
-                    if(isLibre3) {
-                           int[] uit= libre3scan(curve,main,vibrator,tag);
-                           ret=uit[0];
-                           value=uit[1];
-                          }
-                    else {
-                        ret=17;
-                        {if(doLog) {Log.i(LOG_ID,"Read Tag Info Error");};};
-                        vibrator.cancel();
-                        }
-                    }
-                else  {
-                    byte[] data;
-                    var sensorident=Natives.getserial(uid,info);
-                    curve.render.sensorid= sensorident ;
-                    if((data = AlgNfcV.readNfcTag(tag,uid,info)) != null) {
-                        curve.render.badscan =0xff;
-                        curve.requestRender();
-                        if(doLog) {Log.d(LOG_ID,"Read Tag");};
-                        int uit = Natives.nfcdata(uid, info, data);
-                        value = uit & 0xFFFF;
-                        Log.format("glucose=%.1f\n",(float)value/mgdLmult);
-                        ret = uit >> 16;
-                        if(newdevice!=null&& Arrays.equals(newdevice,uid)&& Applic.app.canusebluetooth() ) {
-                            if(value!=0|| (ret&0xFF)==5||(ret&0xFF)==7) {
-//                                sensorident=Natives.getserial(uid,info);
-                                if(SensorBluetooth.resetDevice(sensorident))
-                                    askpermission=true;
-                                newdevice=null;
-                                }
-                            }
-                        {if(doLog) {Log.d(LOG_ID,"Badscan "+ret);};};
-                        vibrator.cancel();
-                        switch(ret&0xFF) {
-                            case 8: {
-                                mayEnablestreaming(tag,uid,info);
-                                ret=0;
-                                break;
-                                }
-                            case 9: {
-//                                sensorident = Natives.getserial(uid, info);
-                                {if(doLog) {Log.d(LOG_ID, "Streaming enabled, resetDevice " + sensorident);};};
-                                if(SensorBluetooth.resetDevice(sensorident))
-                                    askpermission=true;
-                                }
-                                ret=0;
-                                    break;
-                            case 4: 
-//                                  sensorident=Natives.getserial(uid, info);
-                                 SensorBluetooth.sensorEnded(sensorident); 
-                                 break;
-                            case 3: {
-                                if (value == 0) {
-                                
-                                    boolean actsuccess = AlgNfcV.activate(tag, info, uid);
-                                    if(actsuccess) {
-                                        final long[] needsactivationthrill = {20, 10, 40, 5,   2, 15,  35, 7, 12}; // [ms]
-                                        if(android.os.Build.VERSION.SDK_INT < 26) {
-                                            vibrator.vibrate(needsactivationthrill, -1);
-                                            }
-                                        else{
-                                            final int[] needsactivationthrillamp = {0,  255, 0, 255, 0, 255, 0, 255, 0}; // 
-                                            vibrator.vibrate(VibrationEffect.createWaveform(needsactivationthrill,needsactivationthrillamp, -1));
-                                            }
-                                        newdevice = uid;
-                                    } else {
-                                        failure(vibrator);
-                                    }
-                                    main.runOnUiThread(() -> {
-                                        main.activateresult(actsuccess);
-
-                                    });
-
-                                    ret=0;
-                                }
-                                ;
-                            } ;break;
-                                case 0x85: mayEnablestreaming(tag,uid,info); 
-                                            ret&=~0x80;
-
-                                case 5: {
-                                    final long[] newsensorwait = {50, 300, 100, 10};
-                                    if(android.os.Build.VERSION.SDK_INT < 26) 
-                                        vibrator.vibrate(newsensorwait, -1);
-                                    else
-                                        vibrator.vibrate(VibrationEffect.createWaveform(newsensorwait, -1));
-//                                    sensorident = Natives.getserial(uid, info);
-                                    curve.render.badscan = calendar(main,ret,sensorident);
-                                };break;
-                                case 0x87:  mayEnablestreaming(tag,uid,info); 
-                                            ret&=~0x80;
-                                case 7:
-                                    final long[] newsensorVib =  {50, 150,50,50,12,8,15,73};
-                                    if(android.os.Build.VERSION.SDK_INT < 26) 
-                                        vibrator.vibrate(newsensorVib, -1);
-                                    else
-                                        vibrator.vibrate(VibrationEffect.createWaveform(newsensorVib, -1));
-//                                    sensorident = Natives.getserial(uid, info);
-                                 //   curve.render.sensorid= sensorident ;
-                                    curve.render.badscan =calendar(main,ret,sensorident);
-            //                        ret=0;
-                                    break;
-                        };
-                        }
-
-                   else  {
-                    ret=18;
-                    vibrator.cancel();
-                    {if(doLog) {Log.i(LOG_ID,"Read Tag Data Error");};};
-                    if(getversion(info)==2&&!Natives.switchgen2()) {
-                            Openfile.reinstall=true;
-                            Natives.closedynlib();
-                            Applic.RunOnUiThread(() -> { getlibrary.openlibrary(main);    });
-                           }
-
-                   }
-                 }
-                 }
-         }
-        catch( Throwable  error) {
-            ret=19;
-               vibrator.cancel();
-            String mess=error.getMessage();
-            if(mess==null)
-                mess="unknown error";
-           Log.stack(LOG_ID,mess,error);
-
-            failure(vibrator);
-
-            }
-    if(value==0) {
-        curve.render.badscan = ret;
-        failure(vibrator);
-        }
-            }
-    curve.requestRender();
-  if(curve.waitnfc) {
-      curve.waitnfc = false;
-      ((MainActivity) curve.getContext()).setnfc();
-        }
-    main.runOnUiThread(() -> {
-        if(main.curve.numcontrol!=null)
-            main.curve.numcontrol.setVisibility(GONE);
-        main.curve.numberview.closenumview(); Settings.closeview();
-        if(askpermission)
-            main.finepermission();
-        });
-    }
-
 static private void newsensor(MainActivity act,String text,String name) {
-    if(!isWearable) {
-        XInfuus.sendSensorActivateBroadcast(act, name, Natives.laststarttime());
-        }
 
   /*  var metrics= act.getResources().getDisplayMetrics();
     int width= metrics.widthPixels;
@@ -463,7 +146,11 @@ static private void newsensor(MainActivity act,String text,String name) {
                    askcalendar=false;
                 });
         lay.setPadding(pad,pad,pad,pad);
-        lay.setBackgroundColor(Applic.backgroundcolor);
+        var bg=new android.graphics.drawable.GradientDrawable();
+        bg.setCornerRadius(M3.dp(act,28));
+        bg.setColor(M3.color(act,com.google.android.material.R.attr.colorSurfaceContainerHigh,0xFF2B2B2B));
+        lay.setBackground(bg);
+        M3.style(ok);
        var params = new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER_HORIZONTAL| Gravity.CENTER);
         act.addMyContentView(lay, params);
     });

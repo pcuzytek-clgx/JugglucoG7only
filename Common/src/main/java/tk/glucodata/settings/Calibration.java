@@ -8,7 +8,6 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static tk.glucodata.Applic.backgroundcolor;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Natives.setshowcalibratedstream;
-import static tk.glucodata.Natives.setshowstream;
 import static tk.glucodata.NumberView.avoidSpinnerDropdownFocus;
 import static tk.glucodata.settings.Settings.removeContentView;
 import static tk.glucodata.util.getbutton;
@@ -28,6 +27,7 @@ import android.widget.Spinner;
 import tk.glucodata.Applic;
 import tk.glucodata.GlucoseCurve;
 import tk.glucodata.LabelAdapter;
+import tk.glucodata.M3;
 import tk.glucodata.Layout;
 import tk.glucodata.MainActivity;
 import tk.glucodata.Natives;
@@ -65,11 +65,16 @@ static public void show(MainActivity act,View parent) {
           Natives.setAllValues(isChecked);
           act.requestRender();
           });
+   var showcalibrated=getcheckbox(act,act.getString(R.string.showcalibratedstream),Natives.getshowcalibratedstream());
+   showcalibrated.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
+          setshowcalibratedstream(isChecked);
+          act.requestRender();
+          });
    var docalibrate=getcheckbox(act,act.getString(R.string.active),Natives.getDoCalibrate());
    docalibrate.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
           Natives.setDoCalibrate(isChecked);
           if(isChecked) {
-            setshowcalibratedstream(true);
+            showcalibrated.setChecked(true);
             }
           act.requestRender();
           });
@@ -82,29 +87,15 @@ static public void show(MainActivity act,View parent) {
    calibrateA.setOnCheckedChangeListener( (buttonView,  isChecked)-> {
           Natives.setCalibrateA(isChecked);
           });
-  View[][] views;
   if(isWearable) {
+  View[][] views;
         var buttons=new View[]{docalibrate,close};
         views=new View[][]{new View[]{calibrateA},
        new View[]{bloodvar,spinner},buttons,new View[]{calibratepast},new View[]{allvalues}} ;
-    }
-    else {
-       var help=getbutton(act, R.string.helpname);
-        help.setOnClickListener(v->{
-             tk.glucodata.help.help(R.string.calibrationhelp,act);
-            });
-         var  buttons=new View[]{help,docalibrate,close};
-         var lastrow=new View[]{allvalues,calibratepast} ;
-        views=new View[][]{new View[]{calibrateA}, new View[]{bloodvar,spinner},buttons,     lastrow};
-        };
     ViewGroup  layout=new Layout(act, (lay, w, h) -> { return new int[] {w,h};},views );
-  if(isWearable) {
     layout.setBackgroundColor(backgroundcolor);
     var height=    GlucoseCurve.getheight();
-//    layout.setPadding((int)(height*.02f),(int)(height*.11f), (int)(height*.05f), (int)(height*.11f));
     layout.setPaddingRelative((int)(height*.02f),(int)(height*.17f), (int)(height*.05f), 0);
-    //Layout.getMargins(allvalues);
-    //pasmarg.leftMargin=(int)(height*.07f);
     var pasmarg=Layout.getMargins(allvalues);
     pasmarg.bottomMargin=(int)(height*.14f);
         var scroll=new ScrollView(act);
@@ -113,36 +104,38 @@ static public void show(MainActivity act,View parent) {
         scroll.setSmoothScrollingEnabled(false);
        scroll.setScrollbarFadingEnabled(true);
        scroll.setVerticalScrollBarEnabled(Applic.scrollbar);
-
-
     act.addMyContentView(scroll, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-    layout=scroll;
-
-  }
-  else {
-     layout.setBackgroundResource(R.drawable.dialogbackground);
-    var  params =    new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER| Gravity.CENTER_HORIZONTAL);
-
-    act.addMyContentView(layout, params);
-    int pad=(int)(density*5.0f);
-    layout.setPadding(pad,pad,pad,pad);
-
-    }
-    final ViewGroup flayout=layout;
     MainActivity.setonback( () -> {
       if(parent!=null)  {
-          // parent.setVisibility(VISIBLE);
-
            EnableControls(parent,true);
-//           if(!isWearable) act.themeLightBars();
             }
-        removeContentView(flayout);
+        removeContentView(scroll);
         });
 
     close.setOnClickListener(v->{
     	MainActivity.doonback();
     	});
+  }
+  else {
+       var help=getbutton(act, R.string.helpname);
+        help.setOnClickListener(v->{
+             tk.glucodata.help.help(R.string.calibrationhelp,act);
+            });
+       var page=new M3.Page(act,R.string.calibration,true);
+       var g=page.group(null);
+       g.toggle(docalibrate);
+       g.toggle(calibrateA);
+       g.toggle(calibratepast);
+       g.value(act.getString(R.string.bloodvar).replace(":","").trim(),spinner);
+       var show=page.group(R.string.m3_show);
+       show.toggle(showcalibrated);
+       show.toggle(allvalues);
+       page.buttons(help);
+       page.show(()-> {
+          if(parent!=null)
+               EnableControls(parent,true);
+          });
+    }
    }
-
 
 };

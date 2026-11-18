@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="m3_share_web_server">Serwer</string>
+    <string name="m3_share_web_access">Dostęp</string>
+    <string name="m3_share_web_ports">Porty</string>
+    <string name="m3_share_web_ssl">SSL</string>
+    <string name="m3_share_web_data">Dane</string>
+    <string name="m3_share_web_error">Błąd</string>
+    <string name="m3_share_web_folder">Folder</string>
+    <string name="m3_share_web_upload">Przesyłanie</string>
+    <string name="m3_share_web_content">Zawartość</string>
+    <string name="m3_share_clarity_account">Konto</string>
+    <string name="m3_share_clarity_noaccount">Nie zalogowano</string>
+    <string name="m3_share_clarity_sending">Wysyłanie</string>
+    <string name="m3_share_clarity_status">Stan</string>
+    <string name="m3_share_clarity_labels">Etykiety wartości</string>
+    <string name="m3_share_act_import">Importowanie</string>
+    <string name="m3_share_act_data">Dane</string>
+    <string name="m3_share_act_status">Stan</string>
+    <string name="m3_share_act_label">Etykieta</string>
+    <string name="m3_share_act_measure">Miara</string>
+    <string name="m3_share_act_actions">Działania</string>
+    <string name="m3_share_act_details">Szczegóły</string>
+</resources>

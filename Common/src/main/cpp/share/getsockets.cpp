@@ -100,8 +100,7 @@ int getsockets() {
 					typedef uint64_t (*android_fdsan_get_owner_tag_t)(int fd); android_fdsan_get_owner_tag_t android_fdsan_get_owner_tag;
 					typedef uint64_t (*android_fdsan_close_with_tag_t)(int fd, uint64_t tag); android_fdsan_close_with_tag_t android_fdsan_close_with_tag;
 
-					if(android_get_device_api_level()>=29&& 
-					(android_fdsan_get_owner_tag= (android_fdsan_get_owner_tag_t)dlsym(RTLD_DEFAULT,"android_fdsan_get_owner_tag")) && 
+					if((android_fdsan_get_owner_tag= (android_fdsan_get_owner_tag_t)dlsym(RTLD_DEFAULT,"android_fdsan_get_owner_tag")) && 
 					(android_fdsan_close_with_tag= (android_fdsan_close_with_tag_t)dlsym(RTLD_DEFAULT,"android_fdsan_close_with_tag"))) {
 
 						uint64_t tag=android_fdsan_get_owner_tag(handle);

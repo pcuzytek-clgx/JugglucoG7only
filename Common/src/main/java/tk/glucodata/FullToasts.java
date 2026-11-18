@@ -29,7 +29,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -111,7 +110,7 @@ public final class FullToasts {
             cancelLastToast();
             if (SystemClock.elapsedRealtime() - generatedAt > MAX_START_DELAY_MS) return;
             int length = duration == Toast.LENGTH_LONG ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
-            boolean customAllowed = Build.VERSION.SDK_INT < 30 || app.getApplicationInfo().targetSdkVersion < 30 || Applic.getActivity() != null;
+            boolean customAllowed = app.getApplicationInfo().targetSdkVersion < 30 || Applic.getActivity() != null;
             Toast next;
             try {
                 next = customAllowed ? makeCustomToast(app, message, length)
@@ -217,7 +216,7 @@ public final class FullToasts {
         text.setIncludeFontPadding(true);
         text.setPadding(dp(context, HORIZONTAL_PADDING_DP), dp(context, VERTICAL_PADDING_DP),
                 dp(context, HORIZONTAL_PADDING_DP), dp(context, VERTICAL_PADDING_DP));
-        if (Build.VERSION.SDK_INT >= 29) text.setForceDarkAllowed(false);
+        text.setForceDarkAllowed(false);
         text.setText(message);
         return text;
     }
@@ -281,7 +280,7 @@ private static int desiredTextWidth(TextView text, String message) {
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         bp.gravity = Gravity.END;
         content.addView(ok, bp);
-        if (Build.VERSION.SDK_INT >= 29) content.setForceDarkAllowed(false);
+        content.setForceDarkAllowed(false);
         dialog.setContentView(content, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         content.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
@@ -292,7 +291,7 @@ private static int desiredTextWidth(TextView text, String message) {
             View decor = window.getDecorView();
             decor.setPadding(0, 0, 0, 0);
             decor.setMinimumHeight(0);
-            if (Build.VERSION.SDK_INT >= 29) decor.setForceDarkAllowed(false);
+            decor.setForceDarkAllowed(false);
             window.setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT);
            }
         dialog.setOnKeyListener((d, code, event) -> {

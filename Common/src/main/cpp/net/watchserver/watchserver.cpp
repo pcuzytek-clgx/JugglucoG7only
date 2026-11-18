@@ -1557,7 +1557,6 @@ extern   std::span<char> getamounts(int startpos, int len, uint32_t starttime, u
 extern std::span<char> getmeals(int startpos, int len, uint32_t starttime, uint32_t endtime,bool header,int,bool,int,bool,bool);
 extern std::span<char> getactivities(int startpos,int len,uint32_t starttime,uint32_t endtime,bool header,int,bool,int,bool,bool);
 extern std::span<char> getextendedactivities(int startpos,int len,uint32_t starttime,uint32_t endtime,bool header,int,bool,int,bool,bool);
-extern std::span<char> libreviewweb(int startpos, int startlen, uint32_t starttime, uint32_t endtime,bool header,int unit,bool,int maxcount,bool,bool) ;
 
 
 static time_t readtime(const char *&input) {
@@ -2536,9 +2535,9 @@ static bool jugglucos(const char * const input,int size, std::string_view hostna
         }
       }
 
-   constexpr const std::string_view types[]={"history"sv,"stream"sv,"scans"sv,"amounts"sv,"meals"sv,"libreview"sv,"activities"sv};
-    constexpr const getdata_t procs[]={gethistory,getstream,getscans,getamounts,getmeals,libreviewweb,getactivities};
-   constexpr const int perhour[]={12*62,60*81,2*81,5*85,200,700,0}; // Activities grows its own buffer.
+   constexpr const std::string_view types[]={"history"sv,"stream"sv,"scans"sv,"amounts"sv,"meals"sv,"activities"sv};
+    constexpr const getdata_t procs[]={gethistory,getstream,getscans,getamounts,getmeals,getactivities};
+   constexpr const int perhour[]={12*62,60*81,2*81,5*85,200,0}; // Activities grows its own buffer.
    for(int i=0;i<std::size(types);i++) {
       auto type=types[i];
       int typelen=type.size();

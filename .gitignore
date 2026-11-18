@@ -1,0 +1,12 @@
+# Build outputs
+build/
+.gradle/
+.cxx/
+.kotlin/
+
+# IDE
+.idea/
+*.iml
+
+# Local agent notes
+AGENTS.md

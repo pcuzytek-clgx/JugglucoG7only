@@ -1326,6 +1326,8 @@ static bool mkdatabaseSI(string_view sensordir,string_view sensorgegs,uint32_t n
 
     return true;
     }
+#endif
+#if 1 // shared by Air/AidexX/Accu photo-scan
 static bool mkdatabaseAir(string_view sensordir,string_view sensorgegs,uint32_t now) {
    LOGGER("mkdatabasAir %s,%s\n",sensordir.data(),sensorgegs.data());
     mkdir(sensordir.data(),0700);

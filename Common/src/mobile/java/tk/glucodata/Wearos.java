@@ -201,7 +201,6 @@ static public void show(MainActivity context,View parent) {
     var nphone=getradiobutton(context, R.string.phone);
     var nwatch=getradiobutton(context, R.string.watch);
     CheckDirectionRadio[]nswitch={nphone,nwatch}; 
-    var Ok=getbutton(context,R.string.closename);
     var Help=getbutton(context,R.string.helpname);
     Help.setOnClickListener(v-> help.helplight(R.string.wearosinfo,context));
    var nodeslistin=getnodeslist();
@@ -238,44 +237,20 @@ static public void show(MainActivity context,View parent) {
           };
     var spin=mkspinner(context,nodeslist,setpos);
    EnableControls(parent,false);
-    float density=GlucoseCurve.metrics.density;
-    var off=(int)(density*6.0f);
-    direct.setPadding(off,0,0,0);
-    connection.setPadding(off,0,off,0);
-    enternums.setPadding(off,0,0,0);
-    nwatch.setPadding(0,0,off,0);
 
    setpos.accept(nodenumptr[0]);
    if(nodeslist==null||nodeslist.isEmpty()) {
       defaults.setVisibility(GONE);
       }
 
- Layout.getMargins(spin).bottomMargin= (int)(density*20.0);
- Layout.getMargins(enternums).bottomMargin= Layout.getMargins(nphone).bottomMargin= Layout.getMargins(nwatch).bottomMargin=(int)(density*20.0);
- Layout.getMargins(Ok).topMargin= Layout.getMargins(defaults).topMargin= Layout.getMargins(Help).topMargin=(int)(density*20.0);
-    var layout=new Layout(context,(l,w,h)-> {
-    /*
-        var width=GlucoseCurve.getwidth();
-        var height=GlucoseCurve.getheight();
-        if(width>w)
-            l.setX((width-w)/2);
-        if(height>h)
-            l.setY((height-h)/2);
-            */
-        return new int[] {w,h};
-        }, new View[]{spin},new View[]{enternums,nphone,nwatch},new View[]{direct,sphone,swatch,connection},new View[]{Help,defaults,Ok} );
-    int laypad=(int)(density*4.0);
-    layout.setPadding(laypad*2,laypad*2,laypad*2,laypad);
-
-    layout.setBackgroundResource(R.drawable.dialogbackground);
-
-    var  params =    
-            new FrameLayout.LayoutParams(
-                    WRAP_CONTENT,
-                    WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL| Gravity.CENTER);
-
-    context.addMyContentView(layout, params);
+    var page=new M3.Page(context,"Wear OS",true);
+    final View layout=page.root;
+    var gwatch=page.group(R.string.m3_watch_wear_device);
+    gwatch.item(spin);
+    var gsettings=page.group(R.string.m3_watch_wear_settings);
+    gsettings.value(R.string.m3_watch_wear_nums,nphone,nwatch);
+    gsettings.value(R.string.m3_watch_wear_direct,sphone,swatch);
+    page.buttons(Help,defaults);
     // Synchronization can finish after the spinner's initial selection. Keep
     // the gate current without replacing choices the user has already edited.
     Runnable refreshStatus=new Runnable() {
@@ -300,7 +275,8 @@ static public void show(MainActivity context,View parent) {
         };
     //context.addMyContentView(layout, new ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
 //    layout.post(layout::requestLayout);
-    Ok.setOnClickListener(v -> {
+    // Back saves what the former Close button saved.
+    Runnable save=() -> {
         if(swatch.isEnabled()) {
             if(defaults.isEnabled()) {
                 if(doLog) {Log.i(LOG_ID,"default enabled, so do not save");};
@@ -316,6 +292,7 @@ static public void show(MainActivity context,View parent) {
                                 (currentDirect==0&&!Natives.getusebluetooth())) {
                             Log.i(LOG_ID,"Waiting for Wear mirror synchronization before changing "+name);
                             Natives.switchSync();
+                            Applic.argToaster(context, R.string.m3_watch_wear_notsynced, Toast.LENGTH_LONG);
                             return;
                             }
                         final boolean wasdirect=currentDirect!=0;
@@ -324,19 +301,7 @@ static public void show(MainActivity context,View parent) {
                         Runnable doswitch=()-> {
                             Applic.switchbluetooth(name,netinfo,watchdirect);
                             };
-                        if(Natives.hasAidexX()) {
-                            if(!wasdirect&&watchdirect) {
-                                SensorBluetooth.afterUnpair(context,res->doswitch.run());
-                                }
-                            else {
-                                if(wasdirect&&!watchdirect)  {
-                                    returnSensorToPhone(context,name,netinfo);
-                                    }
-                                else
-                                    doswitch.run();
-                                }
-                            }
-                        else {
+                        {
                             doswitch.run();
                             }
                         }
@@ -348,9 +313,7 @@ static public void show(MainActivity context,View parent) {
         else {
             if(doLog) {Log.i(LOG_ID,"Not Enabled");};
             }
-        context.doonback();
-        }
-        );
+        };
 
     defaults.setOnClickListener(v -> {
         if(nodenumptr[0]>=0) {
@@ -381,10 +344,10 @@ static public void show(MainActivity context,View parent) {
                 }
          });
 */
-    context.setonback(()-> { 
+    page.show(()-> { 
         layout.removeCallbacks(refreshStatus);
+        save.run();
         EnableControls(parent,true);
-        removeContentView(layout);
         context.hideSystemUI(); }
         );
     if(!nodeslist.isEmpty()) {
@@ -401,25 +364,11 @@ static String makenodename(WatchTarget target) {
     return target.label;
     }
 
-private static void returnSensorToPhone(MainActivity context,String name,byte[] netinfo) {
-    // Install the reply handler before sending: an authenticated BLE peer can
-    // answer immediately, before sendbluetooth() returns to this UI thread.
-    var unpair=new UnpairOverlayHost(context,R.string.releasingsensor);
-    unpair.postMessage(context.getString(R.string.unpairingwatch));
-    context.unpairer=unpair;
-    context.doswitch=()->Applic.setbluetooth(context,true);
-    if(!sendbluetooth(name,netinfo,false)) {
-        context.unpairer=null;
-        context.doswitch=null;
-        unpair.postFinished(context.getString(R.string.failed),false);
-        unpair.postCloser();
-    }
-}
 
 
 
 private static void confirmunsynced(MainActivity act,Runnable save) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(act);
      builder.setTitle(R.string.notsynced).
     setMessage(R.string.lossdata).
            setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

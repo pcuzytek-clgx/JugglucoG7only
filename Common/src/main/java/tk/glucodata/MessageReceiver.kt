@@ -82,19 +82,10 @@ class MessageReceiver: WearableListenerService() {
         }
         when(path) {
             MessageSender.DEFAULTS_PATH ->  {
-                val sender = tk.glucodata.MessageSender.getMessageSender()
                  if(doLog) {Log.i(LOG_ID,"path==MessageSender.DEFAULTS_PATH $connectionName" );}
                   setWearosdefaults(connectionName,true);
                    val context=if(MainActivity.thisone==null)Applic.app;else MainActivity.thisone;
-                   if(Natives.hasAidexX()) {
-                        if(sender==null) {
-                            Log.d(LOG_ID,"messagesender==null")
-                            return
-                        }
-                        unpairWatch(context,sourceId,sender);
-                        }
-                     else
-                       Applic.setbluetooth(context,false)
+                   Applic.setbluetooth(context,false)
                  }
             MessageSender.WAKE_PATH -> {
                 Natives.wakehereonly()
@@ -224,16 +215,7 @@ class MessageReceiver: WearableListenerService() {
                     val context=if(MainActivity.thisone==null)Applic.app;else MainActivity.thisone;
                     val on=booldata(data)
                     if(tk.glucodata.Log.doLog) {Log.i(LOG_ID,"set bluetooth $on");}
-                    if(!on&&Natives.hasAidexX()) {
-                            val sender = tk.glucodata.MessageSender.getMessageSender()
-                            if (sender == null) {
-                                Log.d(LOG_ID, "5: messagesender==null")
-                                return
-                            }
-                            unpairWatch(context,sourceId,sender);
-                            }
-                         else
-                           Applic.setbluetooth(context,on)
+                    Applic.setbluetooth(context,on)
                         }
 
                 }

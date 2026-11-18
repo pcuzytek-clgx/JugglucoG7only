@@ -26,6 +26,7 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import android.widget.LinearLayout;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 import static tk.glucodata.Applic.isWearable;
@@ -38,7 +39,6 @@ import static tk.glucodata.util.getbutton;
 import static tk.glucodata.util.getcheckbox;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.View;
@@ -58,6 +58,7 @@ import java.util.ArrayList;
 class Sensors {
     private static final String LOG_ID="sensors";
 ViewGroup viewgroup;
+
 CheckDirectionBox hide;
 Button calview;
 TextView textview;
@@ -126,12 +127,7 @@ void setSensorptrText(long sensorptr) {
     settext(Natives.sensortextfromSensorptr(sensorptr));
     }
 void settext(String text) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            textview.setText(fromHtml(text,TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
-            }
-        else {
-            textview.setText(fromHtml(text));
-            }
+        textview.setText(fromHtml(text,TO_HTML_PARAGRAPH_LINES_CONSECUTIVE));
          }
 Button use;
 Sensors(MainActivity act,boolean givehelp,boolean select) {
@@ -192,13 +188,44 @@ Sensors(MainActivity act,boolean givehelp,boolean select) {
        warmupview.setProgress(valueToProgress(60,0));
        View[][] views;
         if(!isWearable) {
-            if(givehelp) {
+            var warm=new LinearLayout(act);
+            warm.setOrientation(LinearLayout.VERTICAL);
+            minutes.setTextColor(M3.onSurface(act));
+            warm.addView(minutes);
+            warm.addView(warmupview,new LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
+            if(!givehelp) {
+                var col=new LinearLayout(act);
+                col.setOrientation(LinearLayout.VERTICAL);
+                col.addView(textview);
+                col.addView(warm);
+                col.addView(hide);
+                var row=new LinearLayout(act);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                M3.style(use);
+                M3.style(calview);
+                row.addView(use);
+                row.addView(calview);
+                col.addView(row);
+                final View root=col;
+                calview.setOnClickListener(v -> { CalibrateList.show(act,sensorptr,root); });
+                viewgroup=col;
+                return;
+                }
+            var page=new M3.Page(act,R.string.sensor,true);
+            page.group(null).item(textview);
+            var g=page.group(null);
+            g.item(warm);
+            g.toggle(hide);
+            g.buttons(use,calview);
+            {
                 var help=getbutton(act,R.string.helpname);
                 help.setOnClickListener(v-> helplight(R.string.sensorinfo,act));
-                views=new View[][]{new View[]{ textview},new View[]{minutes,warmupview},new View[]{hide,help,close},new View[]{use,calview}};
+                page.buttons(help);
                 }
-            else
-                views= new View[][]{new View[]{ textview},new View[]{minutes,warmupview},new View[]{hide,use,calview,close}};
+            final View root=page.root;
+            calview.setOnClickListener(v -> { CalibrateList.show(act,sensorptr,root); });
+            viewgroup=page.root;
+            return;
              }
         else  {
            if(select) {
@@ -282,8 +309,6 @@ private static void useAgain(MainActivity act,long sensorptr) {
            if(res) {
                 act.finepermission(); 
                 }
-              else
-                act.systemlocation();
             }
        Applic.wakemirrors();
        act.requestRender();
@@ -308,8 +333,7 @@ static    void show(MainActivity act,String text, long sensorptr) {
     var scroll=sensors.viewgroup;
    ViewGroup.LayoutParams params;
     if(!isWearable) {
-        scroll.setBackgroundResource(R.drawable.dialogbackground);
-        params = new FrameLayout.LayoutParams( WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER|Gravity.CENTER_HORIZONTAL);
+        params = new FrameLayout.LayoutParams( MATCH_PARENT, MATCH_PARENT);
         }
     else {
          int param=isWearable?MATCH_PARENT:WRAP_CONTENT;

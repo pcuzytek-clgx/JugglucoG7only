@@ -29,7 +29,6 @@ import static java.lang.Math.random;
 
 import static tk.glucodata.Log.doLog;
 
-import android.os.Build;
 
 import androidx.health.connect.client.records.BloodGlucoseRecord;
 import androidx.health.connect.client.records.MealType;
@@ -63,11 +62,7 @@ public class GlucoseIterator implements ListIterator<BloodGlucoseRecord> {
 
 private    BloodGlucoseRecord getglucose(long time,double value) {
     final ZoneOffset offset = null;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        return new BloodGlucoseRecord(Instant.ofEpochSecond(time), offset,base.metadata, BloodGlucose.milligramsPerDeciliter(value),1,0,0);
-    }
-    else
-            return null;
+    return new BloodGlucoseRecord(Instant.ofEpochSecond(time), offset,base.metadata, BloodGlucose.milligramsPerDeciliter(value),1,0,0);
 }
 private    BloodGlucoseRecord getglucose() {
 	int pos=base.start+iter;

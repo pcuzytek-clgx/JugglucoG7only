@@ -1,3 +1,0 @@
-
-nfcdata: nfcdata.cpp
-	g++ -g $(CXXFLAGS) $^ -o $@ 

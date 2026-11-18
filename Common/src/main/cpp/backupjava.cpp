@@ -543,8 +543,6 @@ extern "C" JNIEXPORT jboolean JNICALL   fromjava(stopWifi)(JNIEnv *env, jclass c
 extern "C" JNIEXPORT void JNICALL   fromjava(resetbackuphost)(JNIEnv *env, jclass cl,jint pos) {
     backup->resethost(pos) ;
     }
-extern void wakeaftermin(const int waitmin) ;
-extern void wakeuploader();
 
 extern "C" JNIEXPORT void JNICALL   fromjava(networkpresent)(JNIEnv *env, jclass cl) {
       LOGAR("networkpresent");
@@ -557,9 +555,7 @@ extern "C" JNIEXPORT void JNICALL   fromjava(networkpresent)(JNIEnv *env, jclass
     else
         networkpresent=true;
 
-    wakeuploader();
 #if !defined(WEAROS) && !defined(TESTMENU)
-     wakeaftermin(0) ;
      wakeclarity();
 #endif
     LOGAR("end networkpresend");

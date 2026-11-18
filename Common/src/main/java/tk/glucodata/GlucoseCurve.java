@@ -70,7 +70,6 @@ import static java.lang.Math.abs;
 import static java.lang.System.currentTimeMillis;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Applic.usedlocale;
-import static tk.glucodata.BuildConfig.SiBionics;
 import static tk.glucodata.Log.doLog;
 import static tk.glucodata.MainActivity.REQUEST_BARCODE;
 import static tk.glucodata.MainActivity.systembarBottom;
@@ -123,7 +122,6 @@ static View[] reopen=new View[8]; //6 needed
 static int reopennr=0;
     //    SearchLayout search;
     Layout search;
-    public Dialogs dialogs;
     private static final String LOG_ID = "GlucoseCurve";
 static   public float smallfontsize;
     Calendar cal = Calendar.getInstance();
@@ -155,19 +153,12 @@ private void removeSearchEditor() {
     numberview.hidekeyboard();
     editfocus.clearedittext(under);
     editfocus.clearedittext(above);
-    editfocus.clearedittext(mealquantity);
-    if(meallayout!=null) {
-        removeContentView(meallayout);
-        meallayout=null;
-        }
     if(search!=null) {
         removeContentView(search);
         search=null;
         }
     under=null;
     above=null;
-    mealingredient=null;
-    mealquantity=null;
     searchspinner=null;
     searchspinadap=null;
     scansearch=null;
@@ -227,7 +218,7 @@ void getnumcontrol(MainActivity activity) {
         Natives.firstpage();
                   requestRender();
            });
-        first.setContentDescription("First number");
+        first.setContentDescription("Pierwsza pozycja");
 
            ImageButton back=new ImageButton(activity);
            back.setImageResource( R.drawable.baseline_arrow_back_24);
@@ -236,13 +227,13 @@ void getnumcontrol(MainActivity activity) {
                   requestRender();
 
            });
-        back.setContentDescription("Page back");
+        back.setContentDescription("Poprzednia strona");
             
 
 
      ImageButton search=new ImageButton(activity);
      search.setImageResource( android.R.drawable.ic_menu_search);
-        search.setContentDescription("Search");
+        search.setContentDescription("Szukaj");
 //     search.setImageResource( android.R.attr.actionModeWebSearchDrawable);
 
        search.setOnClickListener(v-> {
@@ -278,7 +269,7 @@ void getnumcontrol(MainActivity activity) {
 
        });
            ImageButton last=new ImageButton(activity);
-       last.setContentDescription("Last number");
+       last.setContentDescription("Ostatnia pozycja");
            last.setImageResource( R.drawable.baseline_last_page_24);
 
            last.setOnClickListener(v-> {
@@ -394,7 +385,6 @@ public GlucoseCurve(MainActivity context) {
     setRenderer(render);
     setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     metrics= getResources().getDisplayMetrics();
-    dialogs=new Dialogs(metrics.density);
     }
 @Override
 protected void onAttachedToWindow() {
@@ -544,8 +534,6 @@ private void requestOverlayLayoutNow() {
 if(!isWearable) {
     if(search!=null)
         search.requestLayout();
-    if(meallayout!=null)
-        meallayout.requestLayout();
     if(searchcontrol!=null)
         searchcontrol.requestLayout();
     if(numcontrol!=null)
@@ -631,15 +619,6 @@ final    private ScaleGestureDetector.SimpleOnScaleGestureListener mScaleListene
         }
     };
 
-    long reldate;
-     void startdatepick(long tim) {
-        reldate=tim;
-        numberview.getdateviewal((MainActivity)getContext(),tim,    (year,month,day)-> {
-            Natives.movedate(reldate, year, month, day);
-            requestRender();
-        });
-
-    }
 class GestureListener implements GestureDetector.OnGestureListener {
         @Override
         public boolean onDown(MotionEvent e) {
@@ -684,9 +663,8 @@ static private boolean startv1=true;
                 switch(menu) {
                      case 0:
                         switch (item) {
-                           case 0: JugglucoChat.show((MainActivity) getContext());break;
-                            case 1: Menus.show((MainActivity) getContext());break;
-                            case 2: {
+                            case 0: Menus.show((MainActivity) getContext());break;
+                            case 1: {
                             MainActivity activity = (MainActivity) getContext();
                             if(!isWearable) {
                                 tk.glucodata.Watch.show(activity);
@@ -697,82 +675,34 @@ static private boolean startv1=true;
                                 }
 
                                 break;
-                              case 3: 
+                              case 2: 
 
                                 bluediag.start((MainActivity)getContext()); 
                                   break;
-                              case 4: {
+                              case 3: {
                                 MainActivity activity = (MainActivity) getContext(); 
                                 Settings.set(activity);
                                 };break;
 
-                            case 5: {
-                                if(!isWearable) {
-                                    MainActivity activity = (MainActivity) getContext();
-                                    if(SiBionics==1)
-                                        PhotoScan.scan(activity,REQUEST_BARCODE);
-                                    else
-                                        doabout(activity);
-                                    }
-
-
-                                break;
-                                }
-                            case 6: ((Activity) getContext()).moveTaskToBack(true);break; //keeps current state 
-                            case 7:  Notify.stopalarm();break;
+                            case 4: ((Activity) getContext()).moveTaskToBack(true);break; //keeps current state 
+                            case 5:  Notify.stopalarm();break;
                             default:
                             }
 
                             break;
              case 1: {
                 switch(item&0xF) {
-                                    case 0: dialogs.showexport(( MainActivity)getContext(),getWidth(),getHeight(),null); break;
-
-
-                   case 1: (new Backup()).mkbackupview(( MainActivity)getContext());break;
-                case 2: {
-                       MainActivity activity = (MainActivity) getContext();
-                    if(Natives.staticnum()) {
-                  if(isWearable)
-                     Specific.blockedNum(activity);
-                  else   {
-                           activity.themeLightBars();
-                            help.help(R.string.staticnum,activity,l->activity.lightBars(!Natives.getInvertColors( ))); 
-                            }
-                        }
-                    else {
-                        numberview.addnumberview(activity);
-                        if(!smallScreen)
-                            showkeyboard(activity);
-                        }
-                    }; break;
-                case 3: getnumcontrol((MainActivity) getContext());return true;
-                case 4: Stats.mkstats((MainActivity) getContext());break;
-                case 5: tk.glucodata.Talker.config((MainActivity) getContext());break;
-                case 6:  Floating.setfloatglucose((MainActivity) getContext(),!Natives.getfloatglucose()) ;break;
+                   case 0: (new Backup()).mkbackupview(( MainActivity)getContext());break;
+                case 1: Stats.mkstats((MainActivity) getContext());break;
                 };
                 };break;
             case 2: {
                 int val=item&0xF;
-                switch(val) {
-                        case 3: 
-                            ((MainActivity) getContext()).selectionSystemUI();
-                            break;
-                        default: ((MainActivity) getContext()).lightBars(val==0);
-                                break;
-                        };
+                ((MainActivity) getContext()).lightBars(val==0);
 //                var light=item==0;
  //               var main=(MainActivity) getContext();
   //              main.lightBars(light);
                 };break;
-            case 3:
-                switch (item) {
-                    case 1: startsearch();
-                                    break;
-                    case 2:
-                                startdatepick(Natives.getstarttime());
-                                    break;
-                            };break;
                     case 0xe: {
               if(reopennr>0)
                   return true;
@@ -977,8 +907,6 @@ private void mktimedialog( Button but,final int num ,View parent) {
     private boolean searchStateValid=false;
     private String savedSearchUnder="0";
     private String savedSearchAbove="999";
-    private String savedMealIngredient="";
-    private String savedMealQuantity="";
     private boolean savedScanSearch=false;
     private boolean savedHistorySearch=false;
     private boolean savedStreamSearch=true;
@@ -1004,12 +932,6 @@ private void mktimedialog( Button but,final int num ,View parent) {
             savedStreamCalibratedSearch=streamcalibratedsearch.isChecked();
         if(historycalibratedsearch!=null)
             savedHistoryCalibratedSearch=historycalibratedsearch.isChecked();
-
-        // Keep the meal criteria even when the meal row is currently hidden.
-        if(mealingredient!=null)
-            savedMealIngredient=mealingredient.getText().toString();
-        if(mealquantity!=null)
-            savedMealQuantity=mealquantity.getText().toString();
 
         searchStateValid=true;
     }
@@ -1049,14 +971,6 @@ private void mktimedialog( Button but,final int num ,View parent) {
         labelsel=selection;
         searchspinner.setSelection(selection);
 
-        if(selection==Natives.getmealvar()) {
-            mkmealsearch(context);
-            if(mealingredient!=null)
-                mealingredient.setText(savedMealIngredient);
-            if(mealquantity!=null)
-                mealquantity.setText(savedMealQuantity);
-        }
-
         setSearchTimeButton(fromtime,minutes[0]);
         setSearchTimeButton(totime,minutes[1]);
 
@@ -1084,12 +998,6 @@ static void reopener() {
 int labelsel=-1;
 void clearsearch(View view) {
 if(!isWearable) {
-    if(mealquantity!=null) {
-         mealquantity.setText("");
-         mealingredient.setText("");
-         }
-    savedMealIngredient="";
-    savedMealQuantity="";
       under.setText("0");
         above.setText("999");
         labelsel=searchspinner.getCount()-1;
@@ -1136,21 +1044,10 @@ void search(boolean forward) {
         try {
                  fabove= Float.parseFloat(above.getText().toString());
             } catch(Exception e) {};
-        float ingamount=0.0f;
-        try {
-            if(mealquantity!=null)
-                ingamount= Float.parseFloat(mealquantity.getText().toString());
-            } catch(Exception e) {};
-        String ingsearch=null;
-        if(mealingredient!=null) {
-            ingsearch=mealingredient.getText().toString();
-            if(ingsearch.length()==0)
-                ingsearch=null;
-                }
            int glsearch=((historysearch.isChecked()?0x40000002:0)| (scansearch.isChecked()?0x40000001:0))|(streamsearch.isChecked()?0x40000004:0)| (streamcalibratedsearch.isChecked()?0x40000008:0)|(historycalibratedsearch.isChecked()?0x40000010:0);
 
 
-       if(Natives.search(glsearch==0?labelsel:glsearch,funder,fabove,minutes[0],minutes[1],forward,ingsearch,ingamount)==0) {
+       if(Natives.search(glsearch==0?labelsel:glsearch,funder,fabove,minutes[0],minutes[1],forward,null,0.0f)==0) {
 
            removeSearchEditor();
            requestRender();
@@ -1290,7 +1187,7 @@ if(searchspinner==null) {
     int minheight=GlucoseCurve.dpToPx(48);
     searchspinner.setMinimumHeight(minheight);
 */
-    searchspinner.setContentDescription("Amount type selector");
+    searchspinner.setContentDescription("Wybór rodzaju ilości");
    NumberView.avoidSpinnerDropdownFocus(searchspinner);
     searchspinadap= new LabelAdapter<String>(context,Natives.getLabels(),0);
         searchspinner.setAdapter(searchspinadap);
@@ -1300,14 +1197,7 @@ if(searchspinner==null) {
        {if(doLog) {Log.i(LOG_ID,"onItemSelected "+position);};};
             if(position!=(searchspinner.getCount()-1)) {
                 selectnumbers();
-        if(position==Natives.getmealvar()) {
-            mkmealsearch(context);
-            }
-        else
-            hidemealsearch();
         }
-        else
-        hidemealsearch();
          labelsel=position;
         }
         @Override
@@ -1322,82 +1212,6 @@ return searchspinner;
 }
 ColorStateList oldColors;
 float oldsize;
-Layout meallayout=null;
-void hidemealsearch() {
-    if(meallayout!=null) 
-        meallayout.setVisibility(GONE);
-    }
-EditText mealingredient=null,mealquantity=null;
-void mkmealsearch(MainActivity act) {
-    if(meallayout==null) {
-        var inglabel=getlabel(act,R.string.ingredient);
-        var qualabel=getlabel(act,R.string.minimum);
-        mealingredient=new EditText(act);
-        mealingredient.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        mealingredient.setImeOptions(editoptions);
-        mealingredient.setOnFocusChangeListener(new editUIfocus());
-        /*
-    TextView.OnEditorActionListener     actlist= new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
-                    || actionId == EditorInfo.IME_ACTION_DONE) {
-                act.hideSystemUI();
-                 tk.glucodata.help.hidekeyboard(act);
-                 {if(doLog) {Log.i(LOG_ID,"onEditorAction");};};
-// hidekeyboard();
-                return true;
-               }
-            return false;
-            }};
-        mealingredient.setOnEditorActionListener(actlist);
-            */
-
-//        mealingredient.setMinEms(10);
-        ViewGroup.LayoutParams params= new ViewGroup.LayoutParams(  MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mealingredient.setLayoutParams(params);
-        if(smallScreen) {
-            mealquantity=geteditwearos(act);
-            }
-        else
-            mealquantity=geteditview(act,new editclosefocus());
-        mealquantity.setMinEms(3);
-        if(searchStateValid) {
-            mealingredient.setText(savedMealIngredient);
-            mealquantity.setText(savedMealQuantity);
-        }
-        int pad= (int)(tk.glucodata.GlucoseCurve.metrics.density*5);
-             inglabel.setPadding(pad,0,pad,0);
-        qualabel.setPadding(pad,0,pad,0);
-
-//        mealquantity.setPadding(0,0,0,(int)metrics.density*8);
-//        mealquantity.setMinEms(2);
-//        mealingredient.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI| EditorInfo.IME_FLAG_NO_FULLSCREEN| EditorInfo.IME_ACTION_SEARCH);
-//        mealquantity.setOnEditorActionListener(actlist);
-      Log.i(LOG_ID,"systembarTop="+systembarTop);
-        meallayout=new Layout(act,
-(lay, w, h)->{
-            lay.setY(systembarTop*4/5);
-            lay.setX(systembarLeft);
-
-        return new int[] {w- systembarLeft- systembarRight,h};
-        },
-
-      //pick.setPadding(MainActivity.systembarLeft,MainActivity.systembarTop,0,MainActivity.systembarBottom);
-      //buttonlay.setPadding(0,MainActivity.systembarTop/2,MainActivity.systembarRight,MainActivity.systembarBottom);
-
-
-        new View[] {inglabel,mealingredient,qualabel,mealquantity});
-        act.addMyContentView(meallayout, new ViewGroup.LayoutParams(MATCH_PARENT,WRAP_CONTENT));
-            meallayout.setBackgroundColor(Applic.backgroundcolor);
-        }
-    else {
-        meallayout.setVisibility(VISIBLE);
-        meallayout.bringToFront();
-        }
-    
-
-    }
 
 private Layout getsearchlayout(MainActivity context) {
 if(isWearable)
@@ -1472,7 +1286,7 @@ else {
 
         ImageButton forward=new ImageButton(context);
 
-    forward.setContentDescription("Search forward");
+    forward.setContentDescription("Szukaj dalej");
 
         forward.setImageResource( R.drawable.baseline_navigate_next_white_36);
         forward.setOnClickListener(v-> {
@@ -1563,7 +1377,7 @@ public void onResume() {
     app.setmintime();
 
     if(!isWearable) {
-       if(SiBionics==1)  {
+       {
             if(MainActivity.tocalendarapp) {
                 final String name=Natives.getUsedSensorName();
                 if(name!=null) {
@@ -1600,14 +1414,6 @@ public void surfaceCreated(SurfaceHolder holder) {
 public void surfaceDestroyed(SurfaceHolder holder) {
    {if(doLog) {Log.i(LOG_ID,"surfaceDestroyed(SurfaceHolder holder)");};};
    super.surfaceDestroyed(holder);
-    }
-static public void    doabout(MainActivity activity) {
-if(!isWearable) {
-    String about=activity.getString(R.string.about)+"<p>Version Code: "+ BuildConfig.VERSION_CODE+"<br>Version Name: "+ 
-        BuildConfig.VERSION_NAME +"<br>"+Natives.getCPUarch()+"<br>Build time: "+ BuildTime.TIME +"</p>";
-    
-    help.help(about, activity,l->{});
-    }
     }
 void removeviews() {
         numberview.deleteviews();    

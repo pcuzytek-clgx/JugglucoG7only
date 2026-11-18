@@ -38,7 +38,6 @@ import static android.os.Build.VERSION.RELEASE;
 import static java.lang.System.exit;
 import static tk.glucodata.Applic.isWearable;
 import static tk.glucodata.Log.doLog;
-import static tk.glucodata.Natives.saveDevice;
 import static tk.glucodata.Natives.startmeals;
 import static tk.glucodata.Natives.startsensors;
 
@@ -92,9 +91,8 @@ static void makefilesfailed()   { throw new noAccessToFilesDirException("no acce
 
 static public boolean setlibrary(Applic con) {
 if(true) {
-   var loc=Locale.getDefault();
    String country=tk.glucodata.util.getCountry();
-   var locstr=loc.getLanguage();
+   var locstr=tk.glucodata.util.getlocale().getLanguage();
    Applic.curlang=locstr;
    File files=con.getFilesDir();
    String filespath=files.getAbsolutePath();
@@ -180,9 +178,7 @@ if(true) {
 
    if(doLog) {
           var build=new StringBuilder();
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-             build.append("\nVERSION.BASE_OS: "+ Build.VERSION.BASE_OS);
-             }
+          build.append("\nVERSION.BASE_OS: "+ Build.VERSION.BASE_OS);
           build.append("\nVERSION.RELEASE: "+ RELEASE+"\n"+
           "VERSION.SDK_INT: "+ Build.VERSION.SDK_INT+"\n"+
           "BRAND: "+ Build.BRAND+"\n"+
@@ -194,20 +190,17 @@ if(true) {
           "PRODUCT: "+ Build.PRODUCT+"\n"+
           "MODEL: "+ Build.MODEL);
 
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-             build.append("\nSUPPORTED_ABIS: ");
-             for(var ap: Build.SUPPORTED_ABIS) {
-                build.append(ap);
-                build.append(", ");
-                }
-          }
+          build.append("\nSUPPORTED_ABIS: ");
+          for(var ap: Build.SUPPORTED_ABIS) {
+             build.append(ap);
+             build.append(", ");
+             }
           build.append('\n');
           Natives.log(build.toString());
            final String version= BuildConfig.VERSION_CODE+" "+ BuildConfig.VERSION_NAME +" "+ tk.glucodata.BuildTime.TIME+"\n";
           if(doLog) {Log.i(LOG_ID,version+locstr+" "+country+" nativeDir="+nativedir);};
       }
 
-   saveDevice(Build.MANUFACTURER, Build.MODEL,Build.PRODUCT, Build.VERSION.SDK_INT);
 
    startsensors( );
    startmeals();

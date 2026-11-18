@@ -43,7 +43,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -98,7 +97,7 @@ RemoteGlucose(float gl,float notwidth,float xper,int whiteonblack,boolean giveti
       case 1: 
       case 2: glucosePaint.setColor(WHITE);break;
       default: {
-      var style = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? android.R.style.TextAppearance_Material_Notification_Title : android.R.style.TextAppearance_StatusBar_EventContent;
+      var style = android.R.style.TextAppearance_Material_Notification_Title;
       int[] attrs = {android.R.attr.textColor};
       try {
          @SuppressLint("ResourceType") TypedArray ta = Applic.app.obtainStyledAttributes(style, attrs);
